@@ -382,3 +382,441 @@ export const sampleProjectMetrics: ProjectMetrics = {
   stakeholderSatisfaction: 96,
   riskScore: 15
 };
+
+export interface TimelineProject {
+  id: string;
+  role: string;
+  company: string;
+  location: string;
+  period: string;
+  startDate: string;
+  endDate: string | null;
+  current: boolean;
+  industry: string;
+  projectType: string;
+  keyAchievements: string[];
+  budget?: string;
+  teamSize?: number;
+  technologies?: string[];
+}
+
+export interface CareerMetric {
+  id: string;
+  value: number | string;
+  label: string;
+  description: string;
+  icon: string;
+  suffix?: string;
+  prefix?: string;
+}
+
+export interface IndustryExperience {
+  id: string;
+  name: string;
+  years: number;
+  color: string;
+  projects: {
+    company: string;
+    role: string;
+    period: string;
+    keyAchievement: string;
+  }[];
+}
+
+export const timelineProjects: TimelineProject[] = [
+  {
+    id: '1',
+    role: 'Head of Projects & PMO Lead',
+    company: 'Novocycle Technology',
+    location: 'Dubai, UAE',
+    period: 'Apr 2024 - Present',
+    startDate: '2024-04',
+    endDate: null,
+    current: true,
+    industry: 'Engineering Tech',
+    projectType: 'PMO Leadership',
+    keyAchievements: [
+      'Created new PMO department from scratch',
+      'Managing EU-funded battery recycling research programmes',
+      'Leading work packages across multiple departments'
+    ],
+    teamSize: 15,
+    technologies: ['Jira', 'Confluence', 'Agile']
+  },
+  {
+    id: '2',
+    role: 'Senior Technical Project Manager',
+    company: 'Caravan and Motorhome Club',
+    location: 'London, UK',
+    period: 'Oct 2022 - Nov 2023',
+    startDate: '2022-10',
+    endDate: '2023-11',
+    current: false,
+    industry: 'Insurance',
+    projectType: 'Product Transformation',
+    keyAchievements: [
+      'Restructured mutual agreement product',
+      'Enhanced insurance product increasing profit margin',
+      'Reduced vendor selection time by 30%'
+    ],
+    technologies: ['Website Transformation', 'Underwriting Negotiation']
+  },
+  {
+    id: '3',
+    role: 'Programme Manager',
+    company: 'Simply Business',
+    location: 'London, UK',
+    period: 'Aug 2022 - Mar 2023',
+    startDate: '2022-08',
+    endDate: '2023-03',
+    current: false,
+    industry: 'Insurance',
+    projectType: 'FCA Compliance',
+    budget: '£1.2M',
+    teamSize: 34,
+    keyAchievements: [
+      'Led Global Hackathon - 10th Edition with 20 unique hacks',
+      'Delivered premier commercial insurance product (£1.2M budget, 34 specialists)',
+      'Managed FCA projects: Operation Resilience + Consumer Duty'
+    ],
+    technologies: ['Microservices', 'APIs', 'Agile', 'Jira']
+  },
+  {
+    id: '4',
+    role: 'Programme Manager & Digital Transformation Lead',
+    company: 'Mercer',
+    location: 'London, UK',
+    period: 'Oct 2021 - Jun 2022',
+    startDate: '2021-10',
+    endDate: '2022-06',
+    current: false,
+    industry: 'Insurance',
+    projectType: 'Digital Transformation',
+    keyAchievements: [
+      'Led global employee benefit platform rollouts',
+      'Established digital transformation framework',
+      'Delivered for Amazon, Estée Lauder, Marsh & McLennan'
+    ],
+    technologies: ['HR Systems', 'Data Analytics']
+  },
+  {
+    id: '5',
+    role: 'Senior International Project Manager',
+    company: '6Connex',
+    location: 'Remote/Nevada, US',
+    period: 'Jul 2020 - Mar 2022',
+    startDate: '2020-07',
+    endDate: '2022-03',
+    current: false,
+    industry: 'Events Tech',
+    projectType: 'Global Delivery',
+    keyAchievements: [
+      'Orchestrated virtual event transformation during COVID-19',
+      'Delivered events across 6 time zones simultaneously',
+      'Established change management framework with robust governance'
+    ],
+    technologies: ['Virtual Event Platform', 'Agile', 'Global Coordination']
+  },
+  {
+    id: '6',
+    role: 'Project Delivery Manager',
+    company: 'Best Future Education Centre',
+    location: 'Nigeria',
+    period: 'Mar 2020 - Dec 2020',
+    startDate: '2020-03',
+    endDate: '2020-12',
+    current: false,
+    industry: 'Education',
+    projectType: 'Digital Transformation',
+    keyAchievements: [
+      'Led COVID-19 strategic response',
+      'Implemented software, training, and data migration',
+      'Ensured uninterrupted education during lockdown'
+    ]
+  },
+  {
+    id: '7',
+    role: 'Project Manager',
+    company: 'GSMA',
+    location: 'London, UK',
+    period: 'Jan 2019 - Mar 2020',
+    startDate: '2019-01',
+    endDate: '2020-03',
+    current: false,
+    industry: 'Telecoms',
+    projectType: 'Sustainability',
+    keyAchievements: [
+      'Delivered Energy Consumption Benchmark Tool',
+      'Achieved 35% energy reduction for major operators',
+      'Worked with Vodafone, Verizon, China Telecom'
+    ],
+    technologies: ['Sustainability Analytics', 'UN SDG Alignment']
+  },
+  {
+    id: '8',
+    role: 'Cryptocurrency & Blockchain Journalist',
+    company: 'Finimize',
+    location: 'London, UK',
+    period: 'Jun 2018 - Jan 2020',
+    startDate: '2018-06',
+    endDate: '2020-01',
+    current: false,
+    industry: 'Blockchain',
+    projectType: 'Content Creation',
+    keyAchievements: [
+      'Created insightful crypto and blockchain content',
+      'Contributed to company growth and reputation',
+      'Established voice in blockchain industry'
+    ]
+  },
+  {
+    id: '9',
+    role: 'Implementation Manager',
+    company: 'Jardine Lloyd Thompson',
+    location: 'London, UK',
+    period: 'Jan 2017 - Jan 2019',
+    startDate: '2017-01',
+    endDate: '2019-01',
+    current: false,
+    industry: 'Insurance',
+    projectType: 'SaaS Implementation',
+    keyAchievements: [
+      'Regional employee benefits platform for Hitachi and TfL',
+      'Optimised renewal process improving efficiency by 34%',
+      'Identified cost-saving opportunities reducing project time'
+    ],
+    technologies: ['SaaS Platform', 'Employee Benefits Software']
+  },
+  {
+    id: '10',
+    role: 'Senior Implementation Consultant',
+    company: 'Dictate.IT',
+    location: 'London, UK',
+    period: 'Sep 2014 - May 2016',
+    startDate: '2014-09',
+    endDate: '2016-05',
+    current: false,
+    industry: 'Healthcare',
+    projectType: 'Software Implementation',
+    keyAchievements: [
+      'Deployed medical transcription software using SDN technology',
+      'Collaborated with C-suite stakeholders and medical professionals',
+      'Delivered projects at St George, Royal Free, Nuffield Health'
+    ],
+    technologies: ['SDN Technology', 'Medical Software']
+  },
+  {
+    id: '11',
+    role: 'Technical Project Manager',
+    company: 'BSS Industrial',
+    location: 'London, UK',
+    period: 'Nov 2013 - Aug 2014',
+    startDate: '2013-11',
+    endDate: '2014-08',
+    current: false,
+    industry: 'Engineering',
+    projectType: 'Construction Management',
+    keyAchievements: [
+      'Managed engineering and construction projects',
+      'Coordinated technical teams and stakeholders'
+    ]
+  },
+  {
+    id: '12',
+    role: 'Project Engineer',
+    company: 'Alfa Laval',
+    location: 'London, UK',
+    period: 'Sep 2008 - Nov 2013',
+    startDate: '2008-09',
+    endDate: '2013-11',
+    current: false,
+    industry: 'Engineering',
+    projectType: 'Engineering Projects',
+    keyAchievements: [
+      'Delivered engineering and construction projects',
+      'Started professional project management career'
+    ]
+  }
+];
+
+export const careerMetrics: CareerMetric[] = [
+  {
+    id: '1',
+    value: 17,
+    label: 'Years Experience',
+    description: 'Managing complex projects internationally',
+    icon: 'Calendar',
+    suffix: '+'
+  },
+  {
+    id: '2',
+    value: 7,
+    label: 'Industries',
+    description: 'Insurance, Engineering, Healthcare, Events, Telecoms, Education, Blockchain',
+    icon: 'Briefcase',
+    suffix: '+'
+  },
+  {
+    id: '3',
+    value: 95,
+    label: 'On-Time Delivery',
+    description: 'Consistent track record across all projects',
+    icon: 'Target',
+    suffix: '%'
+  },
+  {
+    id: '4',
+    value: 30,
+    label: 'Efficiency Gains',
+    description: 'Average improvement across programmes',
+    icon: 'TrendingUp',
+    suffix: '%',
+    prefix: '+'
+  },
+  {
+    id: '5',
+    value: '£1.2M',
+    label: 'Largest Programme',
+    description: 'Single project budget managed',
+    icon: 'DollarSign'
+  },
+  {
+    id: '6',
+    value: 34,
+    label: 'Team Members',
+    description: 'Led on single project',
+    icon: 'Users',
+    suffix: '+'
+  }
+];
+
+export const industryExperience: IndustryExperience[] = [
+  {
+    id: '1',
+    name: 'Insurance Tech',
+    years: 6,
+    color: 'hsl(190, 85%, 55%)',
+    projects: [
+      {
+        company: 'Simply Business',
+        role: 'Programme Manager',
+        period: '2022-2023',
+        keyAchievement: '£1.2M FCA-regulated product delivery'
+      },
+      {
+        company: 'Caravan & Motorhome Club',
+        role: 'Senior Technical PM',
+        period: '2022-2023',
+        keyAchievement: 'Product restructure improving profit margin'
+      },
+      {
+        company: 'Mercer',
+        role: 'Programme Manager',
+        period: '2021-2022',
+        keyAchievement: 'Global benefit platform for Amazon, Estée Lauder'
+      },
+      {
+        company: 'JLT',
+        role: 'Implementation Manager',
+        period: '2017-2019',
+        keyAchievement: '34% efficiency improvement in renewal process'
+      }
+    ]
+  },
+  {
+    id: '2',
+    name: 'Blockchain/Web3',
+    years: 8,
+    color: 'hsl(270, 70%, 60%)',
+    projects: [
+      {
+        company: 'Finimize',
+        role: 'Crypto Journalist',
+        period: '2018-2020',
+        keyAchievement: 'Established voice in blockchain industry'
+      }
+    ]
+  },
+  {
+    id: '3',
+    name: 'Engineering Tech',
+    years: 5,
+    color: 'hsl(220, 90%, 60%)',
+    projects: [
+      {
+        company: 'Novocycle Technology',
+        role: 'Head of Projects & PMO',
+        period: '2024-Present',
+        keyAchievement: 'Created PMO department from scratch'
+      },
+      {
+        company: 'BSS Industrial',
+        role: 'Technical PM',
+        period: '2013-2014',
+        keyAchievement: 'Engineering and construction delivery'
+      },
+      {
+        company: 'Alfa Laval',
+        role: 'Project Engineer',
+        period: '2008-2013',
+        keyAchievement: 'Started PM career journey'
+      }
+    ]
+  },
+  {
+    id: '4',
+    name: 'Healthcare Tech',
+    years: 2,
+    color: 'hsl(140, 70%, 55%)',
+    projects: [
+      {
+        company: 'Dictate.IT',
+        role: 'Senior Implementation Consultant',
+        period: '2014-2016',
+        keyAchievement: 'Medical transcription software deployment using SDN'
+      }
+    ]
+  },
+  {
+    id: '5',
+    name: 'Events Management Tech',
+    years: 2,
+    color: 'hsl(310, 75%, 60%)',
+    projects: [
+      {
+        company: '6Connex',
+        role: 'Senior International PM',
+        period: '2020-2022',
+        keyAchievement: 'Global events across 6 time zones'
+      }
+    ]
+  },
+  {
+    id: '6',
+    name: 'Telecommunications',
+    years: 2,
+    color: 'hsl(40, 85%, 55%)',
+    projects: [
+      {
+        company: 'GSMA',
+        role: 'Project Manager',
+        period: '2019-2020',
+        keyAchievement: '35% energy reduction for major operators'
+      }
+    ]
+  },
+  {
+    id: '7',
+    name: 'Education Tech',
+    years: 1,
+    color: 'hsl(200, 80%, 60%)',
+    projects: [
+      {
+        company: 'Best Future Education Centre',
+        role: 'Project Delivery Manager',
+        period: '2020',
+        keyAchievement: 'Digital transformation during COVID-19'
+      }
+    ]
+  }
+];
