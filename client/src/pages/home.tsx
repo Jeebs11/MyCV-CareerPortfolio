@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { experiences, skills, keyAchievements } from '@shared/schema';
+import { experiences, skills, keyAchievements, caseStudies, detailedCertifications, blogPosts, sampleProjectMetrics } from '@shared/schema';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import ChatBot from '@/components/ChatBot';
 import {
   TrendingUp,
@@ -19,7 +20,18 @@ import {
   Code,
   Users,
   Target,
-  ChevronDown
+  ChevronDown,
+  CheckCircle2,
+  Clock,
+  DollarSign,
+  BarChart3,
+  ShieldCheck,
+  Smile,
+  AlertCircle,
+  ExternalLink,
+  Calendar,
+  BookOpen,
+  Lightbulb
 } from 'lucide-react';
 
 const iconMap: Record<string, any> = {
@@ -54,9 +66,15 @@ export default function Home() {
       
       <CareerTimeline activeRegion={activeRegion} setActiveRegion={setActiveRegion} />
       
+      <CaseStudiesSection />
+      
+      <ProjectDashboard />
+      
       <GeographicMap activeRegion={activeRegion} setActiveRegion={setActiveRegion} />
       
-      <SkillsShowcase />
+      <CertificationsWall />
+      
+      <ThoughtLeadership />
       
       <ContactSection />
       
@@ -96,13 +114,6 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
           
           <div className="hidden md:flex items-center gap-8">
             <button 
-              onClick={() => scrollToSection('about')}
-              className="text-sm text-white/70 hover:text-white transition-colors"
-              data-testid="link-about"
-            >
-              About
-            </button>
-            <button 
               onClick={() => scrollToSection('experience')}
               className="text-sm text-white/70 hover:text-white transition-colors"
               data-testid="link-experience"
@@ -110,11 +121,25 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
               Experience
             </button>
             <button 
-              onClick={() => scrollToSection('skills')}
+              onClick={() => scrollToSection('case-studies')}
               className="text-sm text-white/70 hover:text-white transition-colors"
-              data-testid="link-skills"
+              data-testid="link-case-studies"
             >
-              Skills
+              Case Studies
+            </button>
+            <button 
+              onClick={() => scrollToSection('certifications')}
+              className="text-sm text-white/70 hover:text-white transition-colors"
+              data-testid="link-certifications"
+            >
+              Certifications
+            </button>
+            <button 
+              onClick={() => scrollToSection('insights')}
+              className="text-sm text-white/70 hover:text-white transition-colors"
+              data-testid="link-insights"
+            >
+              Insights
             </button>
             <button 
               onClick={() => scrollToSection('contact')}
@@ -520,53 +545,359 @@ function GeographicMap({ activeRegion, setActiveRegion }: { activeRegion: string
   );
 }
 
-function SkillsShowcase() {
-  const categories = {
-    methodology: skills.filter(s => s.category === 'methodology'),
-    certification: skills.filter(s => s.category === 'certification'),
-    technical: skills.filter(s => s.category === 'technical'),
-    domain: skills.filter(s => s.category === 'domain')
-  };
+function CaseStudiesSection() {
+  const [selectedCase, setSelectedCase] = useState<string | null>(null);
 
   return (
-    <section id="skills" className="relative py-20" data-testid="section-skills">
+    <section id="case-studies" className="relative py-20" data-testid="section-case-studies">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="font-display text-4xl sm:text-5xl font-bold text-white mb-4">
-            Skills & Expertise
+            Project Case Studies
           </h2>
           <p className="text-lg text-white/60 max-w-2xl mx-auto">
-            Certified methodologies and proven technical capabilities
+            Deep-dive into complex programmes delivered with measurable impact
           </p>
         </div>
-        
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <SkillCategory title="Methodologies" skills={categories.methodology} color="hsl(190,85%,55%)" />
-          <SkillCategory title="Certifications" skills={categories.certification} color="hsl(220,90%,60%)" />
-          <SkillCategory title="Technical" skills={categories.technical} color="hsl(145,70%,50%)" />
-          <SkillCategory title="Domain Expertise" skills={categories.domain} color="hsl(25,85%,60%)" />
+
+        <div className="space-y-8">
+          {caseStudies.map((study, index) => (
+            <Card
+              key={study.id}
+              className="bg-white/5 backdrop-blur-xl border-white/10 p-6 sm:p-8 hover-elevate transition-all duration-300"
+              data-testid={`card-case-study-${index}`}
+            >
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                  <div className="flex-1">
+                    <h3 className="font-display text-2xl font-bold text-white mb-2">{study.title}</h3>
+                    <div className="flex flex-wrap items-center gap-3 text-sm text-white/60">
+                      <span className="flex items-center gap-1">
+                        <Briefcase className="w-4 h-4" />
+                        {study.client}
+                      </span>
+                      <span>•</span>
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-4 h-4" />
+                        {study.duration}
+                      </span>
+                      <span>•</span>
+                      <span className="flex items-center gap-1">
+                        <DollarSign className="w-4 h-4" />
+                        {study.value}
+                      </span>
+                    </div>
+                  </div>
+                  <Badge className="bg-[hsl(190,85%,55%)]/20 border-[hsl(190,85%,55%)]/30 text-[hsl(190,85%,70%)] backdrop-blur-md">
+                    {study.industry}
+                  </Badge>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold text-white mb-2 flex items-center gap-2">
+                      <AlertCircle className="w-5 h-5 text-[hsl(25,85%,60%)]" />
+                      The Challenge
+                    </h4>
+                    <p className="text-white/70 text-sm leading-relaxed">{study.challenge}</p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold text-white mb-2 flex items-center gap-2">
+                      <Target className="w-5 h-5 text-[hsl(220,90%,60%)]" />
+                      Approach
+                    </h4>
+                    <ul className="space-y-2">
+                      {study.approach.map((item, idx) => (
+                        <li key={idx} className="flex items-start gap-2 text-sm text-white/70">
+                          <CheckCircle2 className="w-4 h-4 text-[hsl(190,85%,55%)] mt-0.5 flex-shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold text-white mb-3 flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-[hsl(145,70%,50%)]" />
+                      Outcomes & Impact
+                    </h4>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {study.outcomes.map((outcome, idx) => (
+                        <div key={idx} className="bg-white/5 border border-white/10 rounded-md p-4 text-center">
+                          <div className="font-mono text-2xl font-bold text-[hsl(190,85%,55%)] mb-1">
+                            {outcome.metric}
+                          </div>
+                          <div className="text-xs text-white/60">{outcome.description}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {study.testimonial && (
+                    <div className="bg-white/5 border-l-4 border-[hsl(190,85%,55%)] rounded-md p-4 mt-4">
+                      <p className="text-white/80 italic text-sm mb-2">"{study.testimonial.quote}"</p>
+                      <p className="text-white/50 text-xs">
+                        — {study.testimonial.author}, {study.testimonial.role}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </Card>
+          ))}
         </div>
       </div>
     </section>
   );
 }
 
-function SkillCategory({ title, skills, color }: { title: string; skills: any[]; color: string }) {
+function ProjectDashboard() {
   return (
-    <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6 hover-elevate" data-testid={`card-skills-${title.toLowerCase().replace(' ', '-')}`}>
-      <h3 className="font-display text-xl font-bold text-white mb-4">{title}</h3>
-      <div className="space-y-2">
-        {skills.map((skill, index) => (
-          <div
-            key={index}
-            className="flex items-center gap-2"
-          >
-            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
-            <span className="text-white/80 text-sm">{skill.name}</span>
-          </div>
-        ))}
+    <section id="dashboard" className="relative py-20" data-testid="section-dashboard">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <h2 className="font-display text-4xl sm:text-5xl font-bold text-white mb-4">
+            Live Project Metrics
+          </h2>
+          <p className="text-lg text-white/60 max-w-2xl mx-auto">
+            Real-time performance indicators demonstrating PM expertise
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6 hover-elevate" data-testid="card-budget">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display text-lg font-semibold text-white">Budget Utilization</h3>
+              <DollarSign className="w-8 h-8 text-[hsl(145,70%,50%)]" />
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-end gap-2">
+                <span className="text-4xl font-bold text-white">{sampleProjectMetrics.budgetUtilization}%</span>
+                <span className="text-sm text-white/60 mb-1">of allocated budget</span>
+              </div>
+              <Progress value={sampleProjectMetrics.budgetUtilization} className="h-2" />
+              <p className="text-xs text-white/50">On track with planned spend</p>
+            </div>
+          </Card>
+
+          <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6 hover-elevate" data-testid="card-schedule">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display text-lg font-semibold text-white">Schedule Performance</h3>
+              <Clock className="w-8 h-8 text-[hsl(220,90%,60%)]" />
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-end gap-2">
+                <span className="text-4xl font-bold text-white">{sampleProjectMetrics.schedulePerformance}%</span>
+                <span className="text-sm text-white/60 mb-1">on schedule</span>
+              </div>
+              <Progress value={sampleProjectMetrics.schedulePerformance} className="h-2" />
+              <p className="text-xs text-white/50">Ahead of timeline by 2 weeks</p>
+            </div>
+          </Card>
+
+          <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6 hover-elevate" data-testid="card-risk">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display text-lg font-semibold text-white">Risk Score</h3>
+              <ShieldCheck className="w-8 h-8 text-[hsl(145,70%,50%)]" />
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-end gap-2">
+                <span className="text-4xl font-bold text-white">{sampleProjectMetrics.riskScore}</span>
+                <span className="text-sm text-white/60 mb-1">/ 100 (Low)</span>
+              </div>
+              <Progress value={100 - sampleProjectMetrics.riskScore} className="h-2" />
+              <p className="text-xs text-white/50">All major risks mitigated</p>
+            </div>
+          </Card>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6 hover-elevate" data-testid="card-team-satisfaction">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display text-lg font-semibold text-white">Team Satisfaction</h3>
+              <Smile className="w-8 h-8 text-[hsl(25,85%,60%)]" />
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex-1">
+                <div className="text-4xl font-bold text-white mb-2">{sampleProjectMetrics.teamSatisfaction}%</div>
+                <Progress value={sampleProjectMetrics.teamSatisfaction} className="h-2 mb-2" />
+                <p className="text-xs text-white/50">Based on monthly pulse surveys</p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6 hover-elevate" data-testid="card-stakeholder">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display text-lg font-semibold text-white">Stakeholder Satisfaction</h3>
+              <BarChart3 className="w-8 h-8 text-[hsl(190,85%,55%)]" />
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex-1">
+                <div className="text-4xl font-bold text-white mb-2">{sampleProjectMetrics.stakeholderSatisfaction}%</div>
+                <Progress value={sampleProjectMetrics.stakeholderSatisfaction} className="h-2 mb-2" />
+                <p className="text-xs text-white/50">Consistent positive feedback</p>
+              </div>
+            </div>
+          </Card>
+        </div>
       </div>
-    </Card>
+    </section>
+  );
+}
+
+function CertificationsWall() {
+  const [selectedCert, setSelectedCert] = useState<string | null>(null);
+
+  return (
+    <section id="certifications" className="relative py-20" data-testid="section-certifications">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <h2 className="font-display text-4xl sm:text-5xl font-bold text-white mb-4">
+            Certifications & Credentials
+          </h2>
+          <p className="text-lg text-white/60 max-w-2xl mx-auto">
+            Industry-recognized qualifications validating expertise
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {detailedCertifications.map((cert, index) => (
+            <Card
+              key={cert.id}
+              className="bg-white/5 backdrop-blur-xl border-white/10 p-6 hover-elevate transition-all duration-300 cursor-pointer"
+              onClick={() => setSelectedCert(selectedCert === cert.id ? null : cert.id)}
+              data-testid={`card-cert-${index}`}
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-16 h-16 rounded-md bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center flex-shrink-0">
+                  <Award className="w-8 h-8 text-white" />
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-display text-xl font-bold text-white mb-1">{cert.name}</h3>
+                  <p className="text-[hsl(190,85%,55%)] text-sm mb-2">{cert.issuer}</p>
+                  
+                  <div className="flex items-center gap-2 text-xs text-white/50 mb-3">
+                    <Calendar className="w-3 h-3" />
+                    <span>Obtained {cert.dateObtained}</span>
+                    {cert.verificationUrl && (
+                      <>
+                        <span>•</span>
+                        <a 
+                          href={cert.verificationUrl}
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center gap-1 text-[hsl(190,85%,55%)] hover:text-[hsl(190,85%,65%)]"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          Verify
+                        </a>
+                      </>
+                    )}
+                  </div>
+
+                  {selectedCert === cert.id && (
+                    <div className="space-y-3 mt-4 pt-4 border-t border-white/10">
+                      <p className="text-sm text-white/70">{cert.description}</p>
+                      
+                      <div>
+                        <p className="text-xs font-semibold text-white mb-2">Skills Validated:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {cert.skills.map((skill, idx) => (
+                            <Badge 
+                              key={idx}
+                              className="bg-white/10 border-white/20 text-white/80 text-xs"
+                            >
+                              {skill}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ThoughtLeadership() {
+  return (
+    <section id="insights" className="relative py-20" data-testid="section-insights">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <h2 className="font-display text-4xl sm:text-5xl font-bold text-white mb-4">
+            Insights & Thought Leadership
+          </h2>
+          <p className="text-lg text-white/60 max-w-2xl mx-auto">
+            Sharing knowledge from 17+ years of international project delivery
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {blogPosts.map((post, index) => (
+            <Card
+              key={post.id}
+              className="bg-white/5 backdrop-blur-xl border-white/10 p-6 hover-elevate transition-all duration-300"
+              data-testid={`card-blog-${index}`}
+            >
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-12 h-12 rounded-md bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center flex-shrink-0">
+                  <BookOpen className="w-6 h-6 text-white" />
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  <Badge className="bg-[hsl(220,90%,60%)]/20 border-[hsl(220,90%,60%)]/30 text-[hsl(220,90%,70%)] backdrop-blur-md text-xs mb-2">
+                    {post.category}
+                  </Badge>
+                  <h3 className="font-display text-xl font-bold text-white mb-2">{post.title}</h3>
+                </div>
+              </div>
+
+              <p className="text-white/70 text-sm mb-4 leading-relaxed">{post.excerpt}</p>
+
+              <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                <div className="flex items-center gap-4 text-xs text-white/50">
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    {post.readTime} read
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-3 h-3" />
+                    {post.publishDate}
+                  </span>
+                </div>
+                
+                <Button 
+                  size="sm"
+                  variant="ghost"
+                  className="text-[hsl(190,85%,55%)] hover:text-[hsl(190,85%,65%)]"
+                  data-testid={`button-read-more-${index}`}
+                >
+                  Read More
+                  <ArrowRight className="ml-1 w-3 h-3" />
+                </Button>
+              </div>
+
+              <div className="flex flex-wrap gap-2 mt-4">
+                {post.tags.slice(0, 3).map((tag, idx) => (
+                  <Badge 
+                    key={idx}
+                    className="bg-white/5 border-white/10 text-white/60 text-xs"
+                  >
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
