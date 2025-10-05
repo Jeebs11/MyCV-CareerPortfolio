@@ -4,6 +4,18 @@
 
 This is a personal portfolio website for Mujeeb Lawal, a Senior Project Manager with 17+ years of international experience. The site showcases professional experience, skills, achievements, and career highlights through an interactive, dashboard-style interface inspired by Figma's aesthetic. Built with React, TypeScript, and modern web technologies, the portfolio emphasizes visual storytelling through metrics, geographic data visualization, and glassmorphic design elements.
 
+## Recent Updates (October 2024)
+
+Added four major sections to enhance the portfolio's impact and demonstrate PM expertise:
+
+1. **Interactive Project Case Studies** - Deep-dive into 3 major projects (Simply Business £1.2M programme, 6Connex global delivery, GSMA UN sustainability initiative) with detailed challenge/approach/outcomes structure and measurable impact metrics
+
+2. **Live Project Dashboard** - Real-time KPI visualization displaying budget utilization, schedule performance, risk scores, team satisfaction, and stakeholder satisfaction with progress indicators
+
+3. **Certifications Wall of Fame** - Interactive expandable cards showcasing PRINCE2, Scrum Master, Six Sigma, and Agile certifications with detailed descriptions, validation links, and skills mapping
+
+4. **Thought Leadership Section** - Blog-style insights covering PMO leadership, compliance navigation, AI integration, and global delivery methodologies
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
