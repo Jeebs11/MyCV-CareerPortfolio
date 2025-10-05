@@ -120,10 +120,17 @@ export default function ChatBot() {
   return (
     <>
       {/* Floating Chat Button */}
-      <Button
+      <button
         onClick={() => setIsOpen(!isOpen)}
-        size="icon"
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-2xl bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] border border-white/20 hover:scale-110 transition-all duration-300 z-50"
+        className="rounded-full shadow-2xl bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] border border-white/20 hover:scale-110 transition-all duration-300 flex items-center justify-center"
+        style={{
+          position: 'fixed',
+          bottom: '1.5rem',
+          right: '1.5rem',
+          width: '3.5rem',
+          height: '3.5rem',
+          zIndex: 9999
+        }}
         data-testid="button-chat-toggle"
       >
         {isOpen ? (
@@ -131,7 +138,7 @@ export default function ChatBot() {
         ) : (
           <MessageCircle className="h-6 w-6 text-white" />
         )}
-      </Button>
+      </button>
 
       {/* Chat Window */}
       {isOpen && (
