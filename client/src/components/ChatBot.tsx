@@ -136,7 +136,7 @@ export default function ChatBot() {
       {/* Chat Window */}
       {isOpen && (
         <Card 
-          className="fixed bottom-24 right-6 w-96 h-[600px] flex flex-col shadow-2xl border-white/20 bg-[hsl(270,8%,12%)]/95 backdrop-blur-xl z-50 overflow-hidden"
+          className="fixed top-0 right-0 bottom-0 w-96 flex flex-col shadow-2xl border-white/20 bg-[hsl(270,8%,12%)]/95 backdrop-blur-xl z-50 overflow-hidden"
           data-testid="chat-window"
         >
           {/* Header */}
