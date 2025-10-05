@@ -3,6 +3,7 @@ import { experiences, skills, keyAchievements } from '@shared/schema';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import ChatBot from '@/components/ChatBot';
 import {
   TrendingUp,
   Award,
@@ -60,6 +61,8 @@ export default function Home() {
       <ContactSection />
       
       <Footer />
+      
+      <ChatBot />
     </div>
   );
 }
