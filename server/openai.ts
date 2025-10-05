@@ -1,7 +1,6 @@
 import OpenAI from "openai";
 import { experiences, skills, keyAchievements } from "@shared/schema";
 
-// the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // Create a knowledge base about Mujeeb's experience
@@ -62,7 +61,7 @@ When answering questions:
 export async function chatWithAssistant(message: string): Promise<string> {
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-5",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
@@ -86,7 +85,7 @@ export async function chatWithAssistant(message: string): Promise<string> {
 export async function chatWithAssistantStream(message: string) {
   try {
     const stream = await openai.chat.completions.create({
-      model: "gpt-5",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
