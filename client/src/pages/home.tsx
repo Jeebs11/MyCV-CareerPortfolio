@@ -162,20 +162,27 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
 }
 
 function VerticalCareerTimeline() {
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedProject, setSelectedProject] = useState<typeof timelineProjects[0] | null>(null);
-  const visibleCount = 3;
-  const maxIndex = Math.max(0, timelineProjects.length - visibleCount);
+  const desktopScrollRef = useRef<HTMLDivElement>(null);
+  const mobileScrollRef = useRef<HTMLDivElement>(null);
+  const [showTopFade, setShowTopFade] = useState(false);
+  const [showBottomFade, setShowBottomFade] = useState(true);
+  const [showLeftFade, setShowLeftFade] = useState(false);
+  const [showRightFade, setShowRightFade] = useState(true);
 
-  const scrollUp = () => {
-    setCurrentIndex(prev => Math.max(0, prev - 1));
+  const handleDesktopScroll = () => {
+    if (!desktopScrollRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = desktopScrollRef.current;
+    setShowTopFade(scrollTop > 20);
+    setShowBottomFade(scrollTop < scrollHeight - clientHeight - 20);
   };
 
-  const scrollDown = () => {
-    setCurrentIndex(prev => Math.min(maxIndex, prev + 1));
+  const handleMobileScroll = () => {
+    if (!mobileScrollRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = mobileScrollRef.current;
+    setShowLeftFade(scrollLeft > 20);
+    setShowRightFade(scrollLeft < scrollWidth - clientWidth - 20);
   };
-
-  const visibleProjects = timelineProjects.slice(currentIndex, currentIndex + visibleCount);
 
   return (
     <div className="w-full">
@@ -192,10 +199,24 @@ function VerticalCareerTimeline() {
       </div>
 
       <div className="relative">
-        {/* Desktop: Vertical carousel */}
-        <div className="hidden lg:block">
-          <div className="space-y-3">
-            {visibleProjects.map((project) => (
+        {/* Desktop: Vertical scrollable carousel */}
+        <div className="hidden lg:block relative">
+          {/* Top fade overlay */}
+          {showTopFade && (
+            <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-[hsl(270,8%,12%)] to-transparent pointer-events-none z-10" />
+          )}
+          
+          <div 
+            ref={desktopScrollRef}
+            onScroll={handleDesktopScroll}
+            className="max-h-[500px] overflow-y-auto space-y-3 py-2 scrollbar-hide"
+            style={{ 
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none'
+            }}
+            data-testid="carousel-desktop"
+          >
+            {timelineProjects.map((project) => (
               <Card
                 key={project.id}
                 className="bg-white/5 backdrop-blur-xl border-white/10 p-4 hover-elevate cursor-pointer transition-all"
@@ -242,78 +263,81 @@ function VerticalCareerTimeline() {
             ))}
           </div>
 
-          {/* Navigation arrows */}
-          <div className="flex justify-center gap-2 mt-4">
-            <Button
-              size="icon"
-              variant="outline"
-              className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10"
-              onClick={scrollUp}
-              disabled={currentIndex === 0}
-              data-testid="button-career-scroll-up"
-            >
-              <ChevronUp className="w-4 h-4" />
-            </Button>
-            <Button
-              size="icon"
-              variant="outline"
-              className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10"
-              onClick={scrollDown}
-              disabled={currentIndex >= maxIndex}
-              data-testid="button-career-scroll-down"
-            >
-              <ChevronDown className="w-4 h-4" />
-            </Button>
-          </div>
+          {/* Bottom fade overlay */}
+          {showBottomFade && (
+            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[hsl(270,8%,12%)] to-transparent pointer-events-none z-10" />
+          )}
         </div>
 
-        {/* Mobile: Simple stacked list (3 most recent) */}
-        <div className="lg:hidden space-y-3">
-          {timelineProjects.slice(0, 3).map((project) => (
-            <Card
-              key={project.id}
-              className="bg-white/5 backdrop-blur-xl border-white/10 p-4 hover-elevate cursor-pointer"
-              onClick={() => setSelectedProject(project)}
-              data-testid={`card-career-mobile-${project.id}`}
-            >
-              <div className="space-y-2">
-                <div className="flex items-start justify-between gap-2">
-                  <Badge 
-                    className="text-xs bg-gradient-to-r from-[hsl(190,85%,55%)]/20 to-[hsl(220,90%,60%)]/20 border-[hsl(190,85%,55%)]/30 text-white"
-                    data-testid={`badge-career-mobile-period-${project.id}`}
-                  >
-                    {project.period}
-                  </Badge>
-                  {project.current && (
-                    <Badge className="text-xs bg-green-500/20 border-green-500/30 text-green-300" data-testid={`badge-career-mobile-current-${project.id}`}>
-                      Current
+        {/* Mobile: Horizontal scrollable carousel */}
+        <div className="lg:hidden relative">
+          {/* Left fade overlay */}
+          {showLeftFade && (
+            <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[hsl(270,8%,12%)] to-transparent pointer-events-none z-10" />
+          )}
+
+          <div 
+            ref={mobileScrollRef}
+            onScroll={handleMobileScroll}
+            className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide touch-pan-x"
+            style={{ 
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              WebkitOverflowScrolling: 'touch'
+            }}
+            data-testid="carousel-mobile"
+          >
+            {timelineProjects.map((project) => (
+              <Card
+                key={project.id}
+                className="bg-white/5 backdrop-blur-xl border-white/10 p-4 hover-elevate cursor-pointer flex-shrink-0 w-[280px] snap-center"
+                onClick={() => setSelectedProject(project)}
+                data-testid={`card-career-mobile-${project.id}`}
+              >
+                <div className="space-y-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <Badge 
+                      className="text-xs bg-gradient-to-r from-[hsl(190,85%,55%)]/20 to-[hsl(220,90%,60%)]/20 border-[hsl(190,85%,55%)]/30 text-white"
+                      data-testid={`badge-career-mobile-period-${project.id}`}
+                    >
+                      {project.period}
                     </Badge>
-                  )}
-                </div>
+                    {project.current && (
+                      <Badge className="text-xs bg-green-500/20 border-green-500/30 text-green-300" data-testid={`badge-career-mobile-current-${project.id}`}>
+                        Current
+                      </Badge>
+                    )}
+                  </div>
 
-                <div>
-                  <h4 className="font-semibold text-white text-sm leading-tight mb-1" data-testid={`text-career-mobile-role-${project.id}`}>
-                    {project.role}
-                  </h4>
-                  <p className="text-[hsl(190,85%,55%)] text-sm font-medium" data-testid={`text-career-mobile-company-${project.id}`}>
-                    {project.company}
-                  </p>
-                  <p className="text-xs text-white/60" data-testid={`text-career-mobile-location-${project.id}`}>
-                    {project.location}
-                  </p>
-                </div>
+                  <div>
+                    <h4 className="font-semibold text-white text-sm leading-tight mb-1" data-testid={`text-career-mobile-role-${project.id}`}>
+                      {project.role}
+                    </h4>
+                    <p className="text-[hsl(190,85%,55%)] text-sm font-medium" data-testid={`text-career-mobile-company-${project.id}`}>
+                      {project.company}
+                    </p>
+                    <p className="text-xs text-white/60" data-testid={`text-career-mobile-location-${project.id}`}>
+                      {project.location}
+                    </p>
+                  </div>
 
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <Badge variant="outline" className="text-xs border-white/20 text-white/70" data-testid={`badge-career-mobile-industry-${project.id}`}>
-                    {project.industry}
-                  </Badge>
-                  <Badge variant="outline" className="text-xs border-white/20 text-white/70" data-testid={`badge-career-mobile-type-${project.id}`}>
-                    {project.projectType}
-                  </Badge>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <Badge variant="outline" className="text-xs border-white/20 text-white/70" data-testid={`badge-career-mobile-industry-${project.id}`}>
+                      {project.industry}
+                    </Badge>
+                    <Badge variant="outline" className="text-xs border-white/20 text-white/70" data-testid={`badge-career-mobile-type-${project.id}`}>
+                      {project.projectType}
+                    </Badge>
+                  </div>
                 </div>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            ))}
+          </div>
+
+          {/* Right fade overlay */}
+          {showRightFade && (
+            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[hsl(270,8%,12%)] to-transparent pointer-events-none z-10" />
+          )}
         </div>
       </div>
 
