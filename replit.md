@@ -6,11 +6,15 @@ This is a personal portfolio website for Mujeeb Lawal, a Senior Project Manager 
 
 ## Recent Updates (October 2024)
 
-Added four major sections to enhance the portfolio's impact and demonstrate PM expertise:
+**Latest Changes (October 6, 2024):**
+- Streamlined portfolio by removing redundant sections (Impact Metrics, Case Studies, Project Dashboard)
+- Updated navigation to focus on core sections: Journey, Industries, Contact
+- Enhanced Interactive Timeline with triple scroll affordance: peek effect, fade gradient overlay, and accessible arrow navigation
 
-1. **Interactive Project Case Studies** - Deep-dive into 3 major projects (Simply Business £1.2M programme, 6Connex global delivery, GSMA UN sustainability initiative) with detailed challenge/approach/outcomes structure and measurable impact metrics
+**Key Features:**
+1. **Interactive Timeline** - Horizontal scrolling journey through 12 career positions from 2008-2024 with detailed modal view for each role
 
-2. **Live Project Dashboard** - Real-time KPI visualization displaying budget utilization, schedule performance, risk scores, team satisfaction, and stakeholder satisfaction with progress indicators
+2. **Industry Experience Map** - 7 sectors with expandable project cards showing global delivery experience
 
 3. **Certifications Wall of Fame** - Interactive expandable cards showcasing PRINCE2, Scrum Master, Six Sigma, and Agile certifications with detailed descriptions, validation links, and skills mapping
 
