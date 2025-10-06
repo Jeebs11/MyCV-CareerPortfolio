@@ -206,6 +206,8 @@ export interface BlogPost {
   readTime: string;
   publishDate: string;
   tags: string[];
+  featured?: boolean;
+  heroImage?: string;
 }
 
 export interface ProjectMetrics {
@@ -361,7 +363,8 @@ export const blogPosts: BlogPost[] = [
     category: 'Innovation',
     readTime: '7 min',
     publishDate: '2024-10',
-    tags: ['AI', 'Automation', 'Efficiency', 'Innovation']
+    tags: ['AI', 'Automation', 'Efficiency', 'Innovation'],
+    featured: true
   },
   {
     id: '4',
