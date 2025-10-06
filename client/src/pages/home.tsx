@@ -163,6 +163,7 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
 
 function VerticalCareerTimeline() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedProject, setSelectedProject] = useState<typeof timelineProjects[0] | null>(null);
   const visibleCount = 3;
   const maxIndex = Math.max(0, timelineProjects.length - visibleCount);
 
@@ -198,6 +199,7 @@ function VerticalCareerTimeline() {
               <Card
                 key={project.id}
                 className="bg-white/5 backdrop-blur-xl border-white/10 p-4 hover-elevate cursor-pointer transition-all"
+                onClick={() => setSelectedProject(project)}
                 data-testid={`card-career-${project.id}`}
               >
                 <div className="space-y-2">
@@ -270,7 +272,8 @@ function VerticalCareerTimeline() {
           {timelineProjects.slice(0, 3).map((project) => (
             <Card
               key={project.id}
-              className="bg-white/5 backdrop-blur-xl border-white/10 p-4"
+              className="bg-white/5 backdrop-blur-xl border-white/10 p-4 hover-elevate cursor-pointer"
+              onClick={() => setSelectedProject(project)}
               data-testid={`card-career-mobile-${project.id}`}
             >
               <div className="space-y-2">
@@ -313,6 +316,122 @@ function VerticalCareerTimeline() {
           ))}
         </div>
       </div>
+
+      {/* Position Detail Dialog */}
+      <Dialog open={!!selectedProject} onOpenChange={(open) => !open && setSelectedProject(null)}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" data-testid="dialog-career-detail">
+          {selectedProject && (
+            <>
+              <DialogHeader>
+                <div className="flex items-start justify-between gap-4 mb-4">
+                  <div className="flex-1">
+                    <DialogTitle className="text-2xl font-display mb-2" data-testid="text-dialog-role">
+                      {selectedProject.role}
+                    </DialogTitle>
+                    <p className="text-lg text-[hsl(190,85%,55%)] font-medium" data-testid="text-dialog-company">
+                      {selectedProject.company}
+                    </p>
+                  </div>
+                  {selectedProject.current && (
+                    <Badge className="bg-green-500/20 border-green-500/30 text-green-300" data-testid="badge-dialog-current">
+                      Current Position
+                    </Badge>
+                  )}
+                </div>
+              </DialogHeader>
+
+              <div className="space-y-6">
+                {/* Overview Section */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-white/60" />
+                    <div>
+                      <p className="text-xs text-white/60">Period</p>
+                      <p className="text-sm font-medium" data-testid="text-dialog-period">{selectedProject.period}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-white/60" />
+                    <div>
+                      <p className="text-xs text-white/60">Location</p>
+                      <p className="text-sm font-medium" data-testid="text-dialog-location">{selectedProject.location}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Briefcase className="w-4 h-4 text-white/60" />
+                    <div>
+                      <p className="text-xs text-white/60">Industry</p>
+                      <p className="text-sm font-medium" data-testid="text-dialog-industry">{selectedProject.industry}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Target className="w-4 h-4 text-white/60" />
+                    <div>
+                      <p className="text-xs text-white/60">Project Type</p>
+                      <p className="text-sm font-medium" data-testid="text-dialog-type">{selectedProject.projectType}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Key Achievements */}
+                <div>
+                  <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                    <Award className="w-5 h-5 text-[hsl(190,85%,55%)]" />
+                    Key Highlights & Deliverables
+                  </h3>
+                  <ul className="space-y-2">
+                    {selectedProject.keyAchievements.map((achievement, idx) => (
+                      <li key={idx} className="flex items-start gap-2" data-testid={`text-dialog-achievement-${idx}`}>
+                        <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm text-white/80">{achievement}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Additional Details */}
+                {(selectedProject.budget || selectedProject.teamSize || selectedProject.technologies) && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-white/10">
+                    {selectedProject.budget && (
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="w-4 h-4 text-white/60" />
+                        <div>
+                          <p className="text-xs text-white/60">Budget</p>
+                          <p className="text-sm font-medium" data-testid="text-dialog-budget">{selectedProject.budget}</p>
+                        </div>
+                      </div>
+                    )}
+                    {selectedProject.teamSize && (
+                      <div className="flex items-center gap-2">
+                        <Users className="w-4 h-4 text-white/60" />
+                        <div>
+                          <p className="text-xs text-white/60">Team Size</p>
+                          <p className="text-sm font-medium" data-testid="text-dialog-team">{selectedProject.teamSize} members</p>
+                        </div>
+                      </div>
+                    )}
+                    {selectedProject.technologies && selectedProject.technologies.length > 0 && (
+                      <div className="col-span-full">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Code className="w-4 h-4 text-white/60" />
+                          <p className="text-xs text-white/60">Technologies</p>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedProject.technologies.map((tech, idx) => (
+                            <Badge key={idx} variant="outline" className="text-xs" data-testid={`badge-dialog-tech-${idx}`}>
+                              {tech}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
