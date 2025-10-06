@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { experiences, skills, keyAchievements, caseStudies, detailedCertifications, blogPosts, sampleProjectMetrics, timelineProjects, careerMetrics, industryExperience } from '@shared/schema';
+import { experiences, skills, keyAchievements, detailedCertifications, blogPosts, timelineProjects, industryExperience } from '@shared/schema';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -70,8 +70,6 @@ export default function Home() {
       
       <HeroSection scrollToSection={scrollToSection} />
       
-      <ImpactMetricsSection />
-      
       <InteractiveTimeline />
       
       <IndustryExperienceMap />
@@ -79,10 +77,6 @@ export default function Home() {
       <MetricsDashboard />
       
       <CareerTimeline activeRegion={activeRegion} setActiveRegion={setActiveRegion} />
-      
-      <CaseStudiesSection />
-      
-      <ProjectDashboard />
       
       <GeographicMap activeRegion={activeRegion} setActiveRegion={setActiveRegion} />
       
@@ -128,13 +122,6 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
           
           <div className="hidden md:flex items-center gap-8">
             <button 
-              onClick={() => scrollToSection('impact')}
-              className="text-sm text-white/70 hover:text-white transition-colors"
-              data-testid="link-impact"
-            >
-              Impact
-            </button>
-            <button 
               onClick={() => scrollToSection('journey')}
               className="text-sm text-white/70 hover:text-white transition-colors"
               data-testid="link-journey"
@@ -147,13 +134,6 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
               data-testid="link-industries"
             >
               Industries
-            </button>
-            <button 
-              onClick={() => scrollToSection('case-studies')}
-              className="text-sm text-white/70 hover:text-white transition-colors"
-              data-testid="link-case-studies"
-            >
-              Case Studies
             </button>
             <button 
               onClick={() => scrollToSection('contact')}
@@ -559,206 +539,6 @@ function GeographicMap({ activeRegion, setActiveRegion }: { activeRegion: string
   );
 }
 
-function CaseStudiesSection() {
-  const [selectedCase, setSelectedCase] = useState<string | null>(null);
-
-  return (
-    <section id="case-studies" className="relative py-20" data-testid="section-case-studies">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="font-display text-4xl sm:text-5xl font-bold text-white mb-4">
-            Project Case Studies
-          </h2>
-          <p className="text-lg text-white/60 max-w-2xl mx-auto">
-            Deep-dive into complex programmes delivered with measurable impact
-          </p>
-        </div>
-
-        <div className="space-y-8">
-          {caseStudies.map((study, index) => (
-            <Card
-              key={study.id}
-              className="bg-white/5 backdrop-blur-xl border-white/10 p-6 sm:p-8 hover-elevate transition-all duration-300"
-              data-testid={`card-case-study-${index}`}
-            >
-              <div className="space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                  <div className="flex-1">
-                    <h3 className="font-display text-2xl font-bold text-white mb-2">{study.title}</h3>
-                    <div className="flex flex-wrap items-center gap-3 text-sm text-white/60">
-                      <span className="flex items-center gap-1">
-                        <Briefcase className="w-4 h-4" />
-                        {study.client}
-                      </span>
-                      <span>•</span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
-                        {study.duration}
-                      </span>
-                      <span>•</span>
-                      <span className="flex items-center gap-1">
-                        <DollarSign className="w-4 h-4" />
-                        {study.value}
-                      </span>
-                    </div>
-                  </div>
-                  <Badge className="bg-[hsl(190,85%,55%)]/20 border-[hsl(190,85%,55%)]/30 text-[hsl(190,85%,70%)] backdrop-blur-md">
-                    {study.industry}
-                  </Badge>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-semibold text-white mb-2 flex items-center gap-2">
-                      <AlertCircle className="w-5 h-5 text-[hsl(25,85%,60%)]" />
-                      The Challenge
-                    </h4>
-                    <p className="text-white/70 text-sm leading-relaxed">{study.challenge}</p>
-                  </div>
-
-                  <div>
-                    <h4 className="font-semibold text-white mb-2 flex items-center gap-2">
-                      <Target className="w-5 h-5 text-[hsl(220,90%,60%)]" />
-                      Approach
-                    </h4>
-                    <ul className="space-y-2">
-                      {study.approach.map((item, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm text-white/70">
-                          <CheckCircle2 className="w-4 h-4 text-[hsl(190,85%,55%)] mt-0.5 flex-shrink-0" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div>
-                    <h4 className="font-semibold text-white mb-3 flex items-center gap-2">
-                      <TrendingUp className="w-5 h-5 text-[hsl(145,70%,50%)]" />
-                      Outcomes & Impact
-                    </h4>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      {study.outcomes.map((outcome, idx) => (
-                        <div key={idx} className="bg-white/5 border border-white/10 rounded-md p-4 text-center">
-                          <div className="font-mono text-2xl font-bold text-[hsl(190,85%,55%)] mb-1">
-                            {outcome.metric}
-                          </div>
-                          <div className="text-xs text-white/60">{outcome.description}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {study.testimonial && (
-                    <div className="bg-white/5 border-l-4 border-[hsl(190,85%,55%)] rounded-md p-4 mt-4">
-                      <p className="text-white/80 italic text-sm mb-2">"{study.testimonial.quote}"</p>
-                      <p className="text-white/50 text-xs">
-                        — {study.testimonial.author}, {study.testimonial.role}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function ProjectDashboard() {
-  return (
-    <section id="dashboard" className="relative py-20" data-testid="section-dashboard">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="font-display text-4xl sm:text-5xl font-bold text-white mb-4">
-            Live Project Metrics
-          </h2>
-          <p className="text-lg text-white/60 max-w-2xl mx-auto">
-            Real-time performance indicators demonstrating PM expertise
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6 hover-elevate" data-testid="card-budget">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-display text-lg font-semibold text-white">Budget Utilization</h3>
-              <DollarSign className="w-8 h-8 text-[hsl(145,70%,50%)]" />
-            </div>
-            <div className="space-y-3">
-              <div className="flex items-end gap-2">
-                <span className="text-4xl font-bold text-white">{sampleProjectMetrics.budgetUtilization}%</span>
-                <span className="text-sm text-white/60 mb-1">of allocated budget</span>
-              </div>
-              <Progress value={sampleProjectMetrics.budgetUtilization} className="h-2" />
-              <p className="text-xs text-white/50">On track with planned spend</p>
-            </div>
-          </Card>
-
-          <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6 hover-elevate" data-testid="card-schedule">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-display text-lg font-semibold text-white">Schedule Performance</h3>
-              <Clock className="w-8 h-8 text-[hsl(220,90%,60%)]" />
-            </div>
-            <div className="space-y-3">
-              <div className="flex items-end gap-2">
-                <span className="text-4xl font-bold text-white">{sampleProjectMetrics.schedulePerformance}%</span>
-                <span className="text-sm text-white/60 mb-1">on schedule</span>
-              </div>
-              <Progress value={sampleProjectMetrics.schedulePerformance} className="h-2" />
-              <p className="text-xs text-white/50">Ahead of timeline by 2 weeks</p>
-            </div>
-          </Card>
-
-          <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6 hover-elevate" data-testid="card-risk">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-display text-lg font-semibold text-white">Risk Score</h3>
-              <ShieldCheck className="w-8 h-8 text-[hsl(145,70%,50%)]" />
-            </div>
-            <div className="space-y-3">
-              <div className="flex items-end gap-2">
-                <span className="text-4xl font-bold text-white">{sampleProjectMetrics.riskScore}</span>
-                <span className="text-sm text-white/60 mb-1">/ 100 (Low)</span>
-              </div>
-              <Progress value={100 - sampleProjectMetrics.riskScore} className="h-2" />
-              <p className="text-xs text-white/50">All major risks mitigated</p>
-            </div>
-          </Card>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6">
-          <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6 hover-elevate" data-testid="card-team-satisfaction">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-display text-lg font-semibold text-white">Team Satisfaction</h3>
-              <Smile className="w-8 h-8 text-[hsl(25,85%,60%)]" />
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <div className="text-4xl font-bold text-white mb-2">{sampleProjectMetrics.teamSatisfaction}%</div>
-                <Progress value={sampleProjectMetrics.teamSatisfaction} className="h-2 mb-2" />
-                <p className="text-xs text-white/50">Based on monthly pulse surveys</p>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6 hover-elevate" data-testid="card-stakeholder">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-display text-lg font-semibold text-white">Stakeholder Satisfaction</h3>
-              <BarChart3 className="w-8 h-8 text-[hsl(190,85%,55%)]" />
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <div className="text-4xl font-bold text-white mb-2">{sampleProjectMetrics.stakeholderSatisfaction}%</div>
-                <Progress value={sampleProjectMetrics.stakeholderSatisfaction} className="h-2 mb-2" />
-                <p className="text-xs text-white/50">Consistent positive feedback</p>
-              </div>
-            </div>
-          </Card>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 function CertificationsWall() {
   const [selectedCert, setSelectedCert] = useState<string | null>(null);
@@ -915,103 +695,6 @@ function ThoughtLeadership() {
   );
 }
 
-function ImpactMetricsSection() {
-  const [isInView, setIsInView] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const [animatedValues, setAnimatedValues] = useState<Record<string, number>>({});
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !isInView) {
-          setIsInView(true);
-          careerMetrics.forEach(metric => {
-            if (typeof metric.value === 'number') {
-              animateValue(metric.id, 0, metric.value, 2000);
-            }
-          });
-        }
-      },
-      { threshold: 0.2 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [isInView]);
-
-  const animateValue = (id: string, start: number, end: number, duration: number) => {
-    const startTime = Date.now();
-    const step = () => {
-      const now = Date.now();
-      const progress = Math.min((now - startTime) / duration, 1);
-      const easeOutCubic = 1 - Math.pow(1 - progress, 3);
-      const current = Math.floor(start + (end - start) * easeOutCubic);
-      
-      setAnimatedValues(prev => ({ ...prev, [id]: current }));
-      
-      if (progress < 1) {
-        requestAnimationFrame(step);
-      }
-    };
-    requestAnimationFrame(step);
-  };
-
-  return (
-    <section id="impact" ref={sectionRef} className="relative py-24" data-testid="section-impact">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <Badge className="mb-4 bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20" data-testid="badge-impact">
-            Career Impact
-          </Badge>
-          <h2 className="font-display text-4xl sm:text-5xl font-bold text-white mb-4" data-testid="text-impact-title">
-            Delivering Measurable Results
-          </h2>
-          <p className="text-xl text-white/60 max-w-2xl mx-auto" data-testid="text-impact-subtitle">
-            17 years of excellence, quantified
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {careerMetrics.map((metric) => {
-            const Icon = iconMap[metric.icon];
-            const displayValue = typeof metric.value === 'number' 
-              ? animatedValues[metric.id] || 0 
-              : metric.value;
-
-            return (
-              <Card
-                key={metric.id}
-                className="bg-white/5 backdrop-blur-xl border-white/10 p-8 hover-elevate"
-                data-testid={`card-metric-${metric.id}`}
-              >
-                <div className="flex flex-col items-center text-center space-y-4">
-                  <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center">
-                    {Icon && <Icon className="w-8 h-8 text-white" />}
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="font-display text-5xl font-bold text-white" data-testid={`text-metric-value-${metric.id}`}>
-                      {metric.prefix}{displayValue}{metric.suffix}
-                    </div>
-                    <div className="font-semibold text-lg text-white/90" data-testid={`text-metric-label-${metric.id}`}>
-                      {metric.label}
-                    </div>
-                    <p className="text-sm text-white/60" data-testid={`text-metric-description-${metric.id}`}>
-                      {metric.description}
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
 
 function InteractiveTimeline() {
   const [selectedProject, setSelectedProject] = useState<typeof timelineProjects[0] | null>(null);
