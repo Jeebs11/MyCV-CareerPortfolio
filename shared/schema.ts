@@ -335,11 +335,20 @@ export const detailedCertifications: DetailedCertification[] = [
   },
   {
     id: '4',
-    name: 'Agile Certified Practitioner',
-    issuer: 'PMI',
-    dateObtained: '2019',
-    description: 'PMI certification demonstrating knowledge of Agile principles and practices across multiple frameworks.',
-    skills: ['Agile Methodologies', 'Adaptive Planning', 'Team Empowerment', 'Stakeholder Engagement'],
+    name: 'Agile Methodology',
+    issuer: 'Professional Development',
+    dateObtained: '2017',
+    description: 'Comprehensive understanding of Agile principles and practices for iterative project delivery.',
+    skills: ['Agile Frameworks', 'Iterative Development', 'Adaptive Planning', 'Team Collaboration'],
+    verificationUrl: '#'
+  },
+  {
+    id: '5',
+    name: 'Waterfall Methodology',
+    issuer: 'Professional Development',
+    dateObtained: '2014',
+    description: 'Traditional project management approach with sequential phases and comprehensive planning.',
+    skills: ['Sequential Planning', 'Documentation', 'Milestone Management', 'Stakeholder Communication'],
     verificationUrl: '#'
   }
 ];
@@ -347,14 +356,26 @@ export const detailedCertifications: DetailedCertification[] = [
 export const education: Education[] = [
   {
     id: '1',
-    degree: 'Master of Engineering (MEng)',
-    institution: 'Imperial College London',
-    location: 'London, UK',
-    period: '2004 - 2008',
-    fieldOfStudy: 'Mechanical Engineering',
+    degree: 'Master of Science (MSc)',
+    institution: 'Newcastle University',
+    location: 'Newcastle, UK',
+    period: 'Completed',
+    fieldOfStudy: 'Renewable Energy, Enterprise and Management',
     achievements: [
-      'Specialized in project management and systems engineering',
-      'Dissertation on process optimization in engineering projects'
+      'Focused on sustainable energy systems and business management',
+      'Combined technical engineering knowledge with enterprise management'
+    ]
+  },
+  {
+    id: '2',
+    degree: 'Bachelor of Engineering (BEng)',
+    institution: 'Aston University',
+    location: 'Birmingham, UK',
+    period: 'Completed',
+    fieldOfStudy: 'Chemical Engineering',
+    achievements: [
+      'Foundation in engineering principles and process management',
+      'Developed analytical and problem-solving skills'
     ]
   }
 ];
