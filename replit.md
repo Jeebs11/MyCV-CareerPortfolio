@@ -10,10 +10,10 @@ This is a personal portfolio website for Mujeeb Lawal, a Senior Project Manager 
 - Streamlined portfolio by removing redundant sections (Impact Metrics, Case Studies, Project Dashboard)
 - **Moved Insights & Thought Leadership to dedicated blog page** at `/insights` route with interactive filtering, featured article spotlight, and article detail modals
 - Updated navigation to include: Journey, Industries, Insights, Contact
-- Enhanced Interactive Timeline with triple scroll affordance: peek effect, fade gradient overlay, and accessible arrow navigation
+- **Integrated Vertical Career Timeline directly into Hero Section** - Removed separate horizontal timeline section and integrated a compact vertical timeline carousel into the hero (desktop: 3 positions with up/down navigation arrows; mobile: 3 most recent positions stacked)
 
 **Key Features:**
-1. **Interactive Timeline** - Horizontal scrolling journey through 12 career positions from 2008-2024 with detailed modal view for each role
+1. **Hero Section with Integrated Career Timeline** - The hero section (#journey) now features a vertical career timeline carousel showing 3 positions at a time on desktop with arrow navigation, and 3 most recent positions on mobile. Displays all 12 career positions from 2008-2024 with company, role, location, industry, and project type
 
 2. **Industry Experience Map** - 7 sectors with expandable project cards showing global delivery experience
 
