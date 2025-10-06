@@ -34,7 +34,8 @@ import {
   BookOpen,
   Lightbulb,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  ChevronUp
 } from 'lucide-react';
 
 const iconMap: Record<string, any> = {
@@ -69,8 +70,6 @@ export default function Home() {
       <Navigation scrollToSection={scrollToSection} />
       
       <HeroSection scrollToSection={scrollToSection} />
-      
-      <InteractiveTimeline />
       
       <IndustryExperienceMap />
       
@@ -164,7 +163,7 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
 
 function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => void }) {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20" data-testid="section-hero">
+    <section id="journey" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20" data-testid="section-hero">
       <div className="absolute inset-0">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[hsl(190,85%,55%)]/20 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[hsl(220,90%,60%)]/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
@@ -247,8 +246,8 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
             </div>
           </div>
           
-          <div className="relative hidden lg:block">
-            <FloatingCards />
+          <div className="relative w-full lg:w-auto">
+            <VerticalCareerTimeline />
           </div>
         </div>
         
@@ -264,32 +263,158 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
   );
 }
 
-function FloatingCards() {
+function VerticalCareerTimeline() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const visibleCount = 3;
+  const maxIndex = Math.max(0, timelineProjects.length - visibleCount);
+
+  const scrollUp = () => {
+    setCurrentIndex(prev => Math.max(0, prev - 1));
+  };
+
+  const scrollDown = () => {
+    setCurrentIndex(prev => Math.min(maxIndex, prev + 1));
+  };
+
+  const visibleProjects = timelineProjects.slice(currentIndex, currentIndex + visibleCount);
+
   return (
-    <div className="relative w-full h-[500px]">
-      <Card className="absolute top-0 right-0 w-64 bg-white/5 backdrop-blur-xl border-white/10 p-6 transform rotate-3 hover:rotate-0 transition-transform duration-300 hover-elevate" data-testid="card-floating-1">
-        <Briefcase className="w-8 h-8 text-[hsl(190,85%,55%)] mb-3" />
-        <h3 className="font-semibold text-white mb-2">PMO Leadership</h3>
-        <p className="text-sm text-white/60">Established frameworks across Europe & MENA</p>
-      </Card>
-      
-      <Card className="absolute top-20 left-0 w-64 bg-white/5 backdrop-blur-xl border-white/10 p-6 transform -rotate-2 hover:rotate-0 transition-transform duration-300 hover-elevate" data-testid="card-floating-2">
-        <Users className="w-8 h-8 text-[hsl(220,90%,60%)] mb-3" />
-        <h3 className="font-semibold text-white mb-2">Global Teams</h3>
-        <p className="text-sm text-white/60">Coordinated across 6 time zones</p>
-      </Card>
-      
-      <Card className="absolute bottom-20 right-10 w-64 bg-white/5 backdrop-blur-xl border-white/10 p-6 transform rotate-2 hover:rotate-0 transition-transform duration-300 hover-elevate" data-testid="card-floating-3">
-        <Target className="w-8 h-8 text-[hsl(145,70%,50%)] mb-3" />
-        <h3 className="font-semibold text-white mb-2">£1.2M+ Delivered</h3>
-        <p className="text-sm text-white/60">FCA-regulated programmes</p>
-      </Card>
-      
-      <Card className="absolute bottom-0 left-10 w-64 bg-white/5 backdrop-blur-xl border-white/10 p-6 transform -rotate-3 hover:rotate-0 transition-transform duration-300 hover-elevate" data-testid="card-floating-4">
-        <Code className="w-8 h-8 text-[hsl(25,85%,60%)] mb-3" />
-        <h3 className="font-semibold text-white mb-2">AI Integration</h3>
-        <p className="text-sm text-white/60">Developed AI time-tracking tools</p>
-      </Card>
+    <div className="w-full">
+      <div className="mb-4 text-center lg:text-left">
+        <Badge 
+          className="bg-white/10 backdrop-blur-md border border-white/20 text-white"
+          data-testid="badge-career-timeline"
+        >
+          Career Journey
+        </Badge>
+        <h3 className="font-display text-2xl font-bold text-white mt-2" data-testid="text-career-timeline-title">
+          17 Years • 12 Companies
+        </h3>
+      </div>
+
+      <div className="relative">
+        {/* Desktop: Vertical carousel */}
+        <div className="hidden lg:block">
+          <div className="space-y-3">
+            {visibleProjects.map((project) => (
+              <Card
+                key={project.id}
+                className="bg-white/5 backdrop-blur-xl border-white/10 p-4 hover-elevate cursor-pointer transition-all"
+                data-testid={`card-career-${project.id}`}
+              >
+                <div className="space-y-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <Badge 
+                      className="text-xs bg-gradient-to-r from-[hsl(190,85%,55%)]/20 to-[hsl(220,90%,60%)]/20 border-[hsl(190,85%,55%)]/30 text-white"
+                      data-testid={`badge-career-period-${project.id}`}
+                    >
+                      {project.period}
+                    </Badge>
+                    {project.current && (
+                      <Badge className="text-xs bg-green-500/20 border-green-500/30 text-green-300" data-testid={`badge-career-current-${project.id}`}>
+                        Current
+                      </Badge>
+                    )}
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold text-white text-sm leading-tight mb-1" data-testid={`text-career-role-${project.id}`}>
+                      {project.role}
+                    </h4>
+                    <p className="text-[hsl(190,85%,55%)] text-sm font-medium" data-testid={`text-career-company-${project.id}`}>
+                      {project.company}
+                    </p>
+                    <p className="text-xs text-white/60" data-testid={`text-career-location-${project.id}`}>
+                      {project.location}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <Badge variant="outline" className="text-xs border-white/20 text-white/70" data-testid={`badge-career-industry-${project.id}`}>
+                      {project.industry}
+                    </Badge>
+                    <Badge variant="outline" className="text-xs border-white/20 text-white/70" data-testid={`badge-career-type-${project.id}`}>
+                      {project.projectType}
+                    </Badge>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          {/* Navigation arrows */}
+          <div className="flex justify-center gap-2 mt-4">
+            <Button
+              size="icon"
+              variant="outline"
+              className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10"
+              onClick={scrollUp}
+              disabled={currentIndex === 0}
+              data-testid="button-career-scroll-up"
+            >
+              <ChevronUp className="w-4 h-4" />
+            </Button>
+            <Button
+              size="icon"
+              variant="outline"
+              className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10"
+              onClick={scrollDown}
+              disabled={currentIndex >= maxIndex}
+              data-testid="button-career-scroll-down"
+            >
+              <ChevronDown className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Mobile: Simple stacked list (3 most recent) */}
+        <div className="lg:hidden space-y-3">
+          {timelineProjects.slice(0, 3).map((project) => (
+            <Card
+              key={project.id}
+              className="bg-white/5 backdrop-blur-xl border-white/10 p-4"
+              data-testid={`card-career-mobile-${project.id}`}
+            >
+              <div className="space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <Badge 
+                    className="text-xs bg-gradient-to-r from-[hsl(190,85%,55%)]/20 to-[hsl(220,90%,60%)]/20 border-[hsl(190,85%,55%)]/30 text-white"
+                    data-testid={`badge-career-mobile-period-${project.id}`}
+                  >
+                    {project.period}
+                  </Badge>
+                  {project.current && (
+                    <Badge className="text-xs bg-green-500/20 border-green-500/30 text-green-300" data-testid={`badge-career-mobile-current-${project.id}`}>
+                      Current
+                    </Badge>
+                  )}
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-white text-sm leading-tight mb-1" data-testid={`text-career-mobile-role-${project.id}`}>
+                    {project.role}
+                  </h4>
+                  <p className="text-[hsl(190,85%,55%)] text-sm font-medium" data-testid={`text-career-mobile-company-${project.id}`}>
+                    {project.company}
+                  </p>
+                  <p className="text-xs text-white/60" data-testid={`text-career-mobile-location-${project.id}`}>
+                    {project.location}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <Badge variant="outline" className="text-xs border-white/20 text-white/70" data-testid={`badge-career-mobile-industry-${project.id}`}>
+                    {project.industry}
+                  </Badge>
+                  <Badge variant="outline" className="text-xs border-white/20 text-white/70" data-testid={`badge-career-mobile-type-${project.id}`}>
+                    {project.projectType}
+                  </Badge>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -624,234 +749,6 @@ function CertificationsWall() {
   );
 }
 
-function InteractiveTimeline() {
-  const [selectedProject, setSelectedProject] = useState<typeof timelineProjects[0] | null>(null);
-  const timelineRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (timelineRef.current) {
-        const { scrollLeft, scrollWidth, clientWidth } = timelineRef.current;
-        setCanScrollLeft(scrollLeft > 0);
-        setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
-      }
-    };
-
-    const timeline = timelineRef.current;
-    if (timeline) {
-      handleScroll();
-      timeline.addEventListener('scroll', handleScroll);
-      return () => timeline.removeEventListener('scroll', handleScroll);
-    }
-  }, []);
-
-  const scrollTimeline = (direction: 'left' | 'right') => {
-    if (timelineRef.current) {
-      const scrollAmount = 350;
-      const newScrollLeft = timelineRef.current.scrollLeft + (direction === 'right' ? scrollAmount : -scrollAmount);
-      timelineRef.current.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
-    }
-  };
-
-  return (
-    <section id="journey" className="relative py-24 overflow-hidden" data-testid="section-journey">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <Badge className="mb-4 bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20" data-testid="badge-journey">
-            Career Journey
-          </Badge>
-          <h2 className="font-display text-4xl sm:text-5xl font-bold text-white mb-4" data-testid="text-journey-title">
-            17-Year Project Management Journey
-          </h2>
-          <p className="text-xl text-white/60 max-w-2xl mx-auto" data-testid="text-journey-subtitle">
-            From Project Engineer to PMO Leader across 12 companies
-          </p>
-        </div>
-
-        <div className="relative max-w-[90%] mx-auto">
-          <div 
-            ref={timelineRef}
-            className="relative overflow-x-auto pb-8 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-white/5"
-            data-testid="timeline-container"
-          >
-            <div className="flex gap-6 min-w-max pb-4">
-              {timelineProjects.map((project, index) => (
-                <Card
-                  key={project.id}
-                  className="bg-white/5 backdrop-blur-xl border-white/10 p-6 min-w-[320px] max-w-[320px] hover-elevate cursor-pointer"
-                  onClick={() => setSelectedProject(project)}
-                  data-testid={`card-timeline-${project.id}`}
-                >
-                  <div className="space-y-4">
-                    <div className="flex items-start justify-between">
-                      <Badge 
-                        className="bg-gradient-to-r from-[hsl(190,85%,55%)]/20 to-[hsl(220,90%,60%)]/20 border-[hsl(190,85%,55%)]/30 text-white"
-                        data-testid={`badge-timeline-period-${project.id}`}
-                      >
-                        {project.period}
-                      </Badge>
-                      {project.current && (
-                        <Badge className="bg-green-500/20 border-green-500/30 text-green-300" data-testid={`badge-current-${project.id}`}>
-                          Current
-                        </Badge>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <h3 className="font-semibold text-lg text-white line-clamp-2" data-testid={`text-timeline-role-${project.id}`}>
-                        {project.role}
-                      </h3>
-                      <p className="text-[hsl(190,85%,55%)] font-medium" data-testid={`text-timeline-company-${project.id}`}>
-                        {project.company}
-                      </p>
-                      <p className="text-sm text-white/60" data-testid={`text-timeline-location-${project.id}`}>
-                        {project.location}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="text-xs border-white/20 text-white/70" data-testid={`badge-timeline-industry-${project.id}`}>
-                        {project.industry}
-                      </Badge>
-                      <Badge variant="outline" className="text-xs border-white/20 text-white/70" data-testid={`badge-timeline-type-${project.id}`}>
-                        {project.projectType}
-                      </Badge>
-                    </div>
-
-                    <div className="pt-4 border-t border-white/10">
-                      <p className="text-sm text-white/80 line-clamp-2" data-testid={`text-timeline-achievement-${project.id}`}>
-                        {project.keyAchievements[0]}
-                      </p>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="mt-2 text-[hsl(190,85%,55%)] hover:text-white p-0 h-auto"
-                        data-testid={`button-timeline-view-${project.id}`}
-                      >
-                        View Details <ArrowRight className="ml-1 w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          <div className="absolute right-0 top-0 bottom-8 w-32 bg-gradient-to-l from-[hsl(270,8%,12%)] to-transparent pointer-events-none" />
-
-          {canScrollLeft && (
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={() => scrollTimeline('left')}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20"
-              data-testid="button-timeline-scroll-left"
-              aria-label="Scroll timeline left"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </Button>
-          )}
-
-          {canScrollRight && (
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={() => scrollTimeline('right')}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20"
-              data-testid="button-timeline-scroll-right"
-              aria-label="Scroll timeline right"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </Button>
-          )}
-        </div>
-
-        <Dialog open={!!selectedProject} onOpenChange={() => setSelectedProject(null)}>
-          <DialogContent className="bg-[hsl(270,8%,12%)]/95 backdrop-blur-xl border-white/20 text-white max-w-2xl" data-testid="dialog-timeline-details">
-            {selectedProject && (
-              <>
-                <DialogHeader>
-                  <DialogTitle className="text-2xl font-display text-white" data-testid="text-dialog-title">
-                    {selectedProject.role}
-                  </DialogTitle>
-                </DialogHeader>
-                
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-lg text-[hsl(190,85%,55%)]" data-testid="text-dialog-company">
-                        {selectedProject.company}
-                      </p>
-                      <p className="text-sm text-white/60" data-testid="text-dialog-location">
-                        {selectedProject.location} • {selectedProject.period}
-                      </p>
-                    </div>
-                    {selectedProject.current && (
-                      <Badge className="bg-green-500/20 border-green-500/30 text-green-300">
-                        Current Role
-                      </Badge>
-                    )}
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline" className="border-white/20 text-white/70">
-                      {selectedProject.industry}
-                    </Badge>
-                    <Badge variant="outline" className="border-white/20 text-white/70">
-                      {selectedProject.projectType}
-                    </Badge>
-                    {selectedProject.budget && (
-                      <Badge className="bg-green-500/20 border-green-500/30 text-green-300">
-                        Budget: {selectedProject.budget}
-                      </Badge>
-                    )}
-                    {selectedProject.teamSize && (
-                      <Badge className="bg-blue-500/20 border-blue-500/30 text-blue-300">
-                        Team: {selectedProject.teamSize} members
-                      </Badge>
-                    )}
-                  </div>
-
-                  <div>
-                    <h4 className="font-semibold text-white mb-3">Key Achievements</h4>
-                    <ul className="space-y-2">
-                      {selectedProject.keyAchievements.map((achievement, idx) => (
-                        <li key={idx} className="flex items-start gap-2" data-testid={`text-dialog-achievement-${idx}`}>
-                          <CheckCircle2 className="w-5 h-5 text-[hsl(190,85%,55%)] flex-shrink-0 mt-0.5" />
-                          <span className="text-white/80">{achievement}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {selectedProject.technologies && selectedProject.technologies.length > 0 && (
-                    <div>
-                      <h4 className="font-semibold text-white mb-3">Technologies & Tools</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {selectedProject.technologies.map((tech, idx) => (
-                          <Badge 
-                            key={idx}
-                            variant="outline"
-                            className="border-[hsl(190,85%,55%)]/30 text-[hsl(190,85%,55%)]"
-                            data-testid={`badge-dialog-tech-${idx}`}
-                          >
-                            {tech}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
-          </DialogContent>
-        </Dialog>
-      </div>
-    </section>
-  );
-}
 
 function IndustryExperienceMap() {
   const [expandedIndustry, setExpandedIndustry] = useState<string | null>(null);
