@@ -161,108 +161,6 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
   );
 }
 
-function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => void }) {
-  return (
-    <section id="journey" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20" data-testid="section-hero">
-      <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[hsl(190,85%,55%)]/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[hsl(220,90%,60%)]/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[hsl(270,65%,35%)]/10 rounded-full blur-3xl" />
-      </div>
-      
-      <div className="relative max-w-7xl mx-auto px-6 py-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div className="space-y-8">
-            <div className="space-y-4">
-              <Badge 
-                className="bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20"
-                data-testid="badge-status"
-              >
-                Available for New Opportunities
-              </Badge>
-              
-              <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-tight" data-testid="text-hero-title">
-                Senior Project Manager
-              </h1>
-              
-              <p className="text-xl sm:text-2xl text-white/80" data-testid="text-hero-subtitle">
-                Delivering Multi-Million Pound Programmes Across 4 Continents
-              </p>
-              
-              <p className="text-lg text-white/60 max-w-xl" data-testid="text-hero-description">
-                17+ years of expertise in international project delivery, Agile transformation, and PMO leadership. 
-                Trusted by Fortune 500 companies to deliver complex, regulated programmes on time and within budget.
-              </p>
-            </div>
-            
-            <div className="flex flex-wrap gap-4">
-              <Button 
-                size="lg"
-                className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0 hover-elevate active-elevate-2"
-                onClick={() => scrollToSection('contact')}
-                data-testid="button-primary-cta"
-              >
-                Let's Talk <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-              
-              <Button 
-                size="lg"
-                variant="outline"
-                className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10"
-                onClick={() => scrollToSection('experience')}
-                data-testid="button-secondary-cta"
-              >
-                View Experience
-              </Button>
-              
-              <Button 
-                size="lg"
-                variant="outline"
-                className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10"
-                onClick={() => window.open('https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/', '_blank')}
-                data-testid="button-download-cv"
-              >
-                <Download className="mr-2 w-4 h-4" /> LinkedIn Profile
-              </Button>
-            </div>
-            
-            <div className="flex items-center gap-6 pt-4">
-              <a 
-                href="mailto:odmlawal@gmail.com"
-                className="text-white/60 hover:text-white transition-colors"
-                data-testid="link-email"
-              >
-                <Mail className="w-5 h-5" />
-              </a>
-              <a 
-                href="https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white/60 hover:text-white transition-colors"
-                data-testid="link-linkedin"
-              >
-                <Linkedin className="w-5 h-5" />
-              </a>
-            </div>
-          </div>
-          
-          <div className="relative w-full lg:w-auto">
-            <VerticalCareerTimeline />
-          </div>
-        </div>
-        
-        <button 
-          onClick={() => scrollToSection('metrics')}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/40 hover:text-white/60 transition-colors animate-bounce"
-          data-testid="button-scroll-indicator"
-        >
-          <ChevronDown className="w-8 h-8" />
-        </button>
-      </div>
-    </section>
-  );
-}
-
 function VerticalCareerTimeline() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const visibleCount = 3;
@@ -416,6 +314,108 @@ function VerticalCareerTimeline() {
         </div>
       </div>
     </div>
+  );
+}
+
+function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => void }) {
+  return (
+    <section id="journey" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20" data-testid="section-hero">
+      <div className="absolute inset-0">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[hsl(190,85%,55%)]/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[hsl(220,90%,60%)]/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[hsl(270,65%,35%)]/10 rounded-full blur-3xl" />
+      </div>
+      
+      <div className="relative max-w-7xl mx-auto px-6 py-20">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <Badge 
+                className="bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20"
+                data-testid="badge-status"
+              >
+                Available for New Opportunities
+              </Badge>
+              
+              <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-tight" data-testid="text-hero-title">
+                Senior Project Manager
+              </h1>
+              
+              <p className="text-xl sm:text-2xl text-white/80" data-testid="text-hero-subtitle">
+                Delivering Multi-Million Pound Programmes Across 4 Continents
+              </p>
+              
+              <p className="text-lg text-white/60 max-w-xl" data-testid="text-hero-description">
+                17+ years of expertise in international project delivery, Agile transformation, and PMO leadership. 
+                Trusted by Fortune 500 companies to deliver complex, regulated programmes on time and within budget.
+              </p>
+            </div>
+            
+            <div className="flex flex-wrap gap-4">
+              <Button 
+                size="lg"
+                className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0 hover-elevate active-elevate-2"
+                onClick={() => scrollToSection('contact')}
+                data-testid="button-primary-cta"
+              >
+                Let's Talk <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
+              
+              <Button 
+                size="lg"
+                variant="outline"
+                className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10"
+                onClick={() => scrollToSection('experience')}
+                data-testid="button-secondary-cta"
+              >
+                View Experience
+              </Button>
+              
+              <Button 
+                size="lg"
+                variant="outline"
+                className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10"
+                onClick={() => window.open('https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/', '_blank')}
+                data-testid="button-download-cv"
+              >
+                <Download className="mr-2 w-4 h-4" /> LinkedIn Profile
+              </Button>
+            </div>
+            
+            <div className="flex items-center gap-6 pt-4">
+              <a 
+                href="mailto:odmlawal@gmail.com"
+                className="text-white/60 hover:text-white transition-colors"
+                data-testid="link-email"
+              >
+                <Mail className="w-5 h-5" />
+              </a>
+              <a 
+                href="https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white/60 hover:text-white transition-colors"
+                data-testid="link-linkedin"
+              >
+                <Linkedin className="w-5 h-5" />
+              </a>
+            </div>
+          </div>
+          
+          <div className="relative w-full lg:w-auto">
+            <VerticalCareerTimeline />
+          </div>
+        </div>
+        
+        <button 
+          onClick={() => scrollToSection('metrics')}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/40 hover:text-white/60 transition-colors animate-bounce"
+          data-testid="button-scroll-indicator"
+        >
+          <ChevronDown className="w-8 h-8" />
+        </button>
+      </div>
+    </section>
   );
 }
 
