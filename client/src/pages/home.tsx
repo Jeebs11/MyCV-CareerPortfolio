@@ -319,13 +319,16 @@ function VerticalCareerTimeline() {
 
       {/* Position Detail Dialog */}
       <Dialog open={!!selectedProject} onOpenChange={(open) => !open && setSelectedProject(null)}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" data-testid="dialog-career-detail">
+        <DialogContent 
+          className="max-w-2xl max-h-[80vh] overflow-y-auto bg-black/90 backdrop-blur-xl border border-white/10" 
+          data-testid="dialog-career-detail"
+        >
           {selectedProject && (
             <>
               <DialogHeader>
                 <div className="flex items-start justify-between gap-4 mb-4">
                   <div className="flex-1">
-                    <DialogTitle className="text-2xl font-display mb-2" data-testid="text-dialog-role">
+                    <DialogTitle className="text-2xl font-display mb-2 text-white" data-testid="text-dialog-role">
                       {selectedProject.role}
                     </DialogTitle>
                     <DialogDescription className="text-lg text-[hsl(190,85%,55%)] font-medium" data-testid="text-dialog-company">
@@ -347,35 +350,35 @@ function VerticalCareerTimeline() {
                     <Calendar className="w-4 h-4 text-white/60" />
                     <div>
                       <p className="text-xs text-white/60">Period</p>
-                      <p className="text-sm font-medium" data-testid="text-dialog-period">{selectedProject.period}</p>
+                      <p className="text-sm font-medium text-white" data-testid="text-dialog-period">{selectedProject.period}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-white/60" />
                     <div>
                       <p className="text-xs text-white/60">Location</p>
-                      <p className="text-sm font-medium" data-testid="text-dialog-location">{selectedProject.location}</p>
+                      <p className="text-sm font-medium text-white" data-testid="text-dialog-location">{selectedProject.location}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Briefcase className="w-4 h-4 text-white/60" />
                     <div>
                       <p className="text-xs text-white/60">Industry</p>
-                      <p className="text-sm font-medium" data-testid="text-dialog-industry">{selectedProject.industry}</p>
+                      <p className="text-sm font-medium text-white" data-testid="text-dialog-industry">{selectedProject.industry}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Target className="w-4 h-4 text-white/60" />
                     <div>
                       <p className="text-xs text-white/60">Project Type</p>
-                      <p className="text-sm font-medium" data-testid="text-dialog-type">{selectedProject.projectType}</p>
+                      <p className="text-sm font-medium text-white" data-testid="text-dialog-type">{selectedProject.projectType}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Key Achievements */}
                 <div>
-                  <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                  <h3 className="font-semibold text-lg mb-3 flex items-center gap-2 text-white">
                     <Award className="w-5 h-5 text-[hsl(190,85%,55%)]" />
                     Key Highlights & Deliverables
                   </h3>
@@ -397,7 +400,7 @@ function VerticalCareerTimeline() {
                         <DollarSign className="w-4 h-4 text-white/60" />
                         <div>
                           <p className="text-xs text-white/60">Budget</p>
-                          <p className="text-sm font-medium" data-testid="text-dialog-budget">{selectedProject.budget}</p>
+                          <p className="text-sm font-medium text-white" data-testid="text-dialog-budget">{selectedProject.budget}</p>
                         </div>
                       </div>
                     )}
@@ -406,7 +409,7 @@ function VerticalCareerTimeline() {
                         <Users className="w-4 h-4 text-white/60" />
                         <div>
                           <p className="text-xs text-white/60">Team Size</p>
-                          <p className="text-sm font-medium" data-testid="text-dialog-team">{selectedProject.teamSize} members</p>
+                          <p className="text-sm font-medium text-white" data-testid="text-dialog-team">{selectedProject.teamSize} members</p>
                         </div>
                       </div>
                     )}
@@ -421,7 +424,7 @@ function VerticalCareerTimeline() {
                             <Badge 
                               key={`${selectedProject.id}-${tech}-${idx}`} 
                               variant="outline" 
-                              className="text-xs" 
+                              className="text-xs border-white/20 text-white/70 bg-white/5" 
                               data-testid={`badge-dialog-tech-${selectedProject.id}-${tech.toLowerCase().replace(/\s+/g, '-')}-${idx}`}
                             >
                               {tech}
