@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import ChatBot from '@/components/ChatBot';
 import {
   TrendingUp,
@@ -328,9 +328,9 @@ function VerticalCareerTimeline() {
                     <DialogTitle className="text-2xl font-display mb-2" data-testid="text-dialog-role">
                       {selectedProject.role}
                     </DialogTitle>
-                    <p className="text-lg text-[hsl(190,85%,55%)] font-medium" data-testid="text-dialog-company">
+                    <DialogDescription className="text-lg text-[hsl(190,85%,55%)] font-medium" data-testid="text-dialog-company">
                       {selectedProject.company}
-                    </p>
+                    </DialogDescription>
                   </div>
                   {selectedProject.current && (
                     <Badge className="bg-green-500/20 border-green-500/30 text-green-300" data-testid="badge-dialog-current">
@@ -418,7 +418,12 @@ function VerticalCareerTimeline() {
                         </div>
                         <div className="flex flex-wrap gap-2">
                           {selectedProject.technologies.map((tech, idx) => (
-                            <Badge key={idx} variant="outline" className="text-xs" data-testid={`badge-dialog-tech-${idx}`}>
+                            <Badge 
+                              key={`${selectedProject.id}-${tech}-${idx}`} 
+                              variant="outline" 
+                              className="text-xs" 
+                              data-testid={`badge-dialog-tech-${selectedProject.id}-${tech.toLowerCase().replace(/\s+/g, '-')}-${idx}`}
+                            >
                               {tech}
                             </Badge>
                           ))}
