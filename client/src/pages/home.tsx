@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { experiences, skills, keyAchievements, detailedCertifications, blogPosts, timelineProjects, industryExperience } from '@shared/schema';
+import { experiences, skills, keyAchievements, detailedCertifications, timelineProjects, industryExperience } from '@shared/schema';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -82,8 +82,6 @@ export default function Home() {
       
       <CertificationsWall />
       
-      <ThoughtLeadership />
-      
       <ContactSection />
       
       <Footer />
@@ -135,6 +133,13 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
             >
               Industries
             </button>
+            <a 
+              href="/insights"
+              className="text-sm text-white/70 hover:text-white transition-colors"
+              data-testid="link-insights"
+            >
+              Insights
+            </a>
             <button 
               onClick={() => scrollToSection('contact')}
               className="text-sm text-white/70 hover:text-white transition-colors"
@@ -618,83 +623,6 @@ function CertificationsWall() {
     </section>
   );
 }
-
-function ThoughtLeadership() {
-  return (
-    <section id="insights" className="relative py-20" data-testid="section-insights">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="font-display text-4xl sm:text-5xl font-bold text-white mb-4">
-            Insights & Thought Leadership
-          </h2>
-          <p className="text-lg text-white/60 max-w-2xl mx-auto">
-            Sharing knowledge from 17+ years of international project delivery
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6">
-          {blogPosts.map((post, index) => (
-            <Card
-              key={post.id}
-              className="bg-white/5 backdrop-blur-xl border-white/10 p-6 hover-elevate transition-all duration-300"
-              data-testid={`card-blog-${index}`}
-            >
-              <div className="flex items-start gap-4 mb-4">
-                <div className="w-12 h-12 rounded-md bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center flex-shrink-0">
-                  <BookOpen className="w-6 h-6 text-white" />
-                </div>
-                
-                <div className="flex-1 min-w-0">
-                  <Badge className="bg-[hsl(220,90%,60%)]/20 border-[hsl(220,90%,60%)]/30 text-[hsl(220,90%,70%)] backdrop-blur-md text-xs mb-2">
-                    {post.category}
-                  </Badge>
-                  <h3 className="font-display text-xl font-bold text-white mb-2">{post.title}</h3>
-                </div>
-              </div>
-
-              <p className="text-white/70 text-sm mb-4 leading-relaxed">{post.excerpt}</p>
-
-              <div className="flex items-center justify-between pt-4 border-t border-white/10">
-                <div className="flex items-center gap-4 text-xs text-white/50">
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    {post.readTime} read
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Calendar className="w-3 h-3" />
-                    {post.publishDate}
-                  </span>
-                </div>
-                
-                <Button 
-                  size="sm"
-                  variant="ghost"
-                  className="text-[hsl(190,85%,55%)] hover:text-[hsl(190,85%,65%)]"
-                  data-testid={`button-read-more-${index}`}
-                >
-                  Read More
-                  <ArrowRight className="ml-1 w-3 h-3" />
-                </Button>
-              </div>
-
-              <div className="flex flex-wrap gap-2 mt-4">
-                {post.tags.slice(0, 3).map((tag, idx) => (
-                  <Badge 
-                    key={idx}
-                    className="bg-white/5 border-white/10 text-white/60 text-xs"
-                  >
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-            </Card>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 
 function InteractiveTimeline() {
   const [selectedProject, setSelectedProject] = useState<typeof timelineProjects[0] | null>(null);
