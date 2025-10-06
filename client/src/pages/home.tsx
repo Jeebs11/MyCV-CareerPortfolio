@@ -32,7 +32,9 @@ import {
   ExternalLink,
   Calendar,
   BookOpen,
-  Lightbulb
+  Lightbulb,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 const iconMap: Record<string, any> = {
@@ -1014,6 +1016,33 @@ function ImpactMetricsSection() {
 function InteractiveTimeline() {
   const [selectedProject, setSelectedProject] = useState<typeof timelineProjects[0] | null>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (timelineRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = timelineRef.current;
+        setCanScrollLeft(scrollLeft > 0);
+        setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+      }
+    };
+
+    const timeline = timelineRef.current;
+    if (timeline) {
+      handleScroll();
+      timeline.addEventListener('scroll', handleScroll);
+      return () => timeline.removeEventListener('scroll', handleScroll);
+    }
+  }, []);
+
+  const scrollTimeline = (direction: 'left' | 'right') => {
+    if (timelineRef.current) {
+      const scrollAmount = 350;
+      const newScrollLeft = timelineRef.current.scrollLeft + (direction === 'right' ? scrollAmount : -scrollAmount);
+      timelineRef.current.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
+    }
+  };
 
   return (
     <section id="journey" className="relative py-24 overflow-hidden" data-testid="section-journey">
@@ -1030,72 +1059,102 @@ function InteractiveTimeline() {
           </p>
         </div>
 
-        <div 
-          ref={timelineRef}
-          className="relative overflow-x-auto pb-8 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-white/5"
-          data-testid="timeline-container"
-        >
-          <div className="flex gap-6 min-w-max pb-4">
-            {timelineProjects.map((project, index) => (
-              <Card
-                key={project.id}
-                className="bg-white/5 backdrop-blur-xl border-white/10 p-6 min-w-[320px] max-w-[320px] hover-elevate cursor-pointer"
-                onClick={() => setSelectedProject(project)}
-                data-testid={`card-timeline-${project.id}`}
-              >
-                <div className="space-y-4">
-                  <div className="flex items-start justify-between">
-                    <Badge 
-                      className="bg-gradient-to-r from-[hsl(190,85%,55%)]/20 to-[hsl(220,90%,60%)]/20 border-[hsl(190,85%,55%)]/30 text-white"
-                      data-testid={`badge-timeline-period-${project.id}`}
-                    >
-                      {project.period}
-                    </Badge>
-                    {project.current && (
-                      <Badge className="bg-green-500/20 border-green-500/30 text-green-300" data-testid={`badge-current-${project.id}`}>
-                        Current
+        <div className="relative max-w-[90%] mx-auto">
+          <div 
+            ref={timelineRef}
+            className="relative overflow-x-auto pb-8 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-white/5"
+            data-testid="timeline-container"
+          >
+            <div className="flex gap-6 min-w-max pb-4">
+              {timelineProjects.map((project, index) => (
+                <Card
+                  key={project.id}
+                  className="bg-white/5 backdrop-blur-xl border-white/10 p-6 min-w-[320px] max-w-[320px] hover-elevate cursor-pointer"
+                  onClick={() => setSelectedProject(project)}
+                  data-testid={`card-timeline-${project.id}`}
+                >
+                  <div className="space-y-4">
+                    <div className="flex items-start justify-between">
+                      <Badge 
+                        className="bg-gradient-to-r from-[hsl(190,85%,55%)]/20 to-[hsl(220,90%,60%)]/20 border-[hsl(190,85%,55%)]/30 text-white"
+                        data-testid={`badge-timeline-period-${project.id}`}
+                      >
+                        {project.period}
                       </Badge>
-                    )}
-                  </div>
+                      {project.current && (
+                        <Badge className="bg-green-500/20 border-green-500/30 text-green-300" data-testid={`badge-current-${project.id}`}>
+                          Current
+                        </Badge>
+                      )}
+                    </div>
 
-                  <div className="space-y-2">
-                    <h3 className="font-semibold text-lg text-white line-clamp-2" data-testid={`text-timeline-role-${project.id}`}>
-                      {project.role}
-                    </h3>
-                    <p className="text-[hsl(190,85%,55%)] font-medium" data-testid={`text-timeline-company-${project.id}`}>
-                      {project.company}
-                    </p>
-                    <p className="text-sm text-white/60" data-testid={`text-timeline-location-${project.id}`}>
-                      {project.location}
-                    </p>
-                  </div>
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-lg text-white line-clamp-2" data-testid={`text-timeline-role-${project.id}`}>
+                        {project.role}
+                      </h3>
+                      <p className="text-[hsl(190,85%,55%)] font-medium" data-testid={`text-timeline-company-${project.id}`}>
+                        {project.company}
+                      </p>
+                      <p className="text-sm text-white/60" data-testid={`text-timeline-location-${project.id}`}>
+                        {project.location}
+                      </p>
+                    </div>
 
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs border-white/20 text-white/70" data-testid={`badge-timeline-industry-${project.id}`}>
-                      {project.industry}
-                    </Badge>
-                    <Badge variant="outline" className="text-xs border-white/20 text-white/70" data-testid={`badge-timeline-type-${project.id}`}>
-                      {project.projectType}
-                    </Badge>
-                  </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-xs border-white/20 text-white/70" data-testid={`badge-timeline-industry-${project.id}`}>
+                        {project.industry}
+                      </Badge>
+                      <Badge variant="outline" className="text-xs border-white/20 text-white/70" data-testid={`badge-timeline-type-${project.id}`}>
+                        {project.projectType}
+                      </Badge>
+                    </div>
 
-                  <div className="pt-4 border-t border-white/10">
-                    <p className="text-sm text-white/80 line-clamp-2" data-testid={`text-timeline-achievement-${project.id}`}>
-                      {project.keyAchievements[0]}
-                    </p>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="mt-2 text-[hsl(190,85%,55%)] hover:text-white p-0 h-auto"
-                      data-testid={`button-timeline-view-${project.id}`}
-                    >
-                      View Details <ArrowRight className="ml-1 w-4 h-4" />
-                    </Button>
+                    <div className="pt-4 border-t border-white/10">
+                      <p className="text-sm text-white/80 line-clamp-2" data-testid={`text-timeline-achievement-${project.id}`}>
+                        {project.keyAchievements[0]}
+                      </p>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="mt-2 text-[hsl(190,85%,55%)] hover:text-white p-0 h-auto"
+                        data-testid={`button-timeline-view-${project.id}`}
+                      >
+                        View Details <ArrowRight className="ml-1 w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              ))}
+            </div>
           </div>
+
+          <div className="absolute right-0 top-0 bottom-8 w-32 bg-gradient-to-l from-[hsl(270,8%,12%)] to-transparent pointer-events-none" />
+
+          {canScrollLeft && (
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => scrollTimeline('left')}
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20"
+              data-testid="button-timeline-scroll-left"
+              aria-label="Scroll timeline left"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </Button>
+          )}
+
+          {canScrollRight && (
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => scrollTimeline('right')}
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20"
+              data-testid="button-timeline-scroll-right"
+              aria-label="Scroll timeline right"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </Button>
+          )}
         </div>
 
         <Dialog open={!!selectedProject} onOpenChange={() => setSelectedProject(null)}>
