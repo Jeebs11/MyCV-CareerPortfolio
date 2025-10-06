@@ -8,7 +8,8 @@ This is a personal portfolio website for Mujeeb Lawal, a Senior Project Manager 
 
 **Latest Changes (October 6, 2024):**
 - Streamlined portfolio by removing redundant sections (Impact Metrics, Case Studies, Project Dashboard)
-- Updated navigation to focus on core sections: Journey, Industries, Contact
+- **Moved Insights & Thought Leadership to dedicated blog page** at `/insights` route with interactive filtering, featured article spotlight, and article detail modals
+- Updated navigation to include: Journey, Industries, Insights, Contact
 - Enhanced Interactive Timeline with triple scroll affordance: peek effect, fade gradient overlay, and accessible arrow navigation
 
 **Key Features:**
@@ -18,7 +19,12 @@ This is a personal portfolio website for Mujeeb Lawal, a Senior Project Manager 
 
 3. **Certifications Wall of Fame** - Interactive expandable cards showcasing PRINCE2, Scrum Master, Six Sigma, and Agile certifications with detailed descriptions, validation links, and skills mapping
 
-4. **Thought Leadership Section** - Blog-style insights covering PMO leadership, compliance navigation, AI integration, and global delivery methodologies
+4. **Insights & Thought Leadership Page** - Dedicated blog-style page at `/insights` featuring:
+   - Hero section with glassmorphic design
+   - Category filtering (PMO Leadership, Compliance, Innovation, Methodology)
+   - Featured article spotlight
+   - Interactive article grid with detail modals
+   - 4 blog posts covering PMO leadership, FCA compliance, AI integration, and global delivery methodologies
 
 ## User Preferences
 
