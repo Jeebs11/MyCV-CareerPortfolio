@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { experiences, skills, keyAchievements, detailedCertifications, timelineProjects, industryExperience } from '@shared/schema';
+import { experiences, skills, keyAchievements, detailedCertifications, timelineProjects, industryExperience, education } from '@shared/schema';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -35,7 +35,8 @@ import {
   Lightbulb,
   ChevronLeft,
   ChevronRight,
-  ChevronUp
+  ChevronUp,
+  GraduationCap
 } from 'lucide-react';
 
 const iconMap: Record<string, any> = {
@@ -71,11 +72,11 @@ export default function Home() {
       
       <HeroSection scrollToSection={scrollToSection} />
       
-      <IndustryExperienceMap />
-      
       <MetricsDashboard />
       
       <CareerTimeline activeRegion={activeRegion} setActiveRegion={setActiveRegion} />
+      
+      <IndustryExperienceMap />
       
       <GeographicMap activeRegion={activeRegion} setActiveRegion={setActiveRegion} />
       
@@ -823,77 +824,144 @@ function GeographicMap({ activeRegion, setActiveRegion }: { activeRegion: string
 
 function CertificationsWall() {
   const [selectedCert, setSelectedCert] = useState<string | null>(null);
+  const [selectedEdu, setSelectedEdu] = useState<string | null>(null);
 
   return (
     <section id="certifications" className="relative py-20" data-testid="section-certifications">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="font-display text-4xl sm:text-5xl font-bold text-white mb-4">
-            Certifications & Credentials
+            Certifications & Education
           </h2>
           <p className="text-lg text-white/60 max-w-2xl mx-auto">
-            Industry-recognized qualifications validating expertise
+            Industry-recognized qualifications and academic credentials
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          {detailedCertifications.map((cert, index) => (
-            <Card
-              key={cert.id}
-              className="bg-white/5 backdrop-blur-xl border-white/10 p-6 hover-elevate transition-all duration-300 cursor-pointer"
-              onClick={() => setSelectedCert(selectedCert === cert.id ? null : cert.id)}
-              data-testid={`card-cert-${index}`}
-            >
-              <div className="flex items-start gap-4">
-                <div className="w-16 h-16 rounded-md bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center flex-shrink-0">
-                  <Award className="w-8 h-8 text-white" />
-                </div>
-                
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-display text-xl font-bold text-white mb-1">{cert.name}</h3>
-                  <p className="text-[hsl(190,85%,55%)] text-sm mb-2">{cert.issuer}</p>
-                  
-                  <div className="flex items-center gap-2 text-xs text-white/50 mb-3">
-                    <Calendar className="w-3 h-3" />
-                    <span>Obtained {cert.dateObtained}</span>
-                    {cert.verificationUrl && (
-                      <>
-                        <span>•</span>
-                        <a 
-                          href={cert.verificationUrl}
-                          onClick={(e) => e.stopPropagation()}
-                          className="flex items-center gap-1 text-[hsl(190,85%,55%)] hover:text-[hsl(190,85%,65%)]"
-                        >
-                          <ExternalLink className="w-3 h-3" />
-                          Verify
-                        </a>
-                      </>
-                    )}
-                  </div>
-
-                  {selectedCert === cert.id && (
-                    <div className="space-y-3 mt-4 pt-4 border-t border-white/10">
-                      <p className="text-sm text-white/70">{cert.description}</p>
-                      
-                      <div>
-                        <p className="text-xs font-semibold text-white mb-2">Skills Validated:</p>
-                        <div className="flex flex-wrap gap-2">
-                          {cert.skills.map((skill, idx) => (
-                            <Badge 
-                              key={idx}
-                              className="bg-white/10 border-white/20 text-white/80 text-xs"
-                            >
-                              {skill}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
+        <div className="space-y-12">
+          <div>
+            <h3 className="font-display text-2xl font-bold text-white mb-6 flex items-center gap-2">
+              <Award className="w-6 h-6 text-[hsl(190,85%,55%)]" />
+              Professional Certifications
+            </h3>
+            <div className="grid md:grid-cols-2 gap-6">
+              {detailedCertifications.map((cert, index) => (
+                <Card
+                  key={cert.id}
+                  className="bg-white/5 backdrop-blur-xl border-white/10 p-6 hover-elevate transition-all duration-300 cursor-pointer"
+                  onClick={() => setSelectedCert(selectedCert === cert.id ? null : cert.id)}
+                  data-testid={`card-cert-${index}`}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-16 h-16 rounded-md bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center flex-shrink-0">
+                      <Award className="w-8 h-8 text-white" />
                     </div>
-                  )}
-                </div>
-              </div>
-            </Card>
-          ))}
+                    
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-display text-xl font-bold text-white mb-1">{cert.name}</h3>
+                      <p className="text-[hsl(190,85%,55%)] text-sm mb-2">{cert.issuer}</p>
+                      
+                      <div className="flex items-center gap-2 text-xs text-white/50 mb-3">
+                        <Calendar className="w-3 h-3" />
+                        <span>Obtained {cert.dateObtained}</span>
+                        {cert.verificationUrl && (
+                          <>
+                            <span>•</span>
+                            <a 
+                              href={cert.verificationUrl}
+                              onClick={(e) => e.stopPropagation()}
+                              className="flex items-center gap-1 text-[hsl(190,85%,55%)] hover:text-[hsl(190,85%,65%)]"
+                            >
+                              <ExternalLink className="w-3 h-3" />
+                              Verify
+                            </a>
+                          </>
+                        )}
+                      </div>
+
+                      {selectedCert === cert.id && (
+                        <div className="space-y-3 mt-4 pt-4 border-t border-white/10">
+                          <p className="text-sm text-white/70">{cert.description}</p>
+                          
+                          <div>
+                            <p className="text-xs font-semibold text-white mb-2">Skills Validated:</p>
+                            <div className="flex flex-wrap gap-2">
+                              {cert.skills.map((skill, idx) => (
+                                <Badge 
+                                  key={idx}
+                                  className="bg-white/10 border-white/20 text-white/80 text-xs"
+                                >
+                                  {skill}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h3 className="font-display text-2xl font-bold text-white mb-6 flex items-center gap-2">
+              <GraduationCap className="w-6 h-6 text-[hsl(190,85%,55%)]" />
+              Education
+            </h3>
+            <div className="grid md:grid-cols-2 gap-6">
+              {education.map((edu, index) => (
+                <Card
+                  key={edu.id}
+                  className="bg-white/5 backdrop-blur-xl border-white/10 p-6 hover-elevate transition-all duration-300 cursor-pointer"
+                  onClick={() => setSelectedEdu(selectedEdu === edu.id ? null : edu.id)}
+                  data-testid={`card-edu-${index}`}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-16 h-16 rounded-md bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center flex-shrink-0">
+                      <GraduationCap className="w-8 h-8 text-white" />
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-display text-xl font-bold text-white mb-1">{edu.degree}</h3>
+                      <p className="text-[hsl(190,85%,55%)] text-sm mb-2">{edu.institution}</p>
+                      
+                      <div className="flex flex-col gap-1 text-xs text-white/50 mb-3">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-3 h-3" />
+                          <span>{edu.period}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-3 h-3" />
+                          <span>{edu.location}</span>
+                        </div>
+                        {edu.fieldOfStudy && (
+                          <p className="text-white/60 mt-1">{edu.fieldOfStudy}</p>
+                        )}
+                      </div>
+
+                      {selectedEdu === edu.id && edu.achievements && (
+                        <div className="space-y-3 mt-4 pt-4 border-t border-white/10">
+                          <div>
+                            <p className="text-xs font-semibold text-white mb-2">Highlights:</p>
+                            <ul className="space-y-2">
+                              {edu.achievements.map((achievement, idx) => (
+                                <li key={idx} className="flex items-start gap-2">
+                                  <CheckCircle2 className="w-3 h-3 text-green-400 mt-0.5 flex-shrink-0" />
+                                  <span className="text-sm text-white/70">{achievement}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>

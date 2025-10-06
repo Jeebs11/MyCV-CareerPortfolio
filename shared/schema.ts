@@ -197,6 +197,16 @@ export interface DetailedCertification {
   skills: string[];
 }
 
+export interface Education {
+  id: string;
+  degree: string;
+  institution: string;
+  location: string;
+  period: string;
+  fieldOfStudy?: string;
+  achievements?: string[];
+}
+
 export interface BlogPost {
   id: string;
   title: string;
@@ -331,6 +341,21 @@ export const detailedCertifications: DetailedCertification[] = [
     description: 'PMI certification demonstrating knowledge of Agile principles and practices across multiple frameworks.',
     skills: ['Agile Methodologies', 'Adaptive Planning', 'Team Empowerment', 'Stakeholder Engagement'],
     verificationUrl: '#'
+  }
+];
+
+export const education: Education[] = [
+  {
+    id: '1',
+    degree: 'Master of Engineering (MEng)',
+    institution: 'Imperial College London',
+    location: 'London, UK',
+    period: '2004 - 2008',
+    fieldOfStudy: 'Mechanical Engineering',
+    achievements: [
+      'Specialized in project management and systems engineering',
+      'Dissertation on process optimization in engineering projects'
+    ]
   }
 ];
 
