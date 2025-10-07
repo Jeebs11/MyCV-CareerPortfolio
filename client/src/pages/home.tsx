@@ -487,7 +487,7 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/20 border border-green-500/30">
                 <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                 <span className="text-sm font-medium text-green-300" data-testid="badge-status">
-                  Open to Senior PM & Programme Director Roles
+                  Open to new opportunities
                 </span>
               </div>
               
