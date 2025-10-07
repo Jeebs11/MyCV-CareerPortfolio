@@ -492,9 +492,9 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
               </div>
               
               <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight" data-testid="text-hero-title">
-                £50M+ Delivered Across
+                Project and Operation Delivery Expert
                 <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)]">
-                  7 Industries • 4 Continents
+                  7 Industries . 4 Continents
                 </span>
               </h1>
               
