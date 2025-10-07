@@ -577,7 +577,7 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
                 <Mail className="w-5 h-5" />
               </a>
               <span className="text-white/30">|</span>
-              <span className="text-sm text-white/50">Available: Immediate Start • Remote/Hybrid/London</span>
+              <span className="text-sm text-white/50">Available: Immediate Start • Remote/Hybrid/Freelance/No Visa Needed - Self Sponsored</span>
             </div>
           </div>
           
