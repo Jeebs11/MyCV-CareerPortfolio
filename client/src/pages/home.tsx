@@ -470,6 +470,8 @@ function VerticalCareerTimeline() {
 }
 
 function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => void }) {
+  const topRoles = timelineProjects.slice(0, 3);
+
   return (
     <section id="journey" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20" data-testid="section-hero">
       <div className="absolute inset-0">
@@ -481,36 +483,68 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
       <div className="relative max-w-7xl mx-auto px-6 py-20">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">
-            <div className="space-y-4">
-              <Badge 
-                className="bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20"
-                data-testid="badge-status"
-              >
-                Available for New Opportunities
-              </Badge>
+            <div className="space-y-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/20 border border-green-500/30">
+                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                <span className="text-sm font-medium text-green-300" data-testid="badge-status">
+                  Open to Senior PM & Programme Director Roles
+                </span>
+              </div>
               
-              <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-tight" data-testid="text-hero-title">
-                Senior Project Manager
+              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight" data-testid="text-hero-title">
+                £50M+ Delivered Across
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)]">
+                  7 Industries • 4 Continents
+                </span>
               </h1>
               
-              <p className="text-xl sm:text-2xl text-white/80" data-testid="text-hero-subtitle">
-                Delivering Multi-Million Pound Programmes Across 4 Continents
+              <p className="text-xl text-white/80 max-w-xl" data-testid="text-hero-subtitle">
+                Fortune 500-trusted PM specialist delivering regulated, multi-million pound programmes on time and within budget
               </p>
-              
-              <p className="text-lg text-white/60 max-w-xl" data-testid="text-hero-description">
-                17+ years of expertise in international project delivery, Agile transformation, and PMO leadership. 
-                Trusted by Fortune 500 companies to deliver complex, regulated programmes on time and within budget.
-              </p>
+
+              {/* Metrics Bar */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-4">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-white">17+</div>
+                  <div className="text-sm text-white/60">Years</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-white">£50M+</div>
+                  <div className="text-sm text-white/60">Delivered</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-white">95%</div>
+                  <div className="text-sm text-white/60">On-Time</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-white">7</div>
+                  <div className="text-sm text-white/60">Industries</div>
+                </div>
+              </div>
+
+              {/* Social Proof */}
+              <div className="pt-2">
+                <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Trusted By</p>
+                <div className="flex flex-wrap items-center gap-3 text-sm text-white/60">
+                  <span>Amazon</span>
+                  <span>•</span>
+                  <span>Estée Lauder</span>
+                  <span>•</span>
+                  <span>Simply Business</span>
+                  <span>•</span>
+                  <span>Mercer</span>
+                </div>
+              </div>
             </div>
             
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-3">
               <Button 
                 size="lg"
-                className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0 hover-elevate active-elevate-2"
+                className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0 hover-elevate active-elevate-2 text-base px-8"
                 onClick={() => scrollToSection('contact')}
                 data-testid="button-primary-cta"
               >
-                Let's Talk <ArrowRight className="ml-2 w-4 h-4" />
+                Schedule a Call <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               
               <Button 
@@ -520,7 +554,7 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
                 onClick={() => scrollToSection('experience')}
                 data-testid="button-secondary-cta"
               >
-                View Experience
+                View Track Record
               </Button>
               
               <Button 
@@ -530,11 +564,11 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
                 onClick={() => window.open('https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/', '_blank')}
                 data-testid="button-download-cv"
               >
-                <Download className="mr-2 w-4 h-4" /> LinkedIn Profile
+                <Linkedin className="mr-2 w-5 h-5" /> LinkedIn
               </Button>
             </div>
             
-            <div className="flex items-center gap-6 pt-4">
+            <div className="flex items-center gap-4 pt-2">
               <a 
                 href="mailto:odmlawal@gmail.com"
                 className="text-white/60 hover:text-white transition-colors"
@@ -542,20 +576,66 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
               >
                 <Mail className="w-5 h-5" />
               </a>
-              <a 
-                href="https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white/60 hover:text-white transition-colors"
-                data-testid="link-linkedin"
-              >
-                <Linkedin className="w-5 h-5" />
-              </a>
+              <span className="text-white/30">|</span>
+              <span className="text-sm text-white/50">Available: Immediate Start • Remote/Hybrid/London</span>
             </div>
           </div>
           
           <div className="relative w-full lg:w-auto">
-            <VerticalCareerTimeline />
+            <div className="mb-4">
+              <h3 className="font-display text-xl font-bold text-white mb-1" data-testid="text-recent-roles-title">
+                Recent Impact
+              </h3>
+              <p className="text-sm text-white/50">Latest leadership roles</p>
+            </div>
+            <div className="space-y-3">
+              {topRoles.map((project) => (
+                <Card
+                  key={project.id}
+                  className="bg-white/5 backdrop-blur-xl border-white/10 p-5 hover-elevate transition-all"
+                  data-testid={`card-recent-${project.id}`}
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <Badge 
+                        className="text-xs bg-gradient-to-r from-[hsl(190,85%,55%)]/20 to-[hsl(220,90%,60%)]/20 border-[hsl(190,85%,55%)]/30 text-white"
+                        data-testid={`badge-period-${project.id}`}
+                      >
+                        {project.period}
+                      </Badge>
+                      {project.current && (
+                        <Badge className="text-xs bg-green-500/20 border-green-500/30 text-green-300" data-testid={`badge-current-${project.id}`}>
+                          Current
+                        </Badge>
+                      )}
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold text-white text-base leading-tight mb-1" data-testid={`text-role-${project.id}`}>
+                        {project.role}
+                      </h4>
+                      <p className="text-[hsl(190,85%,55%)] text-sm mb-2" data-testid={`text-company-${project.id}`}>
+                        {project.company}
+                      </p>
+                      <p className="text-white/60 text-sm" data-testid={`text-achievement-${project.id}`}>
+                        {project.keyAchievements[0]}
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      <Badge className="text-xs bg-white/5 border-white/10 text-white/70">
+                        {project.industry}
+                      </Badge>
+                      {project.projectType && (
+                        <Badge className="text-xs bg-white/5 border-white/10 text-white/70">
+                          {project.projectType}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
           </div>
         </div>
         
