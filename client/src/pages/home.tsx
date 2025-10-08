@@ -1185,6 +1185,11 @@ function ContactSection() {
                 <span className="mx-3">•</span>
                 <span>London, UK</span>
               </p>
+              <p className="text-white/50 text-sm mt-2">
+                <span className="font-mono">+971 (0) 509082234</span>
+                <span className="mx-3">•</span>
+                <span>Dubai, UAE</span>
+              </p>
             </div>
           </div>
         </Card>
