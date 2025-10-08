@@ -471,6 +471,7 @@ function VerticalCareerTimeline() {
 
 function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => void }) {
   const topRoles = timelineProjects.slice(0, 3);
+  const [selectedProject, setSelectedProject] = useState<typeof timelineProjects[0] | null>(null);
 
   return (
     <section id="journey" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20" data-testid="section-hero">
@@ -602,15 +603,26 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
                       </p>
                     </div>
 
-                    <div className="flex flex-wrap gap-2">
-                      <Badge className="text-xs bg-white/5 border-white/10 text-white/70">
-                        {project.industry}
-                      </Badge>
-                      {project.projectType && (
+                    <div className="flex flex-wrap gap-2 items-center justify-between">
+                      <div className="flex flex-wrap gap-2">
                         <Badge className="text-xs bg-white/5 border-white/10 text-white/70">
-                          {project.projectType}
+                          {project.industry}
                         </Badge>
-                      )}
+                        {project.projectType && (
+                          <Badge className="text-xs bg-white/5 border-white/10 text-white/70">
+                            {project.projectType}
+                          </Badge>
+                        )}
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-xs text-[hsl(190,85%,55%)] hover:text-[hsl(190,85%,65%)] h-auto py-1 px-2"
+                        onClick={() => setSelectedProject(project)}
+                        data-testid={`button-view-impact-${project.id}`}
+                      >
+                        View Impact
+                      </Button>
                     </div>
                   </div>
                 </Card>
@@ -618,6 +630,75 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
             </div>
           </div>
         </div>
+        
+        {/* Impact Dialog */}
+        <Dialog open={selectedProject !== null} onOpenChange={(open) => { if (!open) setSelectedProject(null); }}>
+          <DialogContent className="bg-[hsl(270,8%,12%)] border-white/10 text-white max-w-2xl">
+            {selectedProject && (
+              <>
+                <DialogHeader>
+                  <DialogTitle className="font-display text-2xl text-white">
+                    {selectedProject.role}
+                  </DialogTitle>
+                  <DialogDescription className="text-[hsl(190,85%,55%)]">
+                    {selectedProject.company} • {selectedProject.period}
+                  </DialogDescription>
+                </DialogHeader>
+                
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-sm font-semibold text-white/70 mb-3 flex items-center gap-2">
+                      <Target className="w-4 h-4" />
+                      Key Achievements & Impact
+                    </h3>
+                    <ul className="space-y-2">
+                      {selectedProject.keyAchievements.map((achievement, idx) => (
+                        <li key={idx} className="flex items-start gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-[hsl(190,85%,55%)] mt-0.5 flex-shrink-0" />
+                          <span className="text-sm text-white/80">{achievement}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    <Badge className="text-xs bg-white/5 border-white/10 text-white/70">
+                      {selectedProject.industry}
+                    </Badge>
+                    {selectedProject.projectType && (
+                      <Badge className="text-xs bg-white/5 border-white/10 text-white/70">
+                        {selectedProject.projectType}
+                      </Badge>
+                    )}
+                    {selectedProject.budget && (
+                      <Badge className="text-xs bg-[hsl(190,85%,55%)]/20 border-[hsl(190,85%,55%)]/30 text-[hsl(190,85%,65%)]">
+                        Budget: {selectedProject.budget}
+                      </Badge>
+                    )}
+                    {selectedProject.teamSize && (
+                      <Badge className="text-xs bg-white/5 border-white/10 text-white/70">
+                        Team: {selectedProject.teamSize} people
+                      </Badge>
+                    )}
+                  </div>
+
+                  {selectedProject.technologies && selectedProject.technologies.length > 0 && (
+                    <div>
+                      <h3 className="text-sm font-semibold text-white/70 mb-2">Technologies & Tools</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedProject.technologies.map((tech, idx) => (
+                          <Badge key={idx} className="text-xs bg-white/5 border-white/10 text-white/70">
+                            {tech}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
         
         <button 
           onClick={() => scrollToSection('metrics')}
@@ -758,63 +839,117 @@ function CareerTimeline({ activeRegion, setActiveRegion }: { activeRegion: strin
 
 function TimelineCard({ experience, index, onHover, onLeave }: { experience: any; index: number; onHover: () => void; onLeave: () => void }) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showImpactDialog, setShowImpactDialog] = useState(false);
 
   return (
-    <Card
-      className="bg-white/5 backdrop-blur-xl border-white/10 p-6 sm:p-8 hover-elevate transition-all duration-300"
-      onMouseEnter={onHover}
-      onMouseLeave={onLeave}
-      data-testid={`card-experience-${index}`}
-    >
-      <div className="flex flex-col sm:flex-row sm:items-start gap-6">
-        <div className="flex-shrink-0">
-          <div className="w-12 h-12 rounded-md bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center">
-            <Briefcase className="w-6 h-6 text-white" />
+    <>
+      <Card
+        className="bg-white/5 backdrop-blur-xl border-white/10 p-6 sm:p-8 hover-elevate transition-all duration-300"
+        onMouseEnter={onHover}
+        onMouseLeave={onLeave}
+        data-testid={`card-experience-${index}`}
+      >
+        <div className="flex flex-col sm:flex-row sm:items-start gap-6">
+          <div className="flex-shrink-0">
+            <div className="w-12 h-12 rounded-md bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center">
+              <Briefcase className="w-6 h-6 text-white" />
+            </div>
           </div>
-        </div>
-        
-        <div className="flex-1 min-w-0">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
-            <div>
-              <h3 className="font-display text-xl font-bold text-white mb-1">{experience.role}</h3>
-              <p className="text-[hsl(190,85%,55%)] font-medium">{experience.company}</p>
+          
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
+              <div>
+                <h3 className="font-display text-xl font-bold text-white mb-1">{experience.role}</h3>
+                <p className="text-[hsl(190,85%,55%)] font-medium">{experience.company}</p>
+              </div>
+              
+              <div className="flex flex-col sm:items-end gap-2">
+                <Badge 
+                  className={`${
+                    experience.current 
+                      ? 'bg-[hsl(145,70%,50%)]/20 border-[hsl(145,70%,50%)]/30 text-[hsl(145,70%,70%)]' 
+                      : 'bg-white/10 border-white/20 text-white/70'
+                  } backdrop-blur-md`}
+                >
+                  {experience.period}
+                </Badge>
+                <p className="text-sm text-white/50">{experience.location}</p>
+              </div>
             </div>
             
-            <div className="flex flex-col sm:items-end gap-2">
-              <Badge 
-                className={`${
-                  experience.current 
-                    ? 'bg-[hsl(145,70%,50%)]/20 border-[hsl(145,70%,50%)]/30 text-[hsl(145,70%,70%)]' 
-                    : 'bg-white/10 border-white/20 text-white/70'
-                } backdrop-blur-md`}
+            <div className="space-y-2">
+              {experience.achievements.slice(0, isExpanded ? undefined : 2).map((achievement: string, idx: number) => (
+                <div key={idx} className="flex items-start gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[hsl(190,85%,55%)] mt-2 flex-shrink-0" />
+                  <p className="text-white/70 text-sm">{achievement}</p>
+                </div>
+              ))}
+            </div>
+            
+            <div className="flex items-center gap-3 mt-3">
+              {experience.achievements.length > 2 && (
+                <button
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="text-[hsl(190,85%,55%)] text-sm font-medium hover:text-[hsl(190,85%,65%)] transition-colors"
+                  data-testid={`button-expand-${index}`}
+                >
+                  {isExpanded ? 'Show Less' : `Show ${experience.achievements.length - 2} More`}
+                </button>
+              )}
+              <Button
+                size="sm"
+                variant="ghost"
+                className="text-xs text-[hsl(190,85%,55%)] hover:text-[hsl(190,85%,65%)] h-auto py-1 px-2"
+                onClick={() => setShowImpactDialog(true)}
+                data-testid={`button-view-impact-exp-${index}`}
               >
-                {experience.period}
-              </Badge>
-              <p className="text-sm text-white/50">{experience.location}</p>
+                View Full Impact
+              </Button>
             </div>
           </div>
-          
-          <div className="space-y-2">
-            {experience.achievements.slice(0, isExpanded ? undefined : 2).map((achievement: string, idx: number) => (
-              <div key={idx} className="flex items-start gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-[hsl(190,85%,55%)] mt-2 flex-shrink-0" />
-                <p className="text-white/70 text-sm">{achievement}</p>
-              </div>
-            ))}
-          </div>
-          
-          {experience.achievements.length > 2 && (
-            <button
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="text-[hsl(190,85%,55%)] text-sm font-medium mt-3 hover:text-[hsl(190,85%,65%)] transition-colors"
-              data-testid={`button-expand-${index}`}
-            >
-              {isExpanded ? 'Show Less' : `Show ${experience.achievements.length - 2} More`}
-            </button>
-          )}
         </div>
-      </div>
-    </Card>
+      </Card>
+
+      {/* Impact Dialog */}
+      <Dialog open={showImpactDialog} onOpenChange={(open) => { if (!open) setShowImpactDialog(false); }}>
+        <DialogContent className="bg-[hsl(270,8%,12%)] border-white/10 text-white max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="font-display text-2xl text-white">
+              {experience.role}
+            </DialogTitle>
+            <DialogDescription className="text-[hsl(190,85%,55%)]">
+              {experience.company} • {experience.period}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-sm font-semibold text-white/70 mb-3 flex items-center gap-2">
+                <Target className="w-4 h-4" />
+                All Achievements & Impact
+              </h3>
+              <ul className="space-y-2">
+                {experience.achievements.map((achievement: string, idx: number) => (
+                  <li key={idx} className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-[hsl(190,85%,55%)] mt-0.5 flex-shrink-0" />
+                    <span className="text-sm text-white/80">{achievement}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="flex flex-wrap gap-2 pt-2">
+              <Badge className="text-xs bg-white/5 border-white/10 text-white/70">
+                {experience.industry}
+              </Badge>
+              <Badge className="text-xs bg-white/5 border-white/10 text-white/70">
+                {experience.location}
+              </Badge>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
