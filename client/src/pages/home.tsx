@@ -502,26 +502,6 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
                 Fortune 500-trusted PM specialist delivering regulated, multi-million pound programmes on time and within budget
               </p>
 
-              {/* Metrics Bar */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-4">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-white">17+</div>
-                  <div className="text-sm text-white/60">Years</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-white">£50M+</div>
-                  <div className="text-sm text-white/60">Delivered</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-white">95%</div>
-                  <div className="text-sm text-white/60">On-Time</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-white">7</div>
-                  <div className="text-sm text-white/60">Industries</div>
-                </div>
-              </div>
-
               {/* Social Proof */}
               <div className="pt-2">
                 <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Trusted By</p>

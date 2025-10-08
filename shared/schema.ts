@@ -132,7 +132,7 @@ export const skills: Skill[] = [
 
 export const keyAchievements: Achievement[] = [
   {
-    metric: '£1.2M+',
+    metric: '£50M+',
     description: 'Programme Value Delivered',
     icon: 'TrendingUp'
   },
