@@ -6,7 +6,17 @@ This is a personal portfolio website for Mujeeb Lawal, a Senior Project Manager 
 
 ## Recent Updates (October 2024)
 
-**Latest Changes (October 6, 2024):**
+**Latest Changes (October 8, 2024):**
+- **Added "View Impact" feature** - Interactive dialogs in both Recent Impact (hero section) and Career Journey sections showing full achievements, technologies, budget, and team size details
+- **Completed Career Journey section** - Added 4 missing career entries from PDF resume:
+  - Project Delivery Manager at Best Future Education Centre (Mar 2020 - Dec 2020) - Nigeria, Education sector
+  - Senior Implementation Consultant at Dictate.IT (Sep 2014 - May 2016) - Healthcare sector, NHS implementations
+  - Technical Project Manager at BSS Industrial (Nov 2013 - Aug 2014) - Engineering/Construction, hospitality projects
+  - Project Support Engineer at Alfa Laval (Sep 2008 - Nov 2013) - Engineering, landmark UK infrastructure
+- **Reworded BSS Industrial and Alfa Laval achievements** to match professional tone of other entries - clearer, more action-oriented language
+- Fixed region assignment for Best Future Education Centre (Nigeria) from 'europe' to 'mena' for accurate geographic representation
+
+**Previous Changes (October 6, 2024):**
 - Streamlined portfolio by removing redundant sections (Impact Metrics, Case Studies, Project Dashboard)
 - **Moved Insights & Thought Leadership to dedicated blog page** at `/insights` route with interactive filtering, featured article spotlight, and article detail modals
 - Updated navigation to include: Journey, Industries, Insights, Contact

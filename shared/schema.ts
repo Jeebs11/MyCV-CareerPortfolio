@@ -112,6 +112,66 @@ export const experiences: Experience[] = [
       'Achieved up to 35% energy reduction for major operators like Vodafone, Verizon, and China Telecom',
       'Engaged with regulators and executives to influence adoption of new sustainability standards'
     ]
+  },
+  {
+    id: '7',
+    role: 'Project Delivery Manager',
+    company: 'Best Future Education Centre',
+    location: 'Nigeria',
+    period: 'Mar 2020 - Dec 2020',
+    current: false,
+    region: 'mena',
+    industry: 'Education',
+    achievements: [
+      'Led digital transformation during COVID-19, rolling out data systems and remote learning platforms',
+      'Delivered staff and student training to ensure business continuity',
+      'Enabled uninterrupted education during lockdown period'
+    ]
+  },
+  {
+    id: '8',
+    role: 'Senior Implementation Consultant',
+    company: 'Dictate.IT',
+    location: 'London, UK',
+    period: 'Sep 2014 - May 2016',
+    current: false,
+    region: 'uk',
+    industry: 'Healthcare',
+    achievements: [
+      'Implemented digital dictation systems across NHS Trusts, reducing costs and turnaround times',
+      'Delivered training and change management for clinical teams',
+      'Deployed solutions at St George, Royal Free, and Nuffield Health'
+    ]
+  },
+  {
+    id: '9',
+    role: 'Technical Project Manager',
+    company: 'BSS Industrial',
+    location: 'London, UK',
+    period: 'Nov 2013 - Aug 2014',
+    current: false,
+    region: 'uk',
+    industry: 'Engineering/Construction',
+    achievements: [
+      'Managed construction and sustainable technical solutions for high-profile hospitality and commercial projects',
+      'Delivered fit-out and engineering projects including The Hilton Brighton',
+      'Coordinated procurement, quality control, and risk management for multiple construction sites'
+    ]
+  },
+  {
+    id: '10',
+    role: 'Project Support Engineer',
+    company: 'Alfa Laval',
+    location: 'London, UK',
+    period: 'Sep 2008 - Nov 2013',
+    current: false,
+    region: 'uk',
+    industry: 'Engineering',
+    achievements: [
+      'Developed heat transfer solutions for landmark UK infrastructure projects, improving operational efficiency',
+      'Delivered engineering solutions for The Shard, London 2012 Olympic Aquatic Centre, and 20 Fenchurch Street',
+      'Provided technical consulting and training across construction and engineering projects'
+    ]
   }
 ];
 
