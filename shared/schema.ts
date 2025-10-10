@@ -33,9 +33,9 @@ export const experiences: Experience[] = [
     region: 'mena',
     industry: 'Engineering/Battery Recycling',
     achievements: [
-      'Established a PMO to centralise communication, align projects, and manage multi-million Euro EU grant projects',
-      'Coordinated technical and non-technical delivery teams across Europe and the Middle East',
-      'Introduced structured project reporting and delivery tracking using Jira/Confluence, reducing reporting effort by 36%'
+      'Built the PMO function from the ground up, bringing structure to multi-million Euro EU-funded battery recycling research programmes',
+      'Managing cross-border delivery teams spanning Europe and the Middle East, keeping technical and non-technical workstreams aligned',
+      'Cut reporting overhead by 36% through smart use of Jira and Confluence, giving stakeholders better visibility with less effort'
     ]
   },
   {
@@ -48,9 +48,9 @@ export const experiences: Experience[] = [
     region: 'uk',
     industry: 'Insurance',
     achievements: [
-      'Redesigned a core insurance product, improving profitability',
-      'Facilitated workshops to gather requirements and map workflows, identifying inefficiencies',
-      'Introduced a vendor selection process and managed insurance underwriters'
+      'Transformed a core mutual agreement insurance product, directly boosting profit margins',
+      'Led workshops with stakeholders to map workflows and spot inefficiencies, then fixed them',
+      'Built a vendor selection framework and negotiated with insurance underwriters to get better terms'
     ]
   },
   {
@@ -63,9 +63,10 @@ export const experiences: Experience[] = [
     region: 'uk',
     industry: 'Insurance',
     achievements: [
-      'Delivered a £1.2m insurance product using microservices and APIs',
-      'Managed FCA-regulated programme with multi-workstream Agile delivery',
-      'Introduced sprint cycles and reporting dashboards, improving progress tracking'
+      'Shipped a £1.2M commercial insurance product built on microservices and APIs, with a team of 34 specialists',
+      'Ran the company\'s 10-year anniversary Global Hackathon, then coached the winning team to secure sponsorship and build their MVP',
+      'Delivered two major FCA compliance programmes (Operation Resilience and Consumer Duty) across multiple workstreams',
+      'Set up sprint cycles and live dashboards that gave everyone clear visibility on where we were'
     ]
   },
   {
@@ -78,9 +79,9 @@ export const experiences: Experience[] = [
     region: 'uk',
     industry: 'Insurance',
     achievements: [
-      'Directed multi-country rollouts for clients, including Amazon and Estée Lauder',
-      'Developed BA deliverables such as process maps and onboarding playbooks',
-      'Managed project plans, budgets and risk/dependency logs'
+      'Led global employee benefits platform rollouts for Fortune 500 clients including Amazon, Estée Lauder, and Marsh & McLennan',
+      'Created process maps and onboarding playbooks that made complex regional rollouts smoother',
+      'Kept multiple project plans, budgets, and risk logs on track to hit regulatory deadlines'
     ]
   },
   {
@@ -93,9 +94,9 @@ export const experiences: Experience[] = [
     region: 'us',
     industry: 'Events Technology',
     achievements: [
-      'Simultaneously delivered global virtual platform programmes across Europe, US, MENA and South East Asia',
-      'Coordinated Agile software teams across 6 time zones',
-      'Improved platform infrastructure stability, reducing downtime at major global events'
+      'Ran virtual event programmes simultaneously across 6 time zones (Europe, US, MENA, South East Asia) during the pandemic pivot',
+      'Coordinated Agile engineering teams around the clock to keep major events like university graduations and international exhibitions running',
+      'Improved platform stability, cutting downtime during peak events when thousands of users were online'
     ]
   },
   {
@@ -108,9 +109,9 @@ export const experiences: Experience[] = [
     region: 'uk',
     industry: 'Telecoms',
     achievements: [
-      'Managed creation and roll-out of Energy Consumption Benchmark Tool in association with UN 2030 Sustainability Goal',
-      'Achieved up to 35% energy reduction for major operators like Vodafone, Verizon, and China Telecom',
-      'Engaged with regulators and executives to influence adoption of new sustainability standards'
+      'Built and launched the Energy Consumption Benchmark Tool in partnership with the UN\'s 2030 Sustainability Goals',
+      'Helped major operators (Vodafone, Verizon, China Telecom) cut their energy consumption by up to 35%',
+      'Worked directly with regulators and C-level executives to drive adoption of new sustainability standards globally'
     ]
   },
   {
@@ -123,9 +124,9 @@ export const experiences: Experience[] = [
     region: 'mena',
     industry: 'Education',
     achievements: [
-      'Led digital transformation during COVID-19, rolling out data systems and remote learning platforms',
-      'Delivered staff and student training to ensure business continuity',
-      'Enabled uninterrupted education during lockdown period'
+      'Led the digital pivot when COVID hit, getting data systems and remote learning platforms live fast',
+      'Trained staff and students on new tools so classes could continue without interruption',
+      'Kept education running through the entire lockdown period'
     ]
   },
   {
@@ -138,9 +139,9 @@ export const experiences: Experience[] = [
     region: 'uk',
     industry: 'Healthcare',
     achievements: [
-      'Implemented digital dictation systems across NHS Trusts, reducing costs and turnaround times',
-      'Delivered training and change management for clinical teams',
-      'Deployed solutions at St George, Royal Free, and Nuffield Health'
+      'Deployed digital dictation systems across NHS Trusts including St George\'s, Royal Free, and Nuffield Health',
+      'Cut turnaround times and costs by digitizing clinical documentation workflows',
+      'Trained medical teams on new systems and managed the change process to ensure adoption'
     ]
   },
   {
@@ -153,9 +154,9 @@ export const experiences: Experience[] = [
     region: 'uk',
     industry: 'Engineering/Construction',
     achievements: [
-      'Managed construction and sustainable technical solutions for high-profile hospitality and commercial projects',
-      'Delivered fit-out and engineering projects including The Hilton Brighton',
-      'Coordinated procurement, quality control, and risk management for multiple construction sites'
+      'Delivered high-profile construction projects including The Hilton Brighton and Offplan developments',
+      'Managed fit-out, procurement, and engineering across multiple commercial and hospitality sites',
+      'Oversaw quality control and risk management for sustainable technical solutions'
     ]
   },
   {
@@ -168,9 +169,9 @@ export const experiences: Experience[] = [
     region: 'uk',
     industry: 'Engineering',
     achievements: [
-      'Developed heat transfer solutions for landmark UK infrastructure projects, improving operational efficiency',
-      'Delivered engineering solutions for The Shard, London 2012 Olympic Aquatic Centre, and 20 Fenchurch Street',
-      'Provided technical consulting and training across construction and engineering projects'
+      'Engineered heat transfer solutions for The Shard, London 2012 Olympic Aquatic Centre, and 20 Fenchurch Street',
+      'Improved operational efficiency for landmark UK infrastructure through technical consulting',
+      'Delivered training and support across major construction and engineering projects'
     ]
   }
 ];
@@ -545,9 +546,9 @@ export const timelineProjects: TimelineProject[] = [
     industry: 'Engineering Tech',
     projectType: 'PMO Leadership',
     keyAchievements: [
-      'Created new PMO department from scratch',
-      'Managing EU-funded battery recycling research programmes',
-      'Leading work packages across multiple departments'
+      'Built the PMO function from the ground up, bringing structure to multi-million Euro EU-funded battery recycling research',
+      'Managing cross-border delivery teams spanning Europe and the Middle East',
+      'Cut reporting overhead by 36% through smart use of Jira and Confluence'
     ],
     teamSize: 15,
     technologies: ['Jira', 'Confluence', 'Agile']
@@ -564,9 +565,9 @@ export const timelineProjects: TimelineProject[] = [
     industry: 'Insurance',
     projectType: 'Product Transformation',
     keyAchievements: [
-      'Restructured mutual agreement product',
-      'Enhanced insurance product increasing profit margin',
-      'Reduced vendor selection time by 30%'
+      'Transformed a core mutual agreement insurance product, directly boosting profit margins',
+      'Built a vendor selection framework that cut decision time by 30%',
+      'Led workshops to map workflows and spot inefficiencies, then fixed them'
     ],
     technologies: ['Website Transformation', 'Underwriting Negotiation']
   },
@@ -584,9 +585,9 @@ export const timelineProjects: TimelineProject[] = [
     budget: '£1.2M',
     teamSize: 34,
     keyAchievements: [
-      'Led Global Hackathon - 10th Edition with 20 unique hacks',
-      'Delivered premier commercial insurance product (£1.2M budget, 34 specialists)',
-      'Managed FCA projects: Operation Resilience + Consumer Duty'
+      'Shipped a £1.2M commercial insurance product with 34 specialists using microservices and APIs',
+      'Ran the 10-year anniversary Global Hackathon with 20 unique hacks, coaching the winning team to secure MVP funding',
+      'Delivered Operation Resilience and Consumer Duty FCA programmes across multiple workstreams'
     ],
     technologies: ['Microservices', 'APIs', 'Agile', 'Jira']
   },
@@ -602,9 +603,9 @@ export const timelineProjects: TimelineProject[] = [
     industry: 'Insurance',
     projectType: 'Digital Transformation',
     keyAchievements: [
-      'Led global employee benefit platform rollouts',
-      'Established digital transformation framework',
-      'Delivered for Amazon, Estée Lauder, Marsh & McLennan'
+      'Led global employee benefits platform rollouts for Amazon, Estée Lauder, and Marsh & McLennan',
+      'Created process maps and playbooks that made complex regional rollouts smoother',
+      'Kept project plans, budgets, and risk logs on track to hit regulatory deadlines'
     ],
     technologies: ['HR Systems', 'Data Analytics']
   },
@@ -620,9 +621,9 @@ export const timelineProjects: TimelineProject[] = [
     industry: 'Events Tech',
     projectType: 'Global Delivery',
     keyAchievements: [
-      'Orchestrated virtual event transformation during COVID-19',
-      'Delivered events across 6 time zones simultaneously',
-      'Established change management framework with robust governance'
+      'Ran virtual event programmes across 6 time zones (Europe, US, MENA, Asia) during the pandemic',
+      'Kept major events like university graduations and international exhibitions running smoothly',
+      'Improved platform stability, cutting downtime when thousands of users were online'
     ],
     technologies: ['Virtual Event Platform', 'Agile', 'Global Coordination']
   },
@@ -638,9 +639,9 @@ export const timelineProjects: TimelineProject[] = [
     industry: 'Education',
     projectType: 'Digital Transformation',
     keyAchievements: [
-      'Led COVID-19 strategic response',
-      'Implemented software, training, and data migration',
-      'Ensured uninterrupted education during lockdown'
+      'Led the digital pivot when COVID hit, getting data systems and remote learning platforms live fast',
+      'Trained staff and students on new tools so classes could continue',
+      'Kept education running through the entire lockdown period'
     ]
   },
   {
@@ -655,9 +656,9 @@ export const timelineProjects: TimelineProject[] = [
     industry: 'Telecoms',
     projectType: 'Sustainability',
     keyAchievements: [
-      'Delivered Energy Consumption Benchmark Tool',
-      'Achieved 35% energy reduction for major operators',
-      'Worked with Vodafone, Verizon, China Telecom'
+      'Built and launched the Energy Consumption Benchmark Tool with the UN\'s 2030 Sustainability Goals',
+      'Helped Vodafone, Verizon, and China Telecom cut energy consumption by up to 35%',
+      'Worked directly with regulators and C-level executives to drive global adoption'
     ],
     technologies: ['Sustainability Analytics', 'UN SDG Alignment']
   },

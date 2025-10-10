@@ -6,7 +6,17 @@ This is a personal portfolio website for Mujeeb Lawal, a Senior Project Manager 
 
 ## Recent Updates (October 2024)
 
-**Latest Changes (October 8, 2024):**
+**Latest Changes (October 10, 2024):**
+- **Rewrote all achievements with conversational, professional tone** - Replaced generic role descriptions with specific projects, named clients, and tangible outcomes:
+  - Novocycle: "Built the PMO function from the ground up" + 36% efficiency gain
+  - Simply Business: £1.2M product delivery, 10-year anniversary Global Hackathon, FCA compliance programmes
+  - GSMA: UN partnership, named operators (Vodafone/Verizon/China Telecom), 35% energy reduction
+  - Alfa Laval: Landmark projects (The Shard, Olympic Aquatic Centre, 20 Fenchurch Street)
+  - BSS Industrial: The Hilton Brighton, Offplan developments
+- **View Impact dialogs now showcase actual projects** instead of repeating card content - focuses on key achievements, specific clients, and delivered results
+- Natural language throughout ("Built", "Shipped", "Ran", "Led") - removed robotic AI-sounding phrases
+
+**Previous Changes (October 8, 2024):**
 - **Added "View Impact" feature** - Interactive dialogs in both Recent Impact (hero section) and Career Journey sections showing full achievements, technologies, budget, and team size details
 - **Completed Career Journey section** - Added 4 missing career entries from PDF resume:
   - Project Delivery Manager at Best Future Education Centre (Mar 2020 - Dec 2020) - Nigeria, Education sector
