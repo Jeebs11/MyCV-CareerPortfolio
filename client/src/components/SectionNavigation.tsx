@@ -51,7 +51,16 @@ export default function SectionNavigation() {
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
-    element?.scrollIntoView({ behavior: 'smooth' });
+    if (element) {
+      const offset = 80; // Account for fixed navigation bar
+      const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+      const offsetPosition = elementPosition - offset;
+      
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
     setMobileMenuOpen(false);
   };
 
@@ -100,7 +109,7 @@ export default function SectionNavigation() {
         <SheetTrigger asChild>
           <Button
             size="icon"
-            className="md:hidden fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0 shadow-xl shadow-[hsl(190,85%,55%)]/30 hover-elevate active-elevate-2"
+            className="md:hidden fixed bottom-6 left-6 z-40 w-14 h-14 rounded-full bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0 shadow-xl shadow-[hsl(190,85%,55%)]/30 hover-elevate active-elevate-2"
             data-testid="button-mobile-nav-fab"
           >
             <Compass className="w-6 h-6" />
