@@ -66,7 +66,16 @@ export default function Home() {
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
-    element?.scrollIntoView({ behavior: 'smooth' });
+    if (element) {
+      const offset = 80; // Account for fixed navigation bar
+      const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+      const offsetPosition = elementPosition - offset;
+      
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
   };
 
   return (
@@ -109,8 +118,11 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
   }, []);
 
   const handleNavClick = (section: string) => {
-    scrollToSection(section);
     setMobileMenuOpen(false);
+    // Wait for menu to close before scrolling
+    setTimeout(() => {
+      scrollToSection(section);
+    }, 300);
   };
 
   return (
