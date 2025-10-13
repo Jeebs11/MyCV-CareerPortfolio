@@ -11,10 +11,12 @@ This is a personal portfolio website for Mujeeb Lawal, a Senior Project Manager 
   - Desktop: Floating navigation dots on the right side with glassmorphic design
   - Active section highlighted with gradient (cyan to blue)
   - Hover tooltips show section name and icon
-  - Mobile: Floating Action Button (FAB) with compass icon in bottom-left corner
+  - Mobile: Floating Action Button (FAB) with compass icon in bottom-left corner (ChatBot on right)
   - Opens bottom sheet menu with all sections
   - Smooth scroll to sections with Intersection Observer for active detection
   - Fixed scroll offset (80px) to account for navigation bar, ensuring section headers are visible
+  - Timing fix: menu/sheet closes first (300ms delay), then scrolls to prevent calculation errors
+  - Applied to both hamburger menu and FAB navigation systems
   - Verified with e2e tests on desktop (1280x720) and mobile (iPhone 12 Pro)
 
 - **Comprehensive Mobile Optimization** - Fully optimized the entire portfolio for mobile devices with focus on usability and accessibility:
