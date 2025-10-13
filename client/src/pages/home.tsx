@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from '@/components/ui/sheet';
 import ChatBot from '@/components/ChatBot';
 import SectionNavigation from '@/components/SectionNavigation';
 import {
@@ -192,6 +192,9 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
               >
                 <SheetHeader>
                   <SheetTitle className="text-white font-display">Navigation</SheetTitle>
+                  <SheetDescription className="text-white/60 text-sm">
+                    Explore different sections of the portfolio
+                  </SheetDescription>
                 </SheetHeader>
                 <div className="flex flex-col gap-4 mt-8">
                   <button 

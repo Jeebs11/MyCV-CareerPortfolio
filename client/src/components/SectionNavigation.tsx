@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from '@/components/ui/sheet';
 import {
   Compass,
   Rocket,
@@ -30,14 +30,14 @@ export default function SectionNavigation() {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+          if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
             setActiveSection(entry.target.id);
           }
         });
       },
       {
-        threshold: [0.5],
-        rootMargin: '-20% 0px -20% 0px',
+        threshold: [0.3],
+        rootMargin: '-100px 0px -100px 0px',
       }
     );
 
@@ -138,6 +138,9 @@ export default function SectionNavigation() {
               <Compass className="w-5 h-5 text-[hsl(190,85%,55%)]" />
               Quick Navigation
             </SheetTitle>
+            <SheetDescription className="text-white/60 text-sm">
+              Jump to any section of the portfolio
+            </SheetDescription>
           </SheetHeader>
           
           <div className="grid grid-cols-2 gap-3 pb-6">
