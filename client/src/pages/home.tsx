@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import ChatBot from '@/components/ChatBot';
 import {
   TrendingUp,
@@ -36,7 +37,8 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronUp,
-  GraduationCap
+  GraduationCap,
+  Menu
 } from 'lucide-react';
 
 const iconMap: Record<string, any> = {
@@ -93,6 +95,7 @@ export default function Home() {
 
 function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void }) {
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -102,6 +105,11 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const handleNavClick = (section: string) => {
+    scrollToSection(section);
+    setMobileMenuOpen(false);
+  };
+
   return (
     <nav 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -109,15 +117,16 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
       }`}
       data-testid="navigation"
     >
-      <div className="max-w-7xl mx-auto px-6 py-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-md bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center font-display font-bold text-white">
               ML
             </div>
-            <span className="font-display text-xl text-white hidden sm:block">Mujeeb Lawal</span>
+            <span className="font-display text-lg sm:text-xl text-white hidden sm:block">Mujeeb Lawal</span>
           </div>
           
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
             <button 
               onClick={() => scrollToSection('journey')}
@@ -149,13 +158,72 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
             </button>
           </div>
           
-          <Button 
-            onClick={() => scrollToSection('contact')}
-            className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0"
-            data-testid="button-cta-nav"
-          >
-            Get in Touch
-          </Button>
+          <div className="flex items-center gap-2">
+            {/* Mobile Menu Button */}
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="md:hidden text-white hover:bg-white/10"
+                  data-testid="button-mobile-menu"
+                >
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent 
+                side="right" 
+                className="bg-[hsl(270,8%,12%)]/95 backdrop-blur-xl border-white/10 w-[280px] sm:w-[320px]"
+              >
+                <SheetHeader>
+                  <SheetTitle className="text-white font-display">Navigation</SheetTitle>
+                </SheetHeader>
+                <div className="flex flex-col gap-4 mt-8">
+                  <button 
+                    onClick={() => handleNavClick('journey')}
+                    className="text-left text-white/90 hover:text-white transition-colors py-3 px-4 rounded-md hover-elevate"
+                    data-testid="mobile-link-journey"
+                  >
+                    <div className="font-medium">Journey</div>
+                    <div className="text-sm text-white/60">17 Years of Experience</div>
+                  </button>
+                  <button 
+                    onClick={() => handleNavClick('industries')}
+                    className="text-left text-white/90 hover:text-white transition-colors py-3 px-4 rounded-md hover-elevate"
+                    data-testid="mobile-link-industries"
+                  >
+                    <div className="font-medium">Industries</div>
+                    <div className="text-sm text-white/60">7 Industries Across 4 Continents</div>
+                  </button>
+                  <a 
+                    href="/insights"
+                    className="text-left text-white/90 hover:text-white transition-colors py-3 px-4 rounded-md hover-elevate"
+                    data-testid="mobile-link-insights"
+                  >
+                    <div className="font-medium">Insights</div>
+                    <div className="text-sm text-white/60">Thought Leadership</div>
+                  </a>
+                  <button 
+                    onClick={() => handleNavClick('contact')}
+                    className="text-left text-white/90 hover:text-white transition-colors py-3 px-4 rounded-md hover-elevate"
+                    data-testid="mobile-link-contact"
+                  >
+                    <div className="font-medium">Contact</div>
+                    <div className="text-sm text-white/60">Get in Touch</div>
+                  </button>
+                </div>
+              </SheetContent>
+            </Sheet>
+
+            {/* CTA Button - Hidden on small mobile, visible on sm and up */}
+            <Button 
+              onClick={() => scrollToSection('contact')}
+              className="hidden sm:flex bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0"
+              data-testid="button-cta-nav"
+            >
+              Get in Touch
+            </Button>
+          </div>
         </div>
       </div>
     </nav>
@@ -165,24 +233,14 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
 function VerticalCareerTimeline() {
   const [selectedProject, setSelectedProject] = useState<typeof timelineProjects[0] | null>(null);
   const desktopScrollRef = useRef<HTMLDivElement>(null);
-  const mobileScrollRef = useRef<HTMLDivElement>(null);
   const [showTopFade, setShowTopFade] = useState(false);
   const [showBottomFade, setShowBottomFade] = useState(true);
-  const [showLeftFade, setShowLeftFade] = useState(false);
-  const [showRightFade, setShowRightFade] = useState(true);
 
   const handleDesktopScroll = () => {
     if (!desktopScrollRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = desktopScrollRef.current;
     setShowTopFade(scrollTop > 20);
     setShowBottomFade(scrollTop < scrollHeight - clientHeight - 20);
-  };
-
-  const handleMobileScroll = () => {
-    if (!mobileScrollRef.current) return;
-    const { scrollLeft, scrollWidth, clientWidth } = mobileScrollRef.current;
-    setShowLeftFade(scrollLeft > 20);
-    setShowRightFade(scrollLeft < scrollWidth - clientWidth - 20);
   };
 
   return (
@@ -270,28 +328,13 @@ function VerticalCareerTimeline() {
           )}
         </div>
 
-        {/* Mobile: Horizontal scrollable carousel */}
+        {/* Mobile: Vertical single-column stack */}
         <div className="lg:hidden relative">
-          {/* Left fade overlay */}
-          {showLeftFade && (
-            <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[hsl(270,8%,12%)] to-transparent pointer-events-none z-10" />
-          )}
-
-          <div 
-            ref={mobileScrollRef}
-            onScroll={handleMobileScroll}
-            className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide touch-pan-x"
-            style={{ 
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
-              WebkitOverflowScrolling: 'touch'
-            }}
-            data-testid="carousel-mobile"
-          >
+          <div className="space-y-3" data-testid="carousel-mobile">
             {timelineProjects.map((project) => (
               <Card
                 key={project.id}
-                className="bg-white/5 backdrop-blur-xl border-white/10 p-4 hover-elevate cursor-pointer flex-shrink-0 w-[280px] snap-center"
+                className="bg-white/5 backdrop-blur-xl border-white/10 p-4 hover-elevate cursor-pointer w-full"
                 onClick={() => setSelectedProject(project)}
                 data-testid={`card-career-mobile-${project.id}`}
               >
@@ -334,92 +377,9 @@ function VerticalCareerTimeline() {
               </Card>
             ))}
           </div>
-
-          {/* Right fade overlay */}
-          {showRightFade && (
-            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[hsl(270,8%,12%)] to-transparent pointer-events-none z-10" />
-          )}
         </div>
       </div>
 
-      {/* Position Detail Dialog */}
-      <Dialog open={!!selectedProject} onOpenChange={(open) => !open && setSelectedProject(null)}>
-        <DialogContent 
-          className="max-w-2xl max-h-[80vh] overflow-y-auto bg-black/90 backdrop-blur-xl border border-white/10" 
-          data-testid="dialog-career-detail"
-        >
-          {selectedProject && (
-            <>
-              <DialogHeader>
-                <div className="flex items-start justify-between gap-4 mb-4">
-                  <div className="flex-1">
-                    <DialogTitle className="text-2xl font-display mb-2 text-white" data-testid="text-dialog-role">
-                      {selectedProject.role}
-                    </DialogTitle>
-                    <DialogDescription className="text-lg text-[hsl(190,85%,55%)] font-medium" data-testid="text-dialog-company">
-                      {selectedProject.company}
-                    </DialogDescription>
-                  </div>
-                  {selectedProject.current && (
-                    <Badge className="bg-green-500/20 border-green-500/30 text-green-300" data-testid="badge-dialog-current">
-                      Current Position
-                    </Badge>
-                  )}
-                </div>
-              </DialogHeader>
-
-              <div className="space-y-6">
-                {/* Overview Section */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-white/60" />
-                    <div>
-                      <p className="text-xs text-white/60">Period</p>
-                      <p className="text-sm font-medium text-white" data-testid="text-dialog-period">{selectedProject.period}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-white/60" />
-                    <div>
-                      <p className="text-xs text-white/60">Location</p>
-                      <p className="text-sm font-medium text-white" data-testid="text-dialog-location">{selectedProject.location}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Briefcase className="w-4 h-4 text-white/60" />
-                    <div>
-                      <p className="text-xs text-white/60">Industry</p>
-                      <p className="text-sm font-medium text-white" data-testid="text-dialog-industry">{selectedProject.industry}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Target className="w-4 h-4 text-white/60" />
-                    <div>
-                      <p className="text-xs text-white/60">Project Type</p>
-                      <p className="text-sm font-medium text-white" data-testid="text-dialog-type">{selectedProject.projectType}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Key Achievements */}
-                <div>
-                  <h3 className="font-semibold text-lg mb-3 flex items-center gap-2 text-white">
-                    <Award className="w-5 h-5 text-[hsl(190,85%,55%)]" />
-                    Key Highlights & Deliverables
-                  </h3>
-                  <ul className="space-y-2">
-                    {selectedProject.keyAchievements.map((achievement, idx) => (
-                      <li key={idx} className="flex items-start gap-2" data-testid={`text-dialog-achievement-${idx}`}>
-                        <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm text-white/80">{achievement}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Additional Details */}
-                {(selectedProject.budget || selectedProject.teamSize || selectedProject.technologies) && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-white/10">
                     {selectedProject.budget && (
                       <div className="flex items-center gap-2">
                         <DollarSign className="w-4 h-4 text-white/60" />
@@ -474,39 +434,39 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
   const [selectedProject, setSelectedProject] = useState<typeof timelineProjects[0] | null>(null);
 
   return (
-    <section id="journey" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20" data-testid="section-hero">
+    <section id="journey" className="relative min-h-[85vh] md:min-h-screen flex items-center justify-center overflow-hidden pt-20 md:pt-24" data-testid="section-hero">
       <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[hsl(190,85%,55%)]/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[hsl(220,90%,60%)]/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[hsl(270,65%,35%)]/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 md:w-96 md:h-96 bg-[hsl(190,85%,55%)]/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 md:w-96 md:h-96 bg-[hsl(220,90%,60%)]/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] md:w-[600px] md:h-[600px] bg-[hsl(270,65%,35%)]/10 rounded-full blur-3xl" />
       </div>
       
-      <div className="relative max-w-7xl mx-auto px-6 py-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div className="space-y-8">
-            <div className="space-y-6">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/20 border border-green-500/30">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-20">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          <div className="space-y-6 md:space-y-8">
+            <div className="space-y-4 md:space-y-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-green-500/20 border border-green-500/30">
                 <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                <span className="text-sm font-medium text-green-300" data-testid="badge-status">
+                <span className="text-xs md:text-sm font-medium text-green-300" data-testid="badge-status">
                   Open to new opportunities
                 </span>
               </div>
               
-              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight" data-testid="text-hero-title">
+              <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight" data-testid="text-hero-title">
                 Project and Operation Delivery Expert
                 <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)]">
                   7 Industries . 4 Continents
                 </span>
               </h1>
               
-              <p className="text-xl text-white/80 max-w-xl" data-testid="text-hero-subtitle">
+              <p className="text-base sm:text-lg md:text-xl text-white/80 max-w-xl leading-relaxed" data-testid="text-hero-subtitle">
                 Fortune 500-trusted PM specialist delivering regulated, multi-million pound programmes on time and within budget
               </p>
 
               {/* Social Proof */}
               <div className="pt-2">
                 <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Trusted By</p>
-                <div className="flex flex-wrap items-center gap-3 text-sm text-white/60">
+                <div className="flex flex-wrap items-center gap-2 md:gap-3 text-xs sm:text-sm text-white/60">
                   <span>Amazon</span>
                   <span>•</span>
                   <span>Estée Lauder</span>
@@ -518,20 +478,20 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
               </div>
             </div>
             
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3">
               <Button 
                 size="lg"
-                className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0 hover-elevate active-elevate-2 text-base px-8"
+                className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0 hover-elevate active-elevate-2 text-sm md:text-base px-6 md:px-8 w-full sm:w-auto"
                 onClick={() => scrollToSection('contact')}
                 data-testid="button-primary-cta"
               >
-                Schedule a Call <ArrowRight className="ml-2 w-5 h-5" />
+                Schedule a Call <ArrowRight className="ml-2 w-4 h-4 md:w-5 md:h-5" />
               </Button>
               
               <Button 
                 size="lg"
                 variant="outline"
-                className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10"
+                className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10 text-sm md:text-base w-full sm:w-auto"
                 onClick={() => scrollToSection('experience')}
                 data-testid="button-secondary-cta"
               >
@@ -541,43 +501,44 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
               <Button 
                 size="lg"
                 variant="outline"
-                className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10"
+                className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10 text-sm md:text-base w-full sm:w-auto"
                 onClick={() => window.open('https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/', '_blank')}
                 data-testid="button-download-cv"
               >
-                <Linkedin className="mr-2 w-5 h-5" /> LinkedIn
+                <Linkedin className="mr-2 w-4 h-4 md:w-5 md:h-5" /> LinkedIn
               </Button>
             </div>
             
-            <div className="flex items-center gap-4 pt-2">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 pt-2">
               <a 
                 href="mailto:odmlawal@gmail.com"
-                className="text-white/60 hover:text-white transition-colors"
+                className="text-white/60 hover:text-white transition-colors flex items-center gap-2"
                 data-testid="link-email"
               >
-                <Mail className="w-5 h-5" />
+                <Mail className="w-4 h-4 md:w-5 md:h-5" />
+                <span className="text-sm sm:hidden">odmlawal@gmail.com</span>
               </a>
-              <span className="text-white/30">|</span>
-              <span className="text-sm text-white/50">Available: Immediate Start • Remote/Hybrid/Freelance/No Visa Needed - Self Sponsored</span>
+              <span className="text-white/30 hidden sm:block">|</span>
+              <span className="text-xs sm:text-sm text-white/50 leading-relaxed">Available: Immediate Start • Remote/Hybrid/Freelance/No Visa Needed - Self Sponsored</span>
             </div>
           </div>
           
           <div className="relative w-full lg:w-auto">
-            <div className="mb-4">
-              <h3 className="font-display text-xl font-bold text-white mb-1" data-testid="text-recent-roles-title">
+            <div className="mb-3 md:mb-4">
+              <h3 className="font-display text-lg md:text-xl font-bold text-white mb-1" data-testid="text-recent-roles-title">
                 Recent Impact
               </h3>
-              <p className="text-sm text-white/50">Latest leadership roles</p>
+              <p className="text-xs md:text-sm text-white/50">Latest leadership roles</p>
             </div>
             <div className="space-y-3">
               {topRoles.map((project) => (
                 <Card
                   key={project.id}
-                  className="bg-white/5 backdrop-blur-xl border-white/10 p-5 hover-elevate transition-all"
+                  className="bg-white/5 backdrop-blur-xl border-white/10 p-4 md:p-5 hover-elevate transition-all"
                   data-testid={`card-recent-${project.id}`}
                 >
                   <div className="space-y-3">
-                    <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-start justify-between gap-2 flex-wrap">
                       <Badge 
                         className="text-xs bg-gradient-to-r from-[hsl(190,85%,55%)]/20 to-[hsl(220,90%,60%)]/20 border-[hsl(190,85%,55%)]/30 text-white"
                         data-testid={`badge-period-${project.id}`}
@@ -592,18 +553,18 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
                     </div>
 
                     <div>
-                      <h4 className="font-semibold text-white text-base leading-tight mb-1" data-testid={`text-role-${project.id}`}>
+                      <h4 className="font-semibold text-white text-sm md:text-base leading-tight mb-1" data-testid={`text-role-${project.id}`}>
                         {project.role}
                       </h4>
-                      <p className="text-[hsl(190,85%,55%)] text-sm mb-2" data-testid={`text-company-${project.id}`}>
+                      <p className="text-[hsl(190,85%,55%)] text-xs md:text-sm mb-2" data-testid={`text-company-${project.id}`}>
                         {project.company}
                       </p>
-                      <p className="text-white/60 text-sm" data-testid={`text-achievement-${project.id}`}>
+                      <p className="text-white/60 text-xs md:text-sm leading-relaxed" data-testid={`text-achievement-${project.id}`}>
                         {project.keyAchievements[0]}
                       </p>
                     </div>
 
-                    <div className="flex flex-wrap gap-2 items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:items-center sm:justify-between">
                       <div className="flex flex-wrap gap-2">
                         <Badge className="text-xs bg-white/5 border-white/10 text-white/70">
                           {project.industry}
@@ -617,11 +578,11 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="text-xs text-[hsl(190,85%,55%)] hover:text-[hsl(190,85%,65%)] h-auto py-1 px-2"
+                        className="text-xs text-[hsl(190,85%,55%)] hover:text-[hsl(190,85%,65%)] h-auto py-2 px-3 w-full sm:w-auto justify-center sm:justify-start"
                         onClick={() => setSelectedProject(project)}
                         data-testid={`button-view-impact-${project.id}`}
                       >
-                        View Impact
+                        View Impact <ArrowRight className="ml-1 w-3 h-3" />
                       </Button>
                     </div>
                   </div>
@@ -633,14 +594,14 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
         
         {/* Impact Dialog */}
         <Dialog open={selectedProject !== null} onOpenChange={(open) => { if (!open) setSelectedProject(null); }}>
-          <DialogContent className="bg-[hsl(270,8%,12%)] border-white/10 text-white max-w-2xl">
+          <DialogContent className="bg-[hsl(270,8%,12%)] border-white/10 text-white max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
             {selectedProject && (
               <>
                 <DialogHeader>
-                  <DialogTitle className="font-display text-2xl text-white">
+                  <DialogTitle className="font-display text-xl sm:text-2xl text-white pr-6">
                     {selectedProject.role}
                   </DialogTitle>
-                  <DialogDescription className="text-[hsl(190,85%,55%)]">
+                  <DialogDescription className="text-[hsl(190,85%,55%)] text-sm sm:text-base">
                     {selectedProject.company} • {selectedProject.period}
                   </DialogDescription>
                 </DialogHeader>
@@ -714,18 +675,18 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
 
 function MetricsDashboard() {
   return (
-    <section id="metrics" className="relative py-20" data-testid="section-metrics">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-12">
-          <h2 className="font-display text-4xl sm:text-5xl font-bold text-white mb-4" data-testid="text-metrics-title">
+    <section id="metrics" className="relative py-12 md:py-20" data-testid="section-metrics">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-8 md:mb-12">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4" data-testid="text-metrics-title">
             Impact by Numbers
           </h2>
-          <p className="text-lg text-white/60 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-white/60 max-w-2xl mx-auto px-4">
             Quantifiable results from 17+ years of international project delivery
           </p>
         </div>
         
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
           {keyAchievements.map((achievement, index) => {
             const Icon = iconMap[achievement.icon];
             return (
@@ -791,37 +752,37 @@ function AnimatedMetricCard({ achievement, Icon, index }: { achievement: any; Ic
   return (
     <Card
       ref={ref}
-      className="bg-white/5 backdrop-blur-xl border-white/10 p-6 text-center hover-elevate"
+      className="bg-white/5 backdrop-blur-xl border-white/10 p-4 md:p-6 text-center hover-elevate"
       style={{ animationDelay: `${index * 100}ms` }}
       data-testid={`card-metric-${index}`}
     >
-      <Icon className="w-8 h-8 text-[hsl(190,85%,55%)] mx-auto mb-3" />
-      <div className="font-mono text-3xl font-bold text-white mb-2">
+      <Icon className="w-6 h-6 md:w-8 md:h-8 text-[hsl(190,85%,55%)] mx-auto mb-2 md:mb-3" />
+      <div className="font-mono text-2xl md:text-3xl font-bold text-white mb-2">
         {achievement.metric.includes('£') && '£'}
         {isVisible ? displayValue : hasDecimal ? '0.0' : '0'}
         {achievement.metric.includes('M') && 'M'}
         {achievement.metric.includes('+') && '+'}
         {achievement.metric.includes('%') && '%'}
       </div>
-      <p className="text-sm text-white/60">{achievement.description}</p>
+      <p className="text-xs md:text-sm text-white/60 leading-tight">{achievement.description}</p>
     </Card>
   );
 }
 
 function CareerTimeline({ activeRegion, setActiveRegion }: { activeRegion: string | null; setActiveRegion: (region: string | null) => void }) {
   return (
-    <section id="experience" className="relative py-20" data-testid="section-experience">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="font-display text-4xl sm:text-5xl font-bold text-white mb-4">
+    <section id="experience" className="relative py-12 md:py-20" data-testid="section-experience">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-10 md:mb-16">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4">
             Career Journey
           </h2>
-          <p className="text-lg text-white/60 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-white/60 max-w-2xl mx-auto px-4">
             Delivering complex programmes across insurance, fintech, telecoms, and engineering sectors
           </p>
         </div>
         
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
           {experiences.map((exp, index) => (
             <TimelineCard 
               key={exp.id} 
@@ -844,23 +805,23 @@ function TimelineCard({ experience, index, onHover, onLeave }: { experience: any
   return (
     <>
       <Card
-        className="bg-white/5 backdrop-blur-xl border-white/10 p-6 sm:p-8 hover-elevate transition-all duration-300"
+        className="bg-white/5 backdrop-blur-xl border-white/10 p-4 sm:p-6 md:p-8 hover-elevate transition-all duration-300"
         onMouseEnter={onHover}
         onMouseLeave={onLeave}
         data-testid={`card-experience-${index}`}
       >
-        <div className="flex flex-col sm:flex-row sm:items-start gap-6">
+        <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6">
           <div className="flex-shrink-0">
-            <div className="w-12 h-12 rounded-md bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center">
-              <Briefcase className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-md bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center">
+              <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
           </div>
           
           <div className="flex-1 min-w-0">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
               <div>
-                <h3 className="font-display text-xl font-bold text-white mb-1">{experience.role}</h3>
-                <p className="text-[hsl(190,85%,55%)] font-medium">{experience.company}</p>
+                <h3 className="font-display text-lg sm:text-xl font-bold text-white mb-1 leading-tight">{experience.role}</h3>
+                <p className="text-[hsl(190,85%,55%)] font-medium text-sm sm:text-base">{experience.company}</p>
               </div>
               
               <div className="flex flex-col sm:items-end gap-2">
@@ -869,11 +830,11 @@ function TimelineCard({ experience, index, onHover, onLeave }: { experience: any
                     experience.current 
                       ? 'bg-[hsl(145,70%,50%)]/20 border-[hsl(145,70%,50%)]/30 text-[hsl(145,70%,70%)]' 
                       : 'bg-white/10 border-white/20 text-white/70'
-                  } backdrop-blur-md`}
+                  } backdrop-blur-md text-xs`}
                 >
                   {experience.period}
                 </Badge>
-                <p className="text-sm text-white/50">{experience.location}</p>
+                <p className="text-xs sm:text-sm text-white/50">{experience.location}</p>
               </div>
             </div>
             
@@ -881,16 +842,16 @@ function TimelineCard({ experience, index, onHover, onLeave }: { experience: any
               {experience.achievements.slice(0, isExpanded ? undefined : 2).map((achievement: string, idx: number) => (
                 <div key={idx} className="flex items-start gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-[hsl(190,85%,55%)] mt-2 flex-shrink-0" />
-                  <p className="text-white/70 text-sm">{achievement}</p>
+                  <p className="text-white/70 text-xs sm:text-sm leading-relaxed">{achievement}</p>
                 </div>
               ))}
             </div>
             
-            <div className="flex items-center gap-3 mt-3">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mt-4">
               {experience.achievements.length > 2 && (
                 <button
                   onClick={() => setIsExpanded(!isExpanded)}
-                  className="text-[hsl(190,85%,55%)] text-sm font-medium hover:text-[hsl(190,85%,65%)] transition-colors"
+                  className="text-[hsl(190,85%,55%)] text-xs sm:text-sm font-medium hover:text-[hsl(190,85%,65%)] transition-colors text-left"
                   data-testid={`button-expand-${index}`}
                 >
                   {isExpanded ? 'Show Less' : `Show ${experience.achievements.length - 2} More`}
@@ -899,11 +860,11 @@ function TimelineCard({ experience, index, onHover, onLeave }: { experience: any
               <Button
                 size="sm"
                 variant="ghost"
-                className="text-xs text-[hsl(190,85%,55%)] hover:text-[hsl(190,85%,65%)] h-auto py-1 px-2"
+                className="text-xs text-[hsl(190,85%,55%)] hover:text-[hsl(190,85%,65%)] h-auto py-2 px-3 w-full sm:w-auto justify-center sm:justify-start"
                 onClick={() => setShowImpactDialog(true)}
                 data-testid={`button-view-impact-exp-${index}`}
               >
-                View Full Impact
+                View Full Impact <ArrowRight className="ml-1 w-3 h-3" />
               </Button>
             </div>
           </div>
@@ -912,27 +873,27 @@ function TimelineCard({ experience, index, onHover, onLeave }: { experience: any
 
       {/* Impact Dialog */}
       <Dialog open={showImpactDialog} onOpenChange={(open) => { if (!open) setShowImpactDialog(false); }}>
-        <DialogContent className="bg-[hsl(270,8%,12%)] border-white/10 text-white max-w-2xl">
+        <DialogContent className="bg-[hsl(270,8%,12%)] border-white/10 text-white max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="font-display text-2xl text-white">
+            <DialogTitle className="font-display text-xl sm:text-2xl text-white pr-6">
               {experience.role}
             </DialogTitle>
-            <DialogDescription className="text-[hsl(190,85%,55%)]">
+            <DialogDescription className="text-[hsl(190,85%,55%)] text-sm sm:text-base">
               {experience.company} • {experience.period}
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4">
             <div>
-              <h3 className="text-sm font-semibold text-white/70 mb-3 flex items-center gap-2">
+              <h3 className="text-xs sm:text-sm font-semibold text-white/70 mb-3 flex items-center gap-2">
                 <Target className="w-4 h-4" />
                 All Achievements & Impact
               </h3>
-              <ul className="space-y-2">
+              <ul className="space-y-2.5">
                 {experience.achievements.map((achievement: string, idx: number) => (
                   <li key={idx} className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 text-[hsl(190,85%,55%)] mt-0.5 flex-shrink-0" />
-                    <span className="text-sm text-white/80">{achievement}</span>
+                    <span className="text-xs sm:text-sm text-white/80 leading-relaxed">{achievement}</span>
                   </li>
                 ))}
               </ul>
@@ -963,18 +924,18 @@ function GeographicMap({ activeRegion, setActiveRegion }: { activeRegion: string
   ];
 
   return (
-    <section id="global" className="relative py-20" data-testid="section-global">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="font-display text-4xl sm:text-5xl font-bold text-white mb-4">
+    <section id="global" className="relative py-12 md:py-20" data-testid="section-global">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-10 md:mb-16">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4">
             Global Delivery Footprint
           </h2>
-          <p className="text-lg text-white/60 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-white/60 max-w-2xl mx-auto px-4">
             Successfully delivered programmes across 4 continents, managing teams in 6 time zones
           </p>
         </div>
         
-        <div className="relative w-full h-[500px] bg-white/5 backdrop-blur-xl border border-white/10 rounded-lg overflow-hidden">
+        <div className="relative w-full h-[350px] sm:h-[400px] md:h-[500px] bg-white/5 backdrop-blur-xl border border-white/10 rounded-lg overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-[hsl(270,8%,12%)]/50 to-[hsl(240,12%,18%)]/50" />
           
           <svg className="absolute inset-0 w-full h-full opacity-20" viewBox="0 0 1000 500">
@@ -1022,24 +983,24 @@ function CertificationsWall() {
   const [selectedEdu, setSelectedEdu] = useState<string | null>(null);
 
   return (
-    <section id="certifications" className="relative py-20" data-testid="section-certifications">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="font-display text-4xl sm:text-5xl font-bold text-white mb-4">
+    <section id="certifications" className="relative py-12 md:py-20" data-testid="section-certifications">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-10 md:mb-16">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4">
             Certifications & Education
           </h2>
-          <p className="text-lg text-white/60 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-white/60 max-w-2xl mx-auto px-4">
             Industry-recognized qualifications and academic credentials
           </p>
         </div>
 
-        <div className="space-y-12">
+        <div className="space-y-10 md:space-y-12">
           <div>
-            <h3 className="font-display text-2xl font-bold text-white mb-6 flex items-center gap-2">
-              <Award className="w-6 h-6 text-[hsl(190,85%,55%)]" />
+            <h3 className="font-display text-xl sm:text-2xl font-bold text-white mb-4 md:mb-6 flex items-center gap-2">
+              <Award className="w-5 h-5 sm:w-6 sm:h-6 text-[hsl(190,85%,55%)]" />
               Professional Certifications
             </h3>
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 gap-4 md:gap-6">
               {detailedCertifications.map((cert, index) => (
                 <Card
                   key={cert.id}
@@ -1168,21 +1129,21 @@ function IndustryExperienceMap() {
   const [expandedIndustry, setExpandedIndustry] = useState<string | null>(null);
 
   return (
-    <section id="industries" className="relative py-24" data-testid="section-industries">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <Badge className="mb-4 bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20" data-testid="badge-industries">
+    <section id="industries" className="relative py-12 md:py-20 lg:py-24" data-testid="section-industries">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-10 md:mb-16">
+          <Badge className="mb-3 md:mb-4 bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20" data-testid="badge-industries">
             Industry Expertise
           </Badge>
-          <h2 className="font-display text-4xl sm:text-5xl font-bold text-white mb-4" data-testid="text-industries-title">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4" data-testid="text-industries-title">
             Cross-Industry Experience
           </h2>
-          <p className="text-xl text-white/60 max-w-2xl mx-auto" data-testid="text-industries-subtitle">
+          <p className="text-base md:text-lg lg:text-xl text-white/60 max-w-2xl mx-auto px-4" data-testid="text-industries-subtitle">
             Delivering excellence across 7+ industries
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-7 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-7 gap-4 md:gap-6">
           {industryExperience.map((industry) => {
             const isExpanded = expandedIndustry === industry.id;
             
@@ -1216,9 +1177,8 @@ function IndustryExperienceMap() {
 
                   <Button
                     variant="ghost"
-                    size="sm"
                     onClick={() => setExpandedIndustry(isExpanded ? null : industry.id)}
-                    className="w-full justify-between text-white/70 hover:text-white p-0 h-auto"
+                    className="w-full justify-between text-white/70 hover:text-white min-h-12"
                     data-testid={`button-industry-toggle-${industry.id}`}
                   >
                     <span>{isExpanded ? 'Hide' : 'View'} Projects ({industry.projects.length})</span>
@@ -1258,23 +1218,23 @@ function IndustryExperienceMap() {
 
 function ContactSection() {
   return (
-    <section id="contact" className="relative py-20" data-testid="section-contact">
-      <div className="max-w-4xl mx-auto px-6">
-        <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-8 sm:p-12">
-          <div className="text-center space-y-6">
-            <h2 className="font-display text-4xl sm:text-5xl font-bold text-white">
+    <section id="contact" className="relative py-12 md:py-20" data-testid="section-contact">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6">
+        <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6 sm:p-8 md:p-12">
+          <div className="text-center space-y-4 md:space-y-6">
+            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white">
               Let's Work Together
             </h2>
             
-            <p className="text-lg text-white/70 max-w-2xl mx-auto">
+            <p className="text-base md:text-lg text-white/70 max-w-2xl mx-auto px-2">
               Looking for an experienced project manager to deliver your next critical programme? 
               Let's discuss how I can help drive your success.
             </p>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 pt-2 md:pt-4">
               <Button
                 size="lg"
-                className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0 hover-elevate active-elevate-2"
+                className="w-full sm:w-auto bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0 hover-elevate active-elevate-2 min-h-12"
                 onClick={() => window.location.href = 'mailto:odmlawal@gmail.com'}
                 data-testid="button-email-contact"
               >
@@ -1285,7 +1245,7 @@ function ContactSection() {
               <Button
                 size="lg"
                 variant="outline"
-                className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10"
+                className="w-full sm:w-auto bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10 min-h-12"
                 onClick={() => window.open('https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/', '_blank')}
                 data-testid="button-linkedin-contact"
               >
