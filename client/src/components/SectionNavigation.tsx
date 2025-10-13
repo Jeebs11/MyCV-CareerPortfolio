@@ -113,7 +113,6 @@ export default function SectionNavigation() {
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetTrigger asChild>
           <button
-            onClick={() => setMobileMenuOpen(true)}
             className="md:hidden rounded-full bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-2 border-white/30 shadow-2xl shadow-[hsl(190,85%,55%)]/50 hover:scale-110 active:scale-95 transition-all duration-200 flex items-center justify-center"
             style={{
               position: 'fixed',
