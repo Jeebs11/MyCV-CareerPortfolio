@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import ChatBot from '@/components/ChatBot';
+import SectionNavigation from '@/components/SectionNavigation';
 import {
   TrendingUp,
   Award,
@@ -87,6 +88,8 @@ export default function Home() {
       <ContactSection />
       
       <Footer />
+      
+      <SectionNavigation />
       
       <ChatBot />
     </div>
