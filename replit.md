@@ -6,7 +6,20 @@ This is a personal portfolio website for Mujeeb Lawal, a Senior Project Manager 
 
 ## Recent Updates (October 2024)
 
-**Latest Changes (October 10, 2024):**
+**Latest Changes (October 13, 2024):**
+- **Comprehensive Mobile Optimization** - Fully optimized the entire portfolio for mobile devices with focus on usability and accessibility:
+  - Mobile Navigation: Added hamburger menu with Sheet drawer component for mobile, smooth slide-in navigation
+  - Hero Section: Reduced padding (py-12 vs py-20), responsive typography (text-4xl sm:text-5xl md:text-6xl), stacked CTAs on mobile
+  - Career Timeline: Changed from horizontal carousel to vertical single-column stack on mobile (lg:hidden) with full-width cards
+  - Career Timeline Dialog: Mobile-optimized with max-w-[95vw] width, max-h-[90vh] height, single-column grids, flex-col header layout
+  - Industry Toggle Buttons: Fixed touch targets with h-12 (48px height), flex layout with proper padding for mobile accessibility
+  - All Dialogs: Optimized for mobile with proper width constraints, responsive typography, single-column layouts below md breakpoint
+  - Touch Targets: All interactive elements meet 48px minimum height requirement for mobile usability
+  - Responsive Typography: Consistent scaling pattern (text-base sm:text-lg md:text-xl) throughout all sections
+  - Layout Pattern: Single-column stacking below md breakpoint (grid-cols-1 md:grid-cols-2) for cards and content
+  - Verified with e2e Playwright tests on mobile viewport (iPhone 12 Pro: 390x844)
+
+**Previous Changes (October 10, 2024):**
 - **Rewrote all achievements with conversational, professional tone** - Replaced generic role descriptions with specific projects, named clients, and tangible outcomes:
   - Novocycle: "Built the PMO function from the ground up" + 36% efficiency gain
   - Simply Business: £1.2M product delivery, 10-year anniversary Global Hackathon, FCA compliance programmes
