@@ -17,6 +17,9 @@ This is a personal portfolio website for Mujeeb Lawal, a Senior Project Manager 
   - Fixed scroll offset (80px) to account for navigation bar, ensuring section headers are visible
   - Timing fix: menu/sheet closes first (300ms delay), then scrolls to prevent calculation errors
   - Applied to both hamburger menu and FAB navigation systems
+  - **Section Highlighting Fix**: Adjusted IntersectionObserver threshold to 30% (from 50%) and fixed rootMargin (-100px) for more reliable detection of shorter sections
+  - **Accessibility Fix**: Added SheetDescription to both navigation sheets to eliminate console warnings
+  - **FAB Click Fix**: Removed conflicting onClick handler to allow SheetTrigger to properly manage sheet opening
   - Verified with e2e tests on desktop (1280x720) and mobile (iPhone 12 Pro)
 
 - **Comprehensive Mobile Optimization** - Fully optimized the entire portfolio for mobile devices with focus on usability and accessibility:
