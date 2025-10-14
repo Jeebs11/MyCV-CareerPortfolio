@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -533,20 +535,54 @@ export default function AdminPage() {
 
                 <FormField
                   control={form.control}
+                  name="heroImage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-white">Hero Image URL (Optional)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          {...field} 
+                          className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                          placeholder="https://example.com/image.jpg"
+                          data-testid="input-article-heroimage"
+                        />
+                      </FormControl>
+                      <FormDescription className="text-white/50">
+                        Add a featured image for your article
+                      </FormDescription>
+                      <FormMessage className="text-red-400" />
+                    </FormItem>
+                  )}
+                />
+
+                <Controller
+                  control={form.control}
                   name="content"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-white">Content</FormLabel>
                       <FormControl>
-                        <Textarea 
-                          {...field} 
-                          className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-[200px]"
-                          placeholder="Full article content..."
-                          data-testid="input-article-content"
-                        />
+                        <div className="bg-white rounded-md" data-testid="input-article-content">
+                          <ReactQuill
+                            theme="snow"
+                            value={field.value}
+                            onChange={field.onChange}
+                            modules={{
+                              toolbar: [
+                                [{ 'header': [1, 2, 3, false] }],
+                                ['bold', 'italic', 'underline', 'strike'],
+                                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                                ['blockquote', 'code-block'],
+                                ['link', 'image'],
+                                ['clean']
+                              ],
+                            }}
+                            placeholder="Write your article content with rich formatting..."
+                          />
+                        </div>
                       </FormControl>
                       <FormDescription className="text-white/50">
-                        Write your full article content here
+                        Use the toolbar to format text, add links, and insert images
                       </FormDescription>
                       <FormMessage className="text-red-400" />
                     </FormItem>
