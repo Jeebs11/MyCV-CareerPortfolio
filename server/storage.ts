@@ -1,11 +1,11 @@
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import { Pool } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
+import { neon } from '@neondatabase/serverless';
 import { eq, desc } from 'drizzle-orm';
 import { blogPostsTable, type InsertBlogPost, type UpdateBlogPost, type BlogPostRow } from '@shared/schema';
 
-// Initialize database connection
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-export const db = drizzle(pool);
+// Initialize database connection using HTTP (better for serverless/Replit environments)
+const sql = neon(process.env.DATABASE_URL!);
+export const db = drizzle(sql);
 
 // Storage interface for blog posts
 export interface IStorage {
