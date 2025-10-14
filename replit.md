@@ -6,7 +6,14 @@ This is a personal portfolio website for Mujeeb Lawal, a Senior Project Manager 
 
 ## Recent Updates (October 2024)
 
-**Latest Changes (October 13, 2024):**
+**Latest Changes (October 14, 2024):**
+- **Section Order Fix**: Corrected navigation order to match actual page layout for better UX:
+  - Page sections now render in correct order: Journey → Impact → Timeline → **Industries → Global** → Certifications → Contact
+  - Industries section (Cross-Industry Experience) now appears before Global section (Geographic Footprint)
+  - Navigation systems (desktop dots, mobile FAB, hamburger menu) all updated to reflect correct order
+  - Verified with e2e tests confirming DOM order matches navigation order
+
+**Previous Changes (October 13, 2024):**
 - **Added Section Navigation** - Creative navigation system for easy jumping between sections:
   - Desktop: Floating navigation dots on the right side with glassmorphic design
   - Active section highlighted with gradient (cyan to blue)

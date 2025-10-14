@@ -16,9 +16,9 @@ const sections = [
   { id: 'journey', label: 'Journey', icon: Rocket },
   { id: 'metrics', label: 'Impact', icon: BarChart3 },
   { id: 'experience', label: 'Timeline', icon: Briefcase },
+  { id: 'industries', label: 'Industries', icon: Building2 },
   { id: 'global', label: 'Global', icon: Globe },
   { id: 'certifications', label: 'Certifications', icon: Award },
-  { id: 'industries', label: 'Industries', icon: Building2 },
   { id: 'contact', label: 'Contact', icon: Mail },
 ];
 
