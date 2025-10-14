@@ -160,8 +160,16 @@ export default function InsightsPage() {
                   </Button>
                 </div>
 
-                <div className="relative h-64 md:h-full min-h-[300px] bg-gradient-to-br from-[hsl(190,85%,55%)]/20 to-[hsl(220,90%,60%)]/20 rounded-xl flex items-center justify-center border border-white/10">
-                  <BookOpen className="w-24 h-24 text-white/30" />
+                <div className="relative h-64 md:h-full min-h-[300px] bg-gradient-to-br from-[hsl(190,85%,55%)]/20 to-[hsl(220,90%,60%)]/20 rounded-xl flex items-center justify-center border border-white/10 overflow-hidden">
+                  {featuredPost.heroImage ? (
+                    <img 
+                      src={featuredPost.heroImage} 
+                      alt={featuredPost.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <BookOpen className="w-24 h-24 text-white/30" />
+                  )}
                 </div>
               </div>
             </Card>
@@ -288,11 +296,30 @@ export default function InsightsPage() {
             </div>
           </DialogHeader>
           
-          <div className="prose prose-invert max-w-none">
-            <p className="text-white/80 leading-relaxed whitespace-pre-line">
-              {selectedPost?.content}
-            </p>
-          </div>
+          {selectedPost?.heroImage && (
+            <div className="mb-6 rounded-lg overflow-hidden">
+              <img 
+                src={selectedPost.heroImage} 
+                alt={selectedPost.title}
+                className="w-full h-64 object-cover"
+              />
+            </div>
+          )}
+          
+          <div 
+            className="prose prose-invert prose-lg max-w-none
+              prose-headings:text-white prose-headings:font-display
+              prose-p:text-white/80 prose-p:leading-relaxed
+              prose-a:text-[hsl(190,85%,55%)] prose-a:no-underline hover:prose-a:underline
+              prose-strong:text-white prose-strong:font-semibold
+              prose-code:text-[hsl(190,85%,55%)] prose-code:bg-white/10 prose-code:px-1 prose-code:rounded
+              prose-pre:bg-white/5 prose-pre:border prose-pre:border-white/10
+              prose-blockquote:border-l-[hsl(190,85%,55%)] prose-blockquote:text-white/70
+              prose-ul:text-white/80 prose-ol:text-white/80
+              prose-li:text-white/80
+              prose-img:rounded-lg prose-img:border prose-img:border-white/10"
+            dangerouslySetInnerHTML={{ __html: selectedPost?.content || '' }}
+          />
 
           <div className="mt-6 pt-6 border-t border-white/10">
             <p className="text-sm text-white/60 mb-3">Topics covered:</p>

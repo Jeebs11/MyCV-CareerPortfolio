@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import '../styles/quill-custom.css';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
