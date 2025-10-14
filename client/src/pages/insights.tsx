@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import DOMPurify from 'dompurify';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -193,62 +194,76 @@ export default function InsightsPage() {
             {filteredPosts.map((post, index) => (
               <Card
                 key={post.id}
-                className="bg-white/5 backdrop-blur-xl border-white/10 p-6 hover-elevate transition-all duration-300 cursor-pointer"
+                className="bg-white/5 backdrop-blur-xl border-white/10 overflow-hidden hover-elevate transition-all duration-300 cursor-pointer"
                 onClick={() => setSelectedPost(post)}
                 data-testid={`card-blog-${index}`}
               >
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-md bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center flex-shrink-0">
-                    <BookOpen className="w-6 h-6 text-white" />
+                {post.heroImage && (
+                  <div className="relative h-48 overflow-hidden">
+                    <img 
+                      src={post.heroImage} 
+                      alt={post.title}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <Badge className="bg-[hsl(220,90%,60%)]/20 border-[hsl(220,90%,60%)]/30 text-[hsl(220,90%,70%)] backdrop-blur-md text-xs mb-2">
-                      {post.category}
-                    </Badge>
-                    <h3 className="font-display text-xl font-bold text-white mb-2 line-clamp-2">
-                      {post.title}
-                    </h3>
-                  </div>
-                </div>
-
-                <p className="text-white/70 text-sm mb-4 line-clamp-3">
-                  {post.excerpt}
-                </p>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3 text-xs text-white/50">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {post.readTime}
-                    </span>
-                    <span>•</span>
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      {new Date(post.publishDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                    </span>
+                )}
+                
+                <div className="p-6">
+                  <div className="flex items-start gap-4 mb-4">
+                    {!post.heroImage && (
+                      <div className="w-12 h-12 rounded-md bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center flex-shrink-0">
+                        <BookOpen className="w-6 h-6 text-white" />
+                      </div>
+                    )}
+                    
+                    <div className="flex-1 min-w-0">
+                      <Badge className="bg-[hsl(220,90%,60%)]/20 border-[hsl(220,90%,60%)]/30 text-[hsl(220,90%,70%)] backdrop-blur-md text-xs mb-2">
+                        {post.category}
+                      </Badge>
+                      <h3 className="font-display text-xl font-bold text-white mb-2 line-clamp-2">
+                        {post.title}
+                      </h3>
+                    </div>
                   </div>
 
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="text-[hsl(190,85%,55%)] hover:text-[hsl(190,85%,65%)]"
-                    data-testid={`button-read-more-${index}`}
-                  >
-                    Read More
-                    <ArrowRight className="ml-1 w-3 h-3" />
-                  </Button>
-                </div>
+                  <p className="text-white/70 text-sm mb-4 line-clamp-3">
+                    {post.excerpt}
+                  </p>
 
-                <div className="flex flex-wrap gap-2 mt-4">
-                  {post.tags.slice(0, 3).map((tag, idx) => (
-                    <Badge 
-                      key={idx}
-                      className="bg-white/5 border-white/10 text-white/60 text-xs"
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 text-xs text-white/50">
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {post.readTime}
+                      </span>
+                      <span>•</span>
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {new Date(post.publishDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                      </span>
+                    </div>
+
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-[hsl(190,85%,55%)] hover:text-[hsl(190,85%,65%)]"
+                      data-testid={`button-read-more-${index}`}
                     >
-                      {tag}
-                    </Badge>
-                  ))}
+                      Read More
+                      <ArrowRight className="ml-1 w-3 h-3" />
+                    </Button>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    {post.tags.slice(0, 3).map((tag, idx) => (
+                      <Badge 
+                        key={idx}
+                        className="bg-white/5 border-white/10 text-white/60 text-xs"
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               </Card>
             ))}
@@ -318,7 +333,7 @@ export default function InsightsPage() {
               prose-ul:text-white/80 prose-ol:text-white/80
               prose-li:text-white/80
               prose-img:rounded-lg prose-img:border prose-img:border-white/10"
-            dangerouslySetInnerHTML={{ __html: selectedPost?.content || '' }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedPost?.content || '') }}
           />
 
           <div className="mt-6 pt-6 border-t border-white/10">
