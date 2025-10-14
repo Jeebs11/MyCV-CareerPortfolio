@@ -7,6 +7,15 @@ This is a personal portfolio website for Mujeeb Lawal, a Senior Project Manager 
 ## Recent Updates (October 2024)
 
 **Latest Changes (October 14, 2024):**
+- **Self-Managed Blog CMS**: Implemented complete database-backed blog management system:
+  - PostgreSQL database with Drizzle ORM for blog posts storage
+  - Admin panel at `/admin` with password authentication (ADMIN_PASSWORD secret)
+  - Full CRUD operations: create, edit, delete, and feature articles
+  - Rich form validation with Zod schemas
+  - Insights page now fetches articles from database instead of static data
+  - Seeded 4 existing blog posts to database
+  - No additional costs - uses existing Replit database infrastructure
+
 - **Section Order Fix**: Corrected navigation order to match actual page layout for better UX:
   - Page sections now render in correct order: Journey → Impact → Timeline → **Industries → Global** → Certifications → Contact
   - Industries section (Cross-Industry Experience) now appears before Global section (Geographic Footprint)
@@ -74,12 +83,12 @@ This is a personal portfolio website for Mujeeb Lawal, a Senior Project Manager 
 
 3. **Certifications Wall of Fame** - Interactive expandable cards showcasing PRINCE2, Scrum Master, Six Sigma, and Agile certifications with detailed descriptions, validation links, and skills mapping
 
-4. **Insights & Thought Leadership Page** - Dedicated blog-style page at `/insights` featuring:
-   - Hero section with glassmorphic design
-   - Category filtering (PMO Leadership, Compliance, Innovation, Methodology)
-   - Featured article spotlight
-   - Interactive article grid with detail modals
-   - 4 blog posts covering PMO leadership, FCA compliance, AI integration, and global delivery methodologies
+4. **Self-Managed Blog System** - Complete CMS for managing thought leadership content:
+   - **Admin Panel** (`/admin`): Password-protected interface for creating, editing, and deleting blog articles
+   - **Database-Backed**: PostgreSQL storage with Drizzle ORM, no markdown files needed
+   - **Rich Content Editor**: Full article management with title, excerpt, content, category, tags, and featured status
+   - **Public Blog Page** (`/insights`): Dynamic article display with category filtering and featured article spotlight
+   - **Authentication**: Simple password-based admin auth using ADMIN_PASSWORD environment variable
 
 ## User Preferences
 
