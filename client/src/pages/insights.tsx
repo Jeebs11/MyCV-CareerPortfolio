@@ -1,15 +1,33 @@
 import { useState } from 'react';
-import { blogPosts } from '@shared/schema';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { BookOpen, Clock, Calendar, ArrowRight, Filter, Sparkles } from 'lucide-react';
+import { BookOpen, Clock, Calendar, ArrowRight, Filter, Sparkles, Loader2 } from 'lucide-react';
 import { Link } from 'wouter';
+
+interface BlogPost {
+  id: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  category: string;
+  readTime: string;
+  publishDate: string;
+  tags: string[];
+  featured?: boolean;
+  heroImage?: string;
+}
 
 export default function InsightsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [selectedPost, setSelectedPost] = useState<typeof blogPosts[0] | null>(null);
+  const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
+
+  // Fetch blog posts from database
+  const { data: blogPosts = [], isLoading } = useQuery<BlogPost[]>({
+    queryKey: ['/api/blog-posts'],
+  });
 
   const categories = ['All', ...Array.from(new Set(blogPosts.map(post => post.category)))];
   const featuredPost = blogPosts.find(post => post.featured);
@@ -17,6 +35,17 @@ export default function InsightsPage() {
   const filteredPosts = selectedCategory === 'All' 
     ? blogPosts 
     : blogPosts.filter(post => post.category === selectedCategory);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[hsl(262,50%,8%)] via-[hsl(245,30%,12%)] to-[hsl(220,40%,10%)] flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-[hsl(190,85%,55%)] animate-spin mx-auto mb-4" />
+          <p className="text-white/60">Loading insights...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[hsl(262,50%,8%)] via-[hsl(245,30%,12%)] to-[hsl(220,40%,10%)]">
