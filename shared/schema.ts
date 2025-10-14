@@ -1,3 +1,40 @@
+import { pgTable, serial, varchar, text, timestamp, boolean } from 'drizzle-orm/pg-core';
+import { createInsertSchema } from 'drizzle-zod';
+import { z } from 'zod';
+
+// ============ DATABASE SCHEMA ============
+
+export const blogPostsTable = pgTable('blog_posts', {
+  id: serial('id').primaryKey(),
+  title: varchar('title', { length: 500 }).notNull(),
+  excerpt: text('excerpt').notNull(),
+  content: text('content').notNull(),
+  category: varchar('category', { length: 100 }).notNull(),
+  readTime: varchar('read_time', { length: 50 }).notNull(),
+  publishDate: varchar('publish_date', { length: 50 }).notNull(),
+  tags: text('tags').notNull(), // JSON array stored as string
+  featured: boolean('featured').default(false),
+  heroImage: varchar('hero_image', { length: 500 }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// Zod schemas for validation
+export const insertBlogPostSchema = createInsertSchema(blogPostsTable).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const updateBlogPostSchema = insertBlogPostSchema.partial();
+
+// TypeScript types
+export type BlogPostRow = typeof blogPostsTable.$inferSelect;
+export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
+export type UpdateBlogPost = z.infer<typeof updateBlogPostSchema>;
+
+// ============ INTERFACES ============
+
 export interface Experience {
   id: string;
   role: string;
