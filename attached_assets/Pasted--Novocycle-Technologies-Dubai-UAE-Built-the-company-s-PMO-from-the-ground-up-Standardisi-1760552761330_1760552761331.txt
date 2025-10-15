@@ -1,0 +1,62 @@
+**Novocycle Technologies (Dubai, UAE)**
+
+* Built the company’s PMO from the ground up.
+* Standardising governance and delivery process for both internal and external projects
+* Introduced  department/business progress reporting using  PowerBI and Excel
+* Enhanced transparency, consistency, and accountability across the different business units.
+
+**Caravan and Motorhome Club (London, UK)**
+
+* Redesigned a core insurance product, improving profitability
+* Re-engineered processes to eliminate inefficiencies and accelerate underwriting cycles.
+* Introduced workshops to gather requirements and identify inefficiencies resulting in increased process efficiency.
+* Introduced a vendor governance model, aligning IT and business priorities.
+
+**Simply Business (London, UK)**
+
+* Delivered a £1.2m insurance product using microservices to enhance speed and scalability.
+* Managed FCA-regulated programme with multi-workstream Agile delivery (Operation Resilience + Consumer Duty).
+* Managed the delivery of the 10-year anniversary Hackathon and coached the winning hack to also win sponsorship to build the MVP
+
+**Mercer (London, UK)**
+
+* Developed BA deliverables such as process maps and onboarding playbooks, ensuring clear requirements and smoother adoption across regions.
+* Introduced project governance which improved project onboarding and delivery.
+* Developed a programme reporting dashboard to provide a more accurate overview of the projects within the programme.
+
+**6Connex (Remote, US)**
+
+* Unified delivery across distributed Agile teams in six time zones
+* Strengthened client delivery performance for high-profile enterprise events.
+* Turned around a failing project using effective stakeholder management 
+
+**Best Future Education Centre (Nigeria)**
+
+* Led full digital transition during COVID-19, implementing e-learning platforms and data systems.
+* Ensured operational continuity through scalable technology, staff upskilling and effective training.
+
+**GSMA (London, UK)**
+
+* Led delivery of the Energy Consumption Benchmark Tool supporting UN 2030 Sustainability Goals.
+* Partnered with operators like Vodafone and Verizon to achieve up to 35% energy reduction.
+* Faciliated the unboard of 8 new telecom technologies with mobile operators. 
+
+**JLT Employee Benefits (London, UK)**
+
+* Improved project efficiency by 34% by automating a number of key repetitive tasks in the processes.
+* Streamlined workflows and governance to accelerate delivery and adoption.
+
+**Dictate.IT (London, UK)**
+
+* Revived a failing project with strong stakeholder management
+* Developed a standard change management process to ensure adoption across clinical teams.
+* Standerdised training process and training material resulting in a smoother unboarding and reduced post implementation issues by 65%.
+
+**BSS Industrial (London, UK)**
+
+* Strengthened coordination between design, engineering, and commercial functions.
+
+**Alfa Laval (London, UK)**
+
+* Supported design and installation of energy-efficient systems for The Shard and the 2012 Olympic Aquatic Centre.
+* Achieved the highest sold heat transfer solution for a high end client as a student on career placaement

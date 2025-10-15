@@ -544,9 +544,10 @@ export const timelineProjects: TimelineProject[] = [
     projectType: 'PMO Leadership',
     description: "Oversaw project delivery and governance across EU-funded engineering programmes, building the company's PMO function from scratch. The role blended strategic oversight and hands-on delivery, aligning international teams and embedding scalable systems across R&D and operations.",
     keyAchievements: [
-      'Built the PMO function from the ground up, bringing structure to multi-million Euro EU-funded battery recycling research',
-      'Managing cross-border delivery teams spanning Europe and the Middle East',
-      'Cut reporting overhead by 36% through smart use of Jira and Confluence'
+      'Built the company\'s PMO from the ground up',
+      'Standardising governance and delivery process for both internal and external projects',
+      'Introduced department/business progress reporting using PowerBI and Excel',
+      'Enhanced transparency, consistency, and accountability across the different business units'
     ],
     teamSize: 15,
     technologies: ['Jira', 'Confluence', 'Agile']
@@ -564,9 +565,10 @@ export const timelineProjects: TimelineProject[] = [
     projectType: 'Product Transformation',
     description: 'Led the technical modernisation of insurance products and mutual agreement products, managing ERP and vendor integrations. Focused on improving operational visibility, process efficiency, and alignment between IT and business units.',
     keyAchievements: [
-      'Transformed a core mutual agreement insurance product, directly boosting profit margins',
-      'Built a vendor selection framework that cut decision time by 30%',
-      'Led workshops to map workflows and spot inefficiencies, then fixed them'
+      'Redesigned a core insurance product, improving profitability',
+      'Re-engineered processes to eliminate inefficiencies and accelerate underwriting cycles',
+      'Introduced workshops to gather requirements and identify inefficiencies resulting in increased process efficiency',
+      'Introduced a vendor governance model, aligning IT and business priorities'
     ],
     technologies: ['Website Transformation', 'Underwriting Negotiation']
   },
@@ -585,9 +587,9 @@ export const timelineProjects: TimelineProject[] = [
     teamSize: 34,
     description: 'Directed large-scale digital transformation projects in a regulated insurance environment. Drove the rollout of FCA-compliant platforms and introduced delivery frameworks that improved efficiency and governance across multiple workstreams.',
     keyAchievements: [
-      'Shipped a £1.2M commercial insurance product with 34 specialists using microservices and APIs',
-      'Ran the 10-year anniversary Global Hackathon with 20 unique hacks, coaching the winning team to secure MVP funding',
-      'Delivered Operation Resilience and Consumer Duty FCA programmes across multiple workstreams'
+      'Delivered a £1.2m insurance product using microservices to enhance speed and scalability',
+      'Managed FCA-regulated programme with multi-workstream Agile delivery (Operation Resilience + Consumer Duty)',
+      'Managed the delivery of the 10-year anniversary Hackathon and coached the winning hack to also win sponsorship to build the MVP'
     ],
     technologies: ['Microservices', 'APIs', 'Agile', 'Jira']
   },
@@ -604,9 +606,9 @@ export const timelineProjects: TimelineProject[] = [
     projectType: 'Digital Transformation',
     description: 'Managed multinational transformation projects for global clients in HR and ERP modernisation. Oversaw regional delivery teams and budgets across EMEA, APAC, and the Americas, ensuring complex solutions met compliance and scalability requirements.',
     keyAchievements: [
-      'Led global employee benefits platform rollouts for Amazon, Estée Lauder, and Marsh & McLennan',
-      'Created process maps and playbooks that made complex regional rollouts smoother',
-      'Kept project plans, budgets, and risk logs on track to hit regulatory deadlines'
+      'Developed BA deliverables such as process maps and onboarding playbooks, ensuring clear requirements and smoother adoption across regions',
+      'Introduced project governance which improved project onboarding and delivery',
+      'Developed a programme reporting dashboard to provide a more accurate overview of the projects within the programme'
     ],
     technologies: ['HR Systems', 'Data Analytics']
   },
@@ -623,9 +625,9 @@ export const timelineProjects: TimelineProject[] = [
     projectType: 'Global Delivery',
     description: 'Delivered enterprise SaaS implementations during the global shift to virtual engagement. Streamlined implementation frameworks to improve delivery speed, reliability, and user experience for high-profile corporate clients.',
     keyAchievements: [
-      'Ran virtual event programmes across 6 time zones (Europe, US, MENA, Asia) during the pandemic',
-      'Kept major events like university graduations and international exhibitions running smoothly',
-      'Improved platform stability, cutting downtime when thousands of users were online'
+      'Unified delivery across distributed Agile teams in six time zones',
+      'Strengthened client delivery performance for high-profile enterprise events',
+      'Turned around a failing project using effective stakeholder management'
     ],
     technologies: ['Virtual Event Platform', 'Agile', 'Global Coordination']
   },
@@ -642,9 +644,8 @@ export const timelineProjects: TimelineProject[] = [
     projectType: 'Digital Transformation',
     description: 'Led the digital transition of a traditional school during the pandemic, introducing virtual learning platforms and staff training programmes. Focused on operational continuity, accessibility, and stakeholder adoption.',
     keyAchievements: [
-      'Led the digital pivot when COVID hit, getting data systems and remote learning platforms live fast',
-      'Trained staff and students on new tools so classes could continue',
-      'Kept education running through the entire lockdown period'
+      'Led full digital transition during COVID-19, implementing e-learning platforms and data systems',
+      'Ensured operational continuity through scalable technology, staff upskilling and effective training'
     ]
   },
   {
@@ -660,9 +661,9 @@ export const timelineProjects: TimelineProject[] = [
     projectType: 'Sustainability',
     description: 'Partnered with leading telecom operators to define sustainability standards and develop industry energy benchmarking frameworks. Played a key role in advancing the sector\'s global approach to efficiency and environmental impact as well as future technology adoption.',
     keyAchievements: [
-      'Built and launched the Energy Consumption Benchmark Tool with the UN\'s 2030 Sustainability Goals',
-      'Helped Vodafone, Verizon, and China Telecom cut energy consumption by up to 35%',
-      'Worked directly with regulators and C-level executives to drive global adoption'
+      'Led delivery of the Energy Consumption Benchmark Tool supporting UN 2030 Sustainability Goals',
+      'Partnered with operators like Vodafone and Verizon to achieve up to 35% energy reduction',
+      'Faciliated the unboard of 8 new telecom technologies with mobile operators'
     ],
     technologies: ['Sustainability Analytics', 'UN SDG Alignment']
   },
@@ -697,9 +698,8 @@ export const timelineProjects: TimelineProject[] = [
     projectType: 'SaaS Implementation',
     description: 'Delivered SaaS-based employee benefits transformation projects for enterprise clients including Hitachi and Transport for London. Improved project efficiency by 34% through workflow optimisation and close coordination between IT, operations, and client stakeholders.',
     keyAchievements: [
-      'Regional employee benefits platform for Hitachi and TfL',
-      'Optimised renewal process improving efficiency by 34%',
-      'Identified cost-saving opportunities reducing project time'
+      'Improved project efficiency by 34% by automating a number of key repetitive tasks in the processes',
+      'Streamlined workflows and governance to accelerate delivery and adoption'
     ],
     technologies: ['SaaS Platform', 'Employee Benefits Software']
   },
@@ -716,9 +716,9 @@ export const timelineProjects: TimelineProject[] = [
     projectType: 'Software Implementation',
     description: 'Managed SaaS deployments across NHS Trusts, improving efficiency in clinical documentation and reporting workflows. Oversaw the full implementation cycle, from requirements to onboarding, ensuring seamless adoption in high-compliance environments.',
     keyAchievements: [
-      'Deployed medical transcription software using SDN technology',
-      'Collaborated with C-suite stakeholders and medical professionals',
-      'Delivered projects at St George, Royal Free, Nuffield Health'
+      'Revived a failing project with strong stakeholder management',
+      'Developed a standard change management process to ensure adoption across clinical teams',
+      'Standerdised training process and training material resulting in a smoother unboarding and reduced post implementation issues by 65%'
     ],
     technologies: ['SDN Technology', 'Medical Software']
   },
@@ -735,8 +735,7 @@ export const timelineProjects: TimelineProject[] = [
     projectType: 'Construction Management',
     description: 'Delivered sustainable construction and fit-out projects, coordinating design, engineering, and on-site teams. Ensured projects met technical, safety, and compliance standards within tight operational deadlines.',
     keyAchievements: [
-      'Managed engineering and construction projects',
-      'Coordinated technical teams and stakeholders'
+      'Strengthened coordination between design, engineering, and commercial functions'
     ]
   },
   {
@@ -752,8 +751,8 @@ export const timelineProjects: TimelineProject[] = [
     projectType: 'Engineering Projects',
     description: 'Supported delivery of high-profile energy-efficient engineering projects (heat transfer solutions), for high profile construction sites like The Shard and the 2012 Olympic Aquatic Centre. Contributed to design, testing, and installation phases to ensure optimal performance and compliance.',
     keyAchievements: [
-      'Delivered engineering and construction projects',
-      'Started professional project management career'
+      'Supported design and installation of energy-efficient systems for The Shard and the 2012 Olympic Aquatic Centre',
+      'Achieved the highest sold heat transfer solution for a high end client as a student on career placaement'
     ]
   }
 ];
