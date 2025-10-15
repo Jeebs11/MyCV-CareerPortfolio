@@ -500,6 +500,7 @@ export interface TimelineProject {
   current: boolean;
   industry: string;
   projectType: string;
+  description?: string;
   keyAchievements: string[];
   budget?: string;
   teamSize?: number;
