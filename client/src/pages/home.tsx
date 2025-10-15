@@ -327,6 +327,12 @@ function VerticalCareerTimeline() {
                     </p>
                   </div>
 
+                  {project.description && (
+                    <p className="text-sm text-white/70 leading-relaxed" data-testid={`text-career-description-${project.id}`}>
+                      {project.description}
+                    </p>
+                  )}
+
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <Badge variant="outline" className="text-xs border-white/20 text-white/70" data-testid={`badge-career-industry-${project.id}`}>
                       {project.industry}
@@ -382,6 +388,12 @@ function VerticalCareerTimeline() {
                       {project.location}
                     </p>
                   </div>
+
+                  {project.description && (
+                    <p className="text-sm text-white/70 leading-relaxed" data-testid={`text-career-mobile-description-${project.id}`}>
+                      {project.description}
+                    </p>
+                  )}
 
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <Badge variant="outline" className="text-xs border-white/20 text-white/70" data-testid={`badge-career-mobile-industry-${project.id}`}>
@@ -457,11 +469,20 @@ function VerticalCareerTimeline() {
                   </div>
                 </div>
 
-                {/* Key Achievements */}
+                {/* Description */}
+                {selectedProject.description && (
+                  <div>
+                    <p className="text-base text-white/80 leading-relaxed" data-testid="text-dialog-description">
+                      {selectedProject.description}
+                    </p>
+                  </div>
+                )}
+
+                {/* Full Impact */}
                 <div>
                   <h3 className="font-semibold text-base sm:text-lg mb-3 flex items-center gap-2 text-white">
                     <Award className="w-5 h-5 text-[hsl(190,85%,55%)]" />
-                    Key Highlights & Deliverables
+                    Full Impact
                   </h3>
                   <ul className="space-y-2">
                     {selectedProject.keyAchievements.map((achievement, idx) => (
