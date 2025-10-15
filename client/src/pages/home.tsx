@@ -910,12 +910,12 @@ function CareerTimeline({ activeRegion, setActiveRegion }: { activeRegion: strin
         </div>
         
         <div className="space-y-4 md:space-y-6">
-          {experiences.map((exp, index) => (
+          {timelineProjects.map((exp, index) => (
             <TimelineCard 
               key={exp.id} 
               experience={exp} 
               index={index}
-              onHover={() => setActiveRegion(exp.region)}
+              onHover={() => setActiveRegion(null)}
               onLeave={() => setActiveRegion(null)}
             />
           ))}
@@ -965,23 +965,31 @@ function TimelineCard({ experience, index, onHover, onLeave }: { experience: any
               </div>
             </div>
             
-            <div className="space-y-2">
-              {experience.achievements.slice(0, isExpanded ? undefined : 2).map((achievement: string, idx: number) => (
-                <div key={idx} className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[hsl(190,85%,55%)] mt-2 flex-shrink-0" />
-                  <p className="text-white/70 text-xs sm:text-sm leading-relaxed">{achievement}</p>
-                </div>
-              ))}
-            </div>
+            {experience.description && (
+              <p className="text-white/70 text-sm sm:text-base leading-relaxed mb-3" data-testid={`text-career-journey-description-${index}`}>
+                {experience.description}
+              </p>
+            )}
+            
+            {experience.keyAchievements && experience.keyAchievements.length > 0 && (
+              <div className="space-y-2">
+                {experience.keyAchievements.slice(0, isExpanded ? undefined : 2).map((achievement: string, idx: number) => (
+                  <div key={idx} className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[hsl(190,85%,55%)] mt-2 flex-shrink-0" />
+                    <p className="text-white/70 text-xs sm:text-sm leading-relaxed">{achievement}</p>
+                  </div>
+                ))}
+              </div>
+            )}
             
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mt-4">
-              {experience.achievements.length > 2 && (
+              {experience.keyAchievements && experience.keyAchievements.length > 2 && (
                 <button
                   onClick={() => setIsExpanded(!isExpanded)}
                   className="text-[hsl(190,85%,55%)] text-xs sm:text-sm font-medium hover:text-[hsl(190,85%,65%)] transition-colors text-left"
                   data-testid={`button-expand-${index}`}
                 >
-                  {isExpanded ? 'Show Less' : `Show ${experience.achievements.length - 2} More`}
+                  {isExpanded ? 'Show Less' : `Show ${experience.keyAchievements.length - 2} More`}
                 </button>
               )}
               <Button
@@ -1017,7 +1025,7 @@ function TimelineCard({ experience, index, onHover, onLeave }: { experience: any
                 Full Impact
               </h3>
               <ul className="space-y-2.5">
-                {experience.achievements.map((achievement: string, idx: number) => (
+                {experience.keyAchievements && experience.keyAchievements.map((achievement: string, idx: number) => (
                   <li key={idx} className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 text-[hsl(190,85%,55%)] mt-0.5 flex-shrink-0" />
                     <span className="text-xs sm:text-sm text-white/80 leading-relaxed">{achievement}</span>
