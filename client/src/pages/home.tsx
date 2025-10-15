@@ -165,7 +165,7 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
               className="text-sm text-white/70 hover:text-white transition-colors"
               data-testid="link-insights"
             >
-              Insights
+              Thought Leadership
             </a>
             <Button
               onClick={() => setShowCVDialog(true)}
@@ -216,8 +216,8 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
                     className="text-left text-white/90 hover:text-white transition-colors py-3 px-4 rounded-md hover-elevate"
                     data-testid="mobile-link-insights"
                   >
-                    <div className="font-medium">Insights</div>
-                    <div className="text-sm text-white/60">Thought Leadership</div>
+                    <div className="font-medium">Thought Leadership</div>
+                    <div className="text-sm text-white/60">Articles & Insights</div>
                   </a>
                   <button 
                     onClick={() => {
