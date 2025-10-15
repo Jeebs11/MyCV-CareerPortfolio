@@ -1070,15 +1070,17 @@ function GeographicMap({ activeRegion, setActiveRegion }: { activeRegion: string
               style={{ left: region.left, top: region.top }}
               onMouseEnter={() => setActiveRegion(region.id)}
               onMouseLeave={() => setActiveRegion(null)}
+              onClick={() => setActiveRegion(activeRegion === region.id ? null : region.id)}
               data-testid={`button-region-${region.id}`}
             >
               <div className="relative">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center shadow-lg shadow-[hsl(190,85%,55%)]/50 hover-elevate">
-                  <MapPin className="w-8 h-8 text-white" />
+                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center shadow-lg shadow-[hsl(190,85%,55%)]/50 hover-elevate">
+                  <MapPin className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                 </div>
                 
-                {(activeRegion === region.id || activeRegion === null) && (
-                  <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-md px-3 py-2 whitespace-nowrap">
+                {/* Desktop: show on hover or all, Mobile: show only on click */}
+                {activeRegion === region.id && (
+                  <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-md px-3 py-2 whitespace-nowrap z-10">
                     <p className="text-white text-sm font-semibold">{region.name}</p>
                     <p className="text-white/60 text-xs">{region.projects} projects</p>
                   </div>
@@ -1258,7 +1260,7 @@ function IndustryExperienceMap() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-7 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {industryExperience.map((industry) => {
             const isExpanded = expandedIndustry === industry.id;
             
@@ -1269,34 +1271,28 @@ function IndustryExperienceMap() {
                 data-testid={`card-industry-${industry.id}`}
               >
                 <div className="p-6 space-y-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-xl text-white mb-2" data-testid={`text-industry-name-${industry.id}`}>
-                        {industry.name}
-                      </h3>
-                      <Badge 
-                        className="text-white border-0"
-                        style={{ backgroundColor: industry.color }}
-                        data-testid={`badge-industry-years-${industry.id}`}
-                      >
-                        {industry.years} years
-                      </Badge>
-                    </div>
+                  <div className="flex items-center gap-4">
                     <div 
-                      className="w-16 h-16 rounded-xl flex items-center justify-center text-2xl font-bold text-white"
-                      style={{ backgroundColor: industry.color + '40', border: `2px solid ${industry.color}` }}
+                      className="w-14 h-14 rounded-lg flex items-center justify-center text-2xl font-bold text-white flex-shrink-0"
+                      style={{ backgroundColor: industry.color + '30', border: `2px solid ${industry.color}` }}
                     >
                       {industry.years}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-lg text-white mb-1.5 leading-tight" data-testid={`text-industry-name-${industry.id}`}>
+                        {industry.name}
+                      </h3>
+                      <p className="text-sm text-white/60">{industry.years} years experience</p>
                     </div>
                   </div>
 
                   <Button
                     variant="ghost"
                     onClick={() => setExpandedIndustry(isExpanded ? null : industry.id)}
-                    className="w-full flex items-center justify-between text-white/70 hover:text-white h-12 px-4 py-3"
+                    className="w-full flex items-center justify-between text-white/70 hover:text-white h-10 px-3"
                     data-testid={`button-industry-toggle-${industry.id}`}
                   >
-                    <span className="flex-1 text-left">{isExpanded ? 'Hide' : 'View'} Projects ({industry.projects.length})</span>
+                    <span className="flex-1 text-left text-sm">{isExpanded ? 'Hide' : 'View'} Projects ({industry.projects.length})</span>
                     <ChevronDown className={`w-4 h-4 transition-transform flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`} />
                   </Button>
 
