@@ -676,9 +676,11 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
                       <p className="text-[hsl(190,85%,55%)] text-xs md:text-sm mb-2" data-testid={`text-company-${project.id}`}>
                         {project.company}
                       </p>
-                      <p className="text-white/60 text-xs md:text-sm leading-relaxed" data-testid={`text-achievement-${project.id}`}>
-                        {project.keyAchievements[0]}
-                      </p>
+                      {project.description && (
+                        <p className="text-white/60 text-xs md:text-sm leading-relaxed" data-testid={`text-description-${project.id}`}>
+                          {project.description}
+                        </p>
+                      )}
                     </div>
 
                     <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:items-center sm:justify-between">
@@ -724,10 +726,18 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
                 </DialogHeader>
                 
                 <div className="space-y-4">
+                  {selectedProject.description && (
+                    <div>
+                      <p className="text-base text-white/80 leading-relaxed" data-testid="text-recent-dialog-description">
+                        {selectedProject.description}
+                      </p>
+                    </div>
+                  )}
+
                   <div>
                     <h3 className="text-sm font-semibold text-white/70 mb-3 flex items-center gap-2">
                       <Target className="w-4 h-4" />
-                      Key Achievements & Impact
+                      Full Impact
                     </h3>
                     <ul className="space-y-2">
                       {selectedProject.keyAchievements.map((achievement, idx) => (

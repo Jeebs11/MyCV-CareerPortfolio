@@ -4,10 +4,11 @@
 
 This is a personal portfolio website for Mujeeb Lawal, a Senior Project Manager with 17+ years of international experience. The site showcases professional experience, skills, achievements, and career highlights through an interactive, dashboard-style interface inspired by Figma's aesthetic. Built with React, TypeScript, and modern web technologies, the portfolio emphasizes visual storytelling through metrics, geographic data visualization, and glassmorphic design elements. Key capabilities include:
 
--   **Hero Section with Integrated Career Timeline**: Displays all 12 career positions from 2008-2024 with company, role, location, industry, and project type.
+-   **Hero Section with Recent Impact**: Displays 3 most recent roles with role descriptions, period, company, and industry badges. "View Impact" buttons open dialogs showing role description followed by "Full Impact" section with detailed achievements.
+-   **Career Journey Timeline**: Comprehensive view of all 12 career positions from 2008-2024 with role descriptions, location, industry, and project type. Each position includes a description field separate from the detailed impact information shown in expandable dialogs.
 -   **Industry Experience Map**: 7 sectors with expandable project cards showing global delivery experience.
 -   **Certifications Wall of Fame**: Interactive expandable cards showcasing professional certifications with detailed descriptions and validation links.
--   **Self-Managed Blog System with Rich Content**: A complete CMS for thought leadership featuring ReactQuill WYSIWYG editor for rich text formatting, hero image support for visual storytelling, DOMPurify HTML sanitization for security, and database-backed storage with admin panel.
+-   **Self-Managed Blog System with Rich Content**: A complete CMS for thought leadership featuring ReactQuill WYSIWYG editor with cyan-to-blue gradient toolbar, rich text formatting, hero image support for visual storytelling, DOMPurify HTML sanitization for security, and database-backed storage with admin panel.
 
 ## User Preferences
 
