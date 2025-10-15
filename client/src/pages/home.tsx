@@ -1004,7 +1004,7 @@ function TimelineCard({ experience, index, onHover, onLeave }: { experience: any
             <div>
               <h3 className="text-xs sm:text-sm font-semibold text-white/70 mb-3 flex items-center gap-2">
                 <Target className="w-4 h-4" />
-                All Achievements & Impact
+                Full Impact
               </h3>
               <ul className="space-y-2.5">
                 {experience.achievements.map((achievement: string, idx: number) => (
