@@ -652,7 +652,12 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
                 <span className="text-sm sm:hidden">odmlawal@gmail.com</span>
               </a>
               <span className="text-white/30 hidden sm:block">|</span>
-              <span className="text-xs sm:text-sm text-white/50 leading-relaxed">Available: Immediate Start • Remote/Hybrid/Freelance/No Visa Needed - Self Sponsored</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/20 border border-green-500/30">
+                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                <span className="text-xs sm:text-sm font-medium text-green-300 leading-relaxed">
+                  Available: Immediate Start • Remote/Hybrid/Freelance/No Visa Needed - Self Sponsored
+                </span>
+              </div>
             </div>
           </div>
           

@@ -345,6 +345,33 @@ export default function AdminPage() {
     URL.revokeObjectURL(url);
   };
 
+  const deleteContactMutation = useMutation({
+    mutationFn: async (contactId: number) => {
+      const res = await fetch(`/api/cv/contacts/${contactId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${adminPassword}`,
+        },
+      });
+      if (!res.ok) throw new Error('Failed to delete contact');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/cv/contacts'] });
+      toast({
+        title: "Success",
+        description: "Contact deleted successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete contact",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleEdit = (post: BlogPost) => {
     setEditingPost(post);
     form.reset({
@@ -894,6 +921,7 @@ export default function AdminPage() {
                         <th className="text-left py-3 px-4 text-sm font-semibold text-white/80">Email</th>
                         <th className="text-left py-3 px-4 text-sm font-semibold text-white/80">Phone</th>
                         <th className="text-left py-3 px-4 text-sm font-semibold text-white/80">Downloaded</th>
+                        <th className="text-right py-3 px-4 text-sm font-semibold text-white/80">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -904,9 +932,11 @@ export default function AdminPage() {
                           data-testid={`row-contact-${contact.id}`}
                         >
                           <td className="py-3 px-4 text-white">{contact.name}</td>
-                          <td className="py-3 px-4 text-white/80 flex items-center gap-2">
-                            <Mail className="w-4 h-4 flex-shrink-0" />
-                            {contact.email}
+                          <td className="py-3 px-4 text-white/80">
+                            <span className="flex items-center gap-2">
+                              <Mail className="w-4 h-4 flex-shrink-0" />
+                              {contact.email}
+                            </span>
                           </td>
                           <td className="py-3 px-4 text-white/80">
                             {contact.phone ? (
@@ -923,6 +953,18 @@ export default function AdminPage() {
                               <CalendarIcon className="w-4 h-4 flex-shrink-0" />
                               {new Date(contact.downloadedAt).toLocaleString()}
                             </span>
+                          </td>
+                          <td className="py-3 px-4 text-right">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => deleteContactMutation.mutate(contact.id)}
+                              disabled={deleteContactMutation.isPending}
+                              className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
+                              data-testid={`button-delete-contact-${contact.id}`}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
                           </td>
                         </tr>
                       ))}

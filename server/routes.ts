@@ -256,6 +256,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete CV contact (admin only)
+  app.delete("/api/cv/contacts/:id", adminAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid contact ID" });
+      }
+
+      const deleted = await storage.deleteCVContact(id);
+      if (!deleted) {
+        return res.status(404).json({ error: "Contact not found" });
+      }
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting CV contact:", error);
+      res.status(500).json({ error: "Failed to delete contact" });
+    }
+  });
+
   // Upload new CV (admin only)
   app.post("/api/cv/upload", adminAuth, upload.single('cv'), async (req, res) => {
     try {

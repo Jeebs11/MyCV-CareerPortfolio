@@ -30,6 +30,7 @@ export interface IStorage {
   // CV Contact methods
   createCVContact(contact: InsertCVContact): Promise<CVContactRow>;
   getAllCVContacts(): Promise<CVContactRow[]>;
+  deleteCVContact(id: number): Promise<boolean>;
   
   // CV File methods
   createCVFile(file: InsertCVFile): Promise<CVFileRow>;
@@ -74,6 +75,11 @@ export class DatabaseStorage implements IStorage {
   
   async getAllCVContacts(): Promise<CVContactRow[]> {
     return await db.select().from(cvContactsTable).orderBy(desc(cvContactsTable.downloadedAt));
+  }
+  
+  async deleteCVContact(id: number): Promise<boolean> {
+    const results = await db.delete(cvContactsTable).where(eq(cvContactsTable.id, id)).returning();
+    return results.length > 0;
   }
   
   // CV File CRUD operations
