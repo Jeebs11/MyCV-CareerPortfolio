@@ -2,8 +2,38 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { chatWithAssistantStream } from "./openai";
-import { insertBlogPostSchema, updateBlogPostSchema } from "@shared/schema";
+import { insertBlogPostSchema, updateBlogPostSchema, insertCVContactSchema } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
+import path from "path";
+import fs from "fs/promises";
+import multer from "multer";
+
+// Configure multer for CV file uploads
+const cvStorage = multer.diskStorage({
+  destination: async (req, file, cb) => {
+    const uploadDir = path.join(process.cwd(), 'uploads', 'cv');
+    await fs.mkdir(uploadDir, { recursive: true });
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = `CV_${Date.now()}${path.extname(file.originalname)}`;
+    cb(null, uniqueName);
+  },
+});
+
+const upload = multer({
+  storage: cvStorage,
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['.pdf', '.doc', '.docx'];
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (allowedTypes.includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only PDF, DOC, and DOCX files are allowed'));
+    }
+  },
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+});
 
 // Simple admin authentication middleware
 const adminAuth = (req: Request, res: Response, next: NextFunction) => {
@@ -172,6 +202,95 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Chat error:", error);
       res.status(500).json({ error: "Failed to process chat request" });
+    }
+  });
+
+  // ============ CV ROUTES ============
+  
+  // Download CV and save contact (public)
+  app.post("/api/cv/download", async (req, res) => {
+    try {
+      // Validate contact information
+      const validation = insertCVContactSchema.safeParse(req.body);
+      
+      if (!validation.success) {
+        const validationError = fromZodError(validation.error);
+        return res.status(400).json({ error: validationError.toString() });
+      }
+
+      // Save contact to database
+      await storage.createCVContact(validation.data);
+
+      // Get latest CV file
+      const cvFile = await storage.getLatestCVFile();
+      
+      if (!cvFile) {
+        return res.status(404).json({ error: "CV file not found. Please contact the administrator." });
+      }
+
+      const filePath = path.join(process.cwd(), 'uploads', 'cv', cvFile.filename);
+      
+      // Check if file exists
+      try {
+        await fs.access(filePath);
+      } catch {
+        return res.status(404).json({ error: "CV file not found on server. Please contact the administrator." });
+      }
+
+      // Send file
+      res.download(filePath, 'Mujeeb_Lawal_CV.pdf');
+    } catch (error) {
+      console.error("Error processing CV download:", error);
+      res.status(500).json({ error: "Failed to process CV download" });
+    }
+  });
+
+  // Get all CV contacts (admin only)
+  app.get("/api/cv/contacts", adminAuth, async (req, res) => {
+    try {
+      const contacts = await storage.getAllCVContacts();
+      res.json(contacts);
+    } catch (error) {
+      console.error("Error fetching CV contacts:", error);
+      res.status(500).json({ error: "Failed to fetch CV contacts" });
+    }
+  });
+
+  // Upload new CV (admin only)
+  app.post("/api/cv/upload", adminAuth, upload.single('cv'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      // Save file metadata to database
+      const cvFile = await storage.createCVFile({
+        filename: req.file.filename,
+      });
+
+      res.status(201).json({ 
+        success: true,
+        file: cvFile,
+      });
+    } catch (error) {
+      console.error("Error uploading CV:", error);
+      res.status(500).json({ error: "Failed to upload CV" });
+    }
+  });
+
+  // Get latest CV metadata (admin only)
+  app.get("/api/cv/latest", adminAuth, async (req, res) => {
+    try {
+      const cvFile = await storage.getLatestCVFile();
+      
+      if (!cvFile) {
+        return res.status(404).json({ error: "No CV file found" });
+      }
+
+      res.json(cvFile);
+    } catch (error) {
+      console.error("Error fetching latest CV:", error);
+      res.status(500).json({ error: "Failed to fetch latest CV" });
     }
   });
 

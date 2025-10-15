@@ -108,10 +108,20 @@ export default function Home() {
 function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [showCVDialog, setShowCVDialog] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
+      
+      // Calculate scroll progress
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrollTop = window.scrollY;
+      const scrollable = documentHeight - windowHeight;
+      const progress = (scrollTop / scrollable) * 100;
+      setScrollProgress(Math.min(progress, 100));
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -142,20 +152,13 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
           </div>
           
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-6">
             <button 
               onClick={() => scrollToSection('journey')}
               className="text-sm text-white/70 hover:text-white transition-colors"
               data-testid="link-journey"
             >
               Journey
-            </button>
-            <button 
-              onClick={() => scrollToSection('industries')}
-              className="text-sm text-white/70 hover:text-white transition-colors"
-              data-testid="link-industries"
-            >
-              Industries
             </button>
             <a 
               href="/insights"
@@ -164,13 +167,16 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
             >
               Insights
             </a>
-            <button 
-              onClick={() => scrollToSection('contact')}
-              className="text-sm text-white/70 hover:text-white transition-colors"
-              data-testid="link-contact"
+            <Button
+              onClick={() => setShowCVDialog(true)}
+              variant="outline"
+              size="sm"
+              className="bg-transparent border-white/20 text-white hover:bg-white/10"
+              data-testid="button-download-cv"
             >
-              Contact
-            </button>
+              <Download className="w-4 h-4 mr-2" />
+              Download CV
+            </Button>
           </div>
           
           <div className="flex items-center gap-2">
@@ -205,14 +211,6 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
                     <div className="font-medium">Journey</div>
                     <div className="text-sm text-white/60">17 Years of Experience</div>
                   </button>
-                  <button 
-                    onClick={() => handleNavClick('industries')}
-                    className="text-left text-white/90 hover:text-white transition-colors py-3 px-4 rounded-md hover-elevate"
-                    data-testid="mobile-link-industries"
-                  >
-                    <div className="font-medium">Industries</div>
-                    <div className="text-sm text-white/60">7 Industries Across 4 Continents</div>
-                  </button>
                   <a 
                     href="/insights"
                     className="text-left text-white/90 hover:text-white transition-colors py-3 px-4 rounded-md hover-elevate"
@@ -222,12 +220,18 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
                     <div className="text-sm text-white/60">Thought Leadership</div>
                   </a>
                   <button 
-                    onClick={() => handleNavClick('contact')}
-                    className="text-left text-white/90 hover:text-white transition-colors py-3 px-4 rounded-md hover-elevate"
-                    data-testid="mobile-link-contact"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setTimeout(() => setShowCVDialog(true), 300);
+                    }}
+                    className="text-left text-white/90 hover:text-white transition-colors py-3 px-4 rounded-md hover-elevate flex items-center gap-2"
+                    data-testid="mobile-button-download-cv"
                   >
-                    <div className="font-medium">Contact</div>
-                    <div className="text-sm text-white/60">Get in Touch</div>
+                    <Download className="w-4 h-4" />
+                    <div>
+                      <div className="font-medium">Download CV</div>
+                      <div className="text-sm text-white/60">Get my resume</div>
+                    </div>
                   </button>
                 </div>
               </SheetContent>
@@ -244,6 +248,18 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
           </div>
         </div>
       </div>
+      
+      {/* Scroll Progress Indicator */}
+      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/10">
+        <div 
+          className="h-full bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] transition-all duration-300 ease-out"
+          style={{ width: `${scrollProgress}%` }}
+          data-testid="scroll-progress-bar"
+        />
+      </div>
+      
+      {/* CV Download Dialog */}
+      <CVDownloadDialog open={showCVDialog} onOpenChange={setShowCVDialog} />
     </nav>
   );
 }
@@ -1381,6 +1397,147 @@ function ContactSection() {
         </Card>
       </div>
     </section>
+  );
+}
+
+function CVDownloadDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('/api/cv/download', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, phone }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to process request');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Mujeeb_Lawal_CV.pdf';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+      // Reset form and close dialog
+      setName('');
+      setEmail('');
+      setPhone('');
+      onOpenChange(false);
+    } catch (err) {
+      setError('Unable to download CV. Please try again or contact me directly.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="bg-[hsl(270,8%,12%)] border-white/20 text-white sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-white font-display text-2xl">Download My CV</DialogTitle>
+          <DialogDescription className="text-white/60">
+            Please share your details to receive my CV
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-white/80 mb-2">
+              Full Name <span className="text-red-400">*</span>
+            </label>
+            <input
+              id="name"
+              type="text"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-md text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[hsl(190,85%,55%)] focus:border-transparent"
+              placeholder="John Doe"
+              data-testid="input-cv-name"
+            />
+          </div>
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-white/80 mb-2">
+              Email Address <span className="text-red-400">*</span>
+            </label>
+            <input
+              id="email"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-md text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[hsl(190,85%,55%)] focus:border-transparent"
+              placeholder="john@example.com"
+              data-testid="input-cv-email"
+            />
+          </div>
+          <div>
+            <label htmlFor="phone" className="block text-sm font-medium text-white/80 mb-2">
+              Phone Number <span className="text-white/40 text-xs">(Optional)</span>
+            </label>
+            <input
+              id="phone"
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-md text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[hsl(190,85%,55%)] focus:border-transparent"
+              placeholder="+44 7900 000000"
+              data-testid="input-cv-phone"
+            />
+          </div>
+          {error && (
+            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-md text-red-400 text-sm">
+              {error}
+            </div>
+          )}
+          <div className="flex gap-3 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              className="flex-1 bg-transparent border-white/20 text-white hover:bg-white/10"
+              data-testid="button-cv-cancel"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="flex-1 bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0 hover:opacity-90"
+              data-testid="button-cv-submit"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                  Downloading...
+                </>
+              ) : (
+                <>
+                  <Download className="w-4 h-4 mr-2" />
+                  Download CV
+                </>
+              )}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
 

@@ -38,9 +38,16 @@ import {
   LogOut, 
   Loader2,
   Star,
-  StarOff
+  StarOff,
+  Upload,
+  Download as DownloadIcon,
+  Mail,
+  Phone,
+  Calendar as CalendarIcon,
+  FileText
 } from 'lucide-react';
 import { Link } from 'wouter';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface BlogPost {
   id: string;
@@ -70,6 +77,20 @@ const articleSchema = z.object({
 
 type ArticleFormData = z.infer<typeof articleSchema>;
 
+interface CVContact {
+  id: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  downloadedAt: string;
+}
+
+interface CVFile {
+  id: number;
+  filename: string;
+  uploadedAt: string;
+}
+
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
@@ -77,12 +98,41 @@ export default function AdminPage() {
   const [adminPassword, setAdminPassword] = useState('');
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('blog');
+  const [cvFile, setCVFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
 
   // Fetch blog posts
   const { data: blogPosts = [], isLoading, refetch } = useQuery<BlogPost[]>({
     queryKey: ['/api/blog-posts'],
     enabled: isAuthenticated,
+  });
+
+  // Fetch CV contacts
+  const { data: cvContacts = [], isLoading: isLoadingContacts } = useQuery<CVContact[]>({
+    queryKey: ['/api/cv/contacts'],
+    queryFn: async () => {
+      const res = await fetch('/api/cv/contacts', {
+        headers: { 'Authorization': `Bearer ${adminPassword}` }
+      });
+      if (!res.ok) throw new Error('Failed to fetch contacts');
+      return res.json();
+    },
+    enabled: isAuthenticated && activeTab === 'cv',
+  });
+
+  // Fetch latest CV file
+  const { data: latestCV } = useQuery<CVFile>({
+    queryKey: ['/api/cv/latest'],
+    queryFn: async () => {
+      const res = await fetch('/api/cv/latest', {
+        headers: { 'Authorization': `Bearer ${adminPassword}` }
+      });
+      if (!res.ok) throw new Error('Failed to fetch CV');
+      return res.json();
+    },
+    enabled: isAuthenticated && activeTab === 'cv',
   });
 
   const form = useForm<ArticleFormData>({
@@ -236,6 +286,65 @@ export default function AdminPage() {
     setAdminPassword('');
   };
 
+  const handleCVUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!cvFile) return;
+
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('cv', cvFile);
+
+      const res = await fetch('/api/cv/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${adminPassword}`,
+        },
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to upload CV');
+      }
+
+      toast({
+        title: "Success",
+        description: "CV uploaded successfully",
+      });
+
+      setCVFile(null);
+      queryClient.invalidateQueries({ queryKey: ['/api/cv/latest'] });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to upload CV",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const exportContacts = () => {
+    const csv = [
+      ['Name', 'Email', 'Phone', 'Downloaded At'],
+      ...cvContacts.map(contact => [
+        contact.name,
+        contact.email,
+        contact.phone || '',
+        new Date(contact.downloadedAt).toLocaleString()
+      ])
+    ].map(row => row.join(',')).join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `cv-contacts-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const handleEdit = (post: BlogPost) => {
     setEditingPost(post);
     form.reset({
@@ -329,21 +438,21 @@ export default function AdminPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-display font-bold text-white mb-2">
-              Article Management
+              Admin Dashboard
             </h1>
             <p className="text-white/60">
-              Create, edit, and manage your blog posts
+              Manage your portfolio content and CV downloads
             </p>
           </div>
 
           <div className="flex items-center gap-3">
-            <Link href="/insights">
+            <Link href="/">
               <Button 
                 variant="outline" 
                 className="bg-white/5 border-white/20 text-white hover:bg-white/10"
-                data-testid="button-view-insights"
+                data-testid="button-view-home"
               >
-                View Insights
+                View Portfolio
               </Button>
             </Link>
             <Button
@@ -358,34 +467,55 @@ export default function AdminPage() {
           </div>
         </div>
 
-        {/* Create New Button */}
-        <Button
-          onClick={() => {
-            setEditingPost(null);
-            form.reset();
-            setIsDialogOpen(true);
-          }}
-          className="mb-6 bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white"
-          data-testid="button-create-article"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Create New Article
-        </Button>
+        {/* Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="bg-white/5 border border-white/10 mb-8">
+            <TabsTrigger 
+              value="blog" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(190,85%,55%)] data-[state=active]:to-[hsl(220,90%,60%)] data-[state=active]:text-white"
+              data-testid="tab-blog"
+            >
+              Blog Management
+            </TabsTrigger>
+            <TabsTrigger 
+              value="cv" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(190,85%,55%)] data-[state=active]:to-[hsl(220,90%,60%)] data-[state=active]:text-white"
+              data-testid="tab-cv"
+            >
+              CV Management
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Articles List */}
-        {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 text-[hsl(190,85%,55%)] animate-spin" />
-          </div>
-        ) : blogPosts.length === 0 ? (
-          <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-12 text-center">
-            <p className="text-white/60 text-lg">
-              No articles yet. Create your first article to get started!
-            </p>
-          </Card>
-        ) : (
-          <div className="grid gap-4">
-            {blogPosts.map((post) => (
+          {/* Blog Management Tab */}
+          <TabsContent value="blog">
+            {/* Create New Button */}
+            <Button
+              onClick={() => {
+                setEditingPost(null);
+                form.reset();
+                setIsDialogOpen(true);
+              }}
+              className="mb-6 bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white"
+              data-testid="button-create-article"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Create New Article
+            </Button>
+
+            {/* Articles List */}
+            {isLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-8 h-8 text-[hsl(190,85%,55%)] animate-spin" />
+              </div>
+            ) : blogPosts.length === 0 ? (
+              <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-12 text-center">
+                <p className="text-white/60 text-lg">
+                  No articles yet. Create your first article to get started!
+                </p>
+              </Card>
+            ) : (
+              <div className="grid gap-4">
+                {blogPosts.map((post) => (
               <Card 
                 key={post.id} 
                 className="bg-white/5 backdrop-blur-xl border-white/10 p-6"
@@ -437,43 +567,43 @@ export default function AdminPage() {
                     </Button>
                   </div>
                 </div>
-              </Card>
-            ))}
-          </div>
-        )}
+                  </Card>
+                ))}
+              </div>
+            )}
 
-        {/* Create/Edit Dialog */}
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-black/90 backdrop-blur-xl border border-white/10">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-display text-white">
-                {editingPost ? 'Edit Article' : 'Create New Article'}
-              </DialogTitle>
-              <DialogDescription className="text-white/60">
-                {editingPost ? 'Update your article details below' : 'Fill in the details to create a new article'}
-              </DialogDescription>
-            </DialogHeader>
+            {/* Create/Edit Dialog */}
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-black/90 backdrop-blur-xl border border-white/10">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl font-display text-white">
+                    {editingPost ? 'Edit Article' : 'Create New Article'}
+                  </DialogTitle>
+                  <DialogDescription className="text-white/60">
+                    {editingPost ? 'Update your article details below' : 'Fill in the details to create a new article'}
+                  </DialogDescription>
+                </DialogHeader>
 
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white">Title</FormLabel>
-                      <FormControl>
-                        <Input 
-                          {...field} 
-                          className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
-                          placeholder="Enter article title"
-                          data-testid="input-article-title"
-                        />
-                      </FormControl>
-                      <FormMessage className="text-red-400" />
-                    </FormItem>
-                  )}
-                />
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <FormField
+                      control={form.control}
+                      name="title"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white">Title</FormLabel>
+                          <FormControl>
+                            <Input 
+                              {...field} 
+                              className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                              placeholder="Enter article title"
+                              data-testid="input-article-title"
+                            />
+                          </FormControl>
+                          <FormMessage className="text-red-400" />
+                        </FormItem>
+                      )}
+                    />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
@@ -681,6 +811,128 @@ export default function AdminPage() {
             </Form>
           </DialogContent>
         </Dialog>
+          </TabsContent>
+
+          {/* CV Management Tab */}
+          <TabsContent value="cv" className="space-y-6">
+            {/* Upload CV Section */}
+            <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6">
+              <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                <Upload className="w-5 h-5" />
+                Upload CV
+              </h2>
+              {latestCV && (
+                <div className="mb-4 p-3 bg-white/5 rounded-md">
+                  <p className="text-sm text-white/60">
+                    Current CV: <span className="text-white font-mono">{latestCV.filename}</span>
+                  </p>
+                  <p className="text-xs text-white/40 mt-1">
+                    Uploaded: {new Date(latestCV.uploadedAt).toLocaleString()}
+                  </p>
+                </div>
+              )}
+              <form onSubmit={handleCVUpload} className="space-y-4">
+                <div>
+                  <Input
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    onChange={(e) => setCVFile(e.target.files?.[0] || null)}
+                    className="bg-white/5 border-white/10 text-white file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gradient-to-r file:from-[hsl(190,85%,55%)] file:to-[hsl(220,90%,60%)] file:text-white hover:file:opacity-90"
+                    data-testid="input-cv-file"
+                  />
+                  <p className="text-xs text-white/40 mt-2">
+                    Accepted formats: PDF, DOC, DOCX (Max 10MB)
+                  </p>
+                </div>
+                <Button
+                  type="submit"
+                  disabled={!cvFile || isUploading}
+                  className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white"
+                  data-testid="button-upload-cv"
+                >
+                  {isUploading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                  {isUploading ? 'Uploading...' : 'Upload CV'}
+                </Button>
+              </form>
+            </Card>
+
+            {/* CV Contacts Section */}
+            <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-white flex items-center gap-2">
+                  <DownloadIcon className="w-5 h-5" />
+                  CV Download Contacts ({cvContacts.length})
+                </h2>
+                {cvContacts.length > 0 && (
+                  <Button
+                    onClick={exportContacts}
+                    variant="outline"
+                    className="bg-white/5 border-white/20 text-white hover:bg-white/10"
+                    data-testid="button-export-contacts"
+                  >
+                    <DownloadIcon className="w-4 h-4 mr-2" />
+                    Export CSV
+                  </Button>
+                )}
+              </div>
+
+              {isLoadingContacts ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 text-[hsl(190,85%,55%)] animate-spin" />
+                </div>
+              ) : cvContacts.length === 0 ? (
+                <div className="text-center py-12 text-white/60">
+                  <FileText className="w-12 h-12 mx-auto mb-4 opacity-40" />
+                  <p>No CV downloads yet</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-white/10">
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-white/80">Name</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-white/80">Email</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-white/80">Phone</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-white/80">Downloaded</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {cvContacts.map((contact) => (
+                        <tr 
+                          key={contact.id} 
+                          className="border-b border-white/5 hover:bg-white/5 transition-colors"
+                          data-testid={`row-contact-${contact.id}`}
+                        >
+                          <td className="py-3 px-4 text-white">{contact.name}</td>
+                          <td className="py-3 px-4 text-white/80 flex items-center gap-2">
+                            <Mail className="w-4 h-4 flex-shrink-0" />
+                            {contact.email}
+                          </td>
+                          <td className="py-3 px-4 text-white/80">
+                            {contact.phone ? (
+                              <span className="flex items-center gap-2">
+                                <Phone className="w-4 h-4 flex-shrink-0" />
+                                {contact.phone}
+                              </span>
+                            ) : (
+                              <span className="text-white/40">N/A</span>
+                            )}
+                          </td>
+                          <td className="py-3 px-4 text-white/60 text-sm">
+                            <span className="flex items-center gap-2">
+                              <CalendarIcon className="w-4 h-4 flex-shrink-0" />
+                              {new Date(contact.downloadedAt).toLocaleString()}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

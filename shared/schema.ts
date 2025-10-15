@@ -33,6 +33,38 @@ export type BlogPostRow = typeof blogPostsTable.$inferSelect;
 export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
 export type UpdateBlogPost = z.infer<typeof updateBlogPostSchema>;
 
+// CV Contacts Table
+export const cvContactsTable = pgTable('cv_contacts', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 200 }).notNull(),
+  email: varchar('email', { length: 300 }).notNull(),
+  phone: varchar('phone', { length: 50 }),
+  downloadedAt: timestamp('downloaded_at').defaultNow().notNull(),
+});
+
+export const insertCVContactSchema = createInsertSchema(cvContactsTable).omit({
+  id: true,
+  downloadedAt: true,
+});
+
+export type CVContactRow = typeof cvContactsTable.$inferSelect;
+export type InsertCVContact = z.infer<typeof insertCVContactSchema>;
+
+// CV File Table
+export const cvFileTable = pgTable('cv_file', {
+  id: serial('id').primaryKey(),
+  filename: varchar('filename', { length: 300 }).notNull(),
+  uploadedAt: timestamp('uploaded_at').defaultNow().notNull(),
+});
+
+export const insertCVFileSchema = createInsertSchema(cvFileTable).omit({
+  id: true,
+  uploadedAt: true,
+});
+
+export type CVFileRow = typeof cvFileTable.$inferSelect;
+export type InsertCVFile = z.infer<typeof insertCVFileSchema>;
+
 // ============ INTERFACES ============
 
 export interface Experience {

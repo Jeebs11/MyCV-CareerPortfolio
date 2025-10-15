@@ -9,6 +9,8 @@ This is a personal portfolio website for Mujeeb Lawal, a Senior Project Manager 
 -   **Industry Experience Map**: 7 sectors with expandable project cards showing global delivery experience.
 -   **Certifications Wall of Fame**: Interactive expandable cards showcasing professional certifications with detailed descriptions and validation links.
 -   **Self-Managed Blog System with Rich Content**: A complete CMS for thought leadership featuring ReactQuill WYSIWYG editor with cyan-to-blue gradient toolbar, rich text formatting, hero image support for visual storytelling, DOMPurify HTML sanitization for security, and database-backed storage with admin panel.
+-   **CV Download with Contact Capture**: Visitors can download the CV by providing their name, email, and optional phone number through a form modal. CV downloads trigger immediately upon form submission.
+-   **Admin Dashboard with CV Management**: Tab-based admin interface for managing blog posts and CV downloads. Features include CV file upload (PDF, DOC, DOCX), viewing all contact submissions with download timestamps, and CSV export of contact data for lead management.
 
 ## User Preferences
 
@@ -26,11 +28,16 @@ The backend utilizes **Express.js** with **TypeScript** on a Node.js runtime. It
 
 ### Data Storage
 
-Currently, the portfolio uses **in-memory storage** for user data and static constants for portfolio content. However, the system is pre-configured with **Drizzle ORM** for PostgreSQL, **Neon Database serverless driver**, and migration setup, ready for future database integration for features like blog posts or dynamic content.
+The portfolio uses **PostgreSQL** database via **Neon Database serverless driver** managed through **Drizzle ORM**. Database tables include:
+-   **blogPostsTable**: Stores blog articles with rich content, metadata, and featured status
+-   **cvContactsTable**: Captures contact information from CV downloads (name, email, phone, timestamp)
+-   **cvFileTable**: Manages uploaded CV files with metadata and timestamps
+
+File uploads are handled using **Multer** middleware and stored in the `uploads/` directory. Static portfolio content (career history, certifications) uses in-memory constants for fast access.
 
 ### Authentication and Authorization
 
-While authentication is not yet implemented, a user schema and storage interface are in place, making it ready for future session management and database-backed authentication.
+The admin dashboard uses **Bearer token authentication** with the `ADMIN_PASSWORD` environment secret. Admin routes (`/api/blog-posts`, `/api/cv/*`) validate the Authorization header against the stored password to protect administrative operations.
 
 ### Build and Deployment
 
@@ -68,6 +75,9 @@ The build process involves Vite for the frontend (output to `dist/public`) and e
 -   **nanoid**: Unique ID generation.
 -   **cmdk**: Command menu component.
 -   **embla-carousel-react**: Carousel component.
+-   **Multer**: Multipart/form-data file upload handling.
+-   **DOMPurify**: HTML sanitization for blog content security.
+-   **ReactQuill**: WYSIWYG rich text editor for blog posts.
 
 ### SEO
 

@@ -1,13 +1,24 @@
 import { drizzle } from 'drizzle-orm/neon-http';
 import { neon } from '@neondatabase/serverless';
 import { eq, desc } from 'drizzle-orm';
-import { blogPostsTable, type InsertBlogPost, type UpdateBlogPost, type BlogPostRow } from '@shared/schema';
+import { 
+  blogPostsTable, 
+  type InsertBlogPost, 
+  type UpdateBlogPost, 
+  type BlogPostRow,
+  cvContactsTable,
+  type InsertCVContact,
+  type CVContactRow,
+  cvFileTable,
+  type InsertCVFile,
+  type CVFileRow
+} from '@shared/schema';
 
 // Initialize database connection using HTTP (better for serverless/Replit environments)
 const sql = neon(process.env.DATABASE_URL!);
 export const db = drizzle(sql);
 
-// Storage interface for blog posts
+// Storage interface for blog posts and CV management
 export interface IStorage {
   // Blog Post methods
   getAllBlogPosts(): Promise<BlogPostRow[]>;
@@ -15,6 +26,14 @@ export interface IStorage {
   createBlogPost(post: InsertBlogPost): Promise<BlogPostRow>;
   updateBlogPost(id: number, post: UpdateBlogPost): Promise<BlogPostRow | undefined>;
   deleteBlogPost(id: number): Promise<boolean>;
+  
+  // CV Contact methods
+  createCVContact(contact: InsertCVContact): Promise<CVContactRow>;
+  getAllCVContacts(): Promise<CVContactRow[]>;
+  
+  // CV File methods
+  createCVFile(file: InsertCVFile): Promise<CVFileRow>;
+  getLatestCVFile(): Promise<CVFileRow | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -45,6 +64,27 @@ export class DatabaseStorage implements IStorage {
   async deleteBlogPost(id: number): Promise<boolean> {
     const results = await db.delete(blogPostsTable).where(eq(blogPostsTable.id, id)).returning();
     return results.length > 0;
+  }
+  
+  // CV Contact CRUD operations
+  async createCVContact(contact: InsertCVContact): Promise<CVContactRow> {
+    const results = await db.insert(cvContactsTable).values(contact).returning();
+    return results[0];
+  }
+  
+  async getAllCVContacts(): Promise<CVContactRow[]> {
+    return await db.select().from(cvContactsTable).orderBy(desc(cvContactsTable.downloadedAt));
+  }
+  
+  // CV File CRUD operations
+  async createCVFile(file: InsertCVFile): Promise<CVFileRow> {
+    const results = await db.insert(cvFileTable).values(file).returning();
+    return results[0];
+  }
+  
+  async getLatestCVFile(): Promise<CVFileRow | undefined> {
+    const results = await db.select().from(cvFileTable).orderBy(desc(cvFileTable.uploadedAt)).limit(1);
+    return results[0];
   }
 }
 
