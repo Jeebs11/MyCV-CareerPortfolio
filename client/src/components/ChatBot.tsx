@@ -122,28 +122,20 @@ export default function ChatBot() {
       {/* Floating Chat Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="rounded-full shadow-2xl bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] border border-white/20 hover:scale-110 transition-all duration-300 flex items-center justify-center"
-        style={{
-          position: 'fixed',
-          bottom: '1.5rem',
-          right: '1.5rem',
-          width: '3.5rem',
-          height: '3.5rem',
-          zIndex: 9999
-        }}
+        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 w-12 h-12 md:w-14 md:h-14 rounded-full shadow-2xl bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] border border-white/20 hover:scale-110 transition-all duration-300 flex items-center justify-center z-[9999]"
         data-testid="button-chat-toggle"
       >
         {isOpen ? (
-          <X className="h-6 w-6 text-white" />
+          <X className="h-5 w-5 md:h-6 md:w-6 text-white" />
         ) : (
-          <MessageCircle className="h-6 w-6 text-white" />
+          <MessageCircle className="h-5 w-5 md:h-6 md:w-6 text-white" />
         )}
       </button>
 
       {/* Chat Window */}
       {isOpen && (
         <Card 
-          className="fixed bottom-24 right-6 w-96 h-[600px] flex flex-col shadow-2xl border-white/20 bg-[hsl(270,8%,12%)]/95 backdrop-blur-xl z-50 overflow-hidden"
+          className="fixed bottom-20 md:bottom-24 left-4 right-4 md:left-auto md:right-6 md:w-96 h-[500px] md:h-[600px] flex flex-col shadow-2xl border-white/20 bg-[hsl(270,8%,12%)]/95 backdrop-blur-xl z-50 overflow-hidden"
           data-testid="chat-window"
         >
           {/* Header */}
