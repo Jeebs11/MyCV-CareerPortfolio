@@ -113,18 +113,10 @@ export default function SectionNavigation() {
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetTrigger asChild>
           <button
-            className="md:hidden rounded-full bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-2 border-white/30 shadow-2xl shadow-[hsl(190,85%,55%)]/50 hover:scale-110 active:scale-95 transition-all duration-200 flex items-center justify-center"
-            style={{
-              position: 'fixed',
-              bottom: '1.5rem',
-              left: '1.5rem',
-              width: '4rem',
-              height: '4rem',
-              zIndex: 9999
-            }}
+            className="md:hidden fixed bottom-4 left-4 w-14 h-14 rounded-full bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-2 border-white/30 shadow-2xl shadow-[hsl(190,85%,55%)]/50 hover:scale-110 active:scale-95 transition-all duration-200 flex items-center justify-center z-[9999]"
             data-testid="button-mobile-nav-fab"
           >
-            <Compass className="w-7 h-7" />
+            <Compass className="w-6 h-6" />
           </button>
         </SheetTrigger>
         

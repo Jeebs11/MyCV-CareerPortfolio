@@ -122,13 +122,13 @@ export default function ChatBot() {
       {/* Floating Chat Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 w-12 h-12 md:w-14 md:h-14 rounded-full shadow-2xl bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] border border-white/20 hover:scale-110 transition-all duration-300 flex items-center justify-center z-[9999]"
+        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 w-14 h-14 rounded-full shadow-2xl bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] border border-white/20 hover:scale-110 transition-all duration-300 flex items-center justify-center z-[9999]"
         data-testid="button-chat-toggle"
       >
         {isOpen ? (
-          <X className="h-5 w-5 md:h-6 md:w-6 text-white" />
+          <X className="h-6 w-6 text-white" />
         ) : (
-          <MessageCircle className="h-5 w-5 md:h-6 md:w-6 text-white" />
+          <MessageCircle className="h-6 w-6 text-white" />
         )}
       </button>
 
