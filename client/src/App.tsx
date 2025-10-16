@@ -1,20 +1,35 @@
+import { lazy, Suspense } from "react";
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "@/pages/home";
-import InsightsPage from "@/pages/insights";
-import AdminPage from "@/pages/admin";
+
+const InsightsPage = lazy(() => import("@/pages/insights"));
+const AdminPage = lazy(() => import("@/pages/admin"));
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen bg-[hsl(270,8%,12%)] flex items-center justify-center">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-12 h-12 border-4 border-[hsl(190,85%,55%)]/30 border-t-[hsl(190,85%,55%)] rounded-full animate-spin" />
+        <p className="text-white/60 text-sm">Loading...</p>
+      </div>
+    </div>
+  );
+}
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/insights" component={InsightsPage} />
-      <Route path="/admin" component={AdminPage} />
-      <Route path="*" component={Home} />
-    </Switch>
+    <Suspense fallback={<LoadingFallback />}>
+      <Switch>
+        <Route path="/" component={Home} />
+        <Route path="/insights" component={InsightsPage} />
+        <Route path="/admin" component={AdminPage} />
+        <Route path="*" component={Home} />
+      </Switch>
+    </Suspense>
   );
 }
 

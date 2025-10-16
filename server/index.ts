@@ -47,6 +47,28 @@ app.use((req, res, next) => {
     throw err;
   });
 
+  // Add cache headers middleware for static assets in production
+  if (app.get("env") !== "development") {
+    app.use((req, res, next) => {
+      const path = req.path;
+      
+      // Cache static assets aggressively (JS, CSS, fonts, images with hashes)
+      if (path.match(/\.(js|css|woff2?|ttf|eot)$/) && path.includes('-')) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      }
+      // Cache images for 1 week
+      else if (path.match(/\.(png|jpg|jpeg|gif|webp|avif|svg|ico)$/)) {
+        res.setHeader('Cache-Control', 'public, max-age=604800');
+      }
+      // Don't cache HTML
+      else if (path.endsWith('.html') || path === '/') {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      }
+      
+      next();
+    });
+  }
+
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes

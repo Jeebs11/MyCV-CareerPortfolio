@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { experiences, skills, keyAchievements, detailedCertifications, timelineProjects, industryExperience, education } from '@shared/schema';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -6,8 +6,9 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from '@/components/ui/sheet';
-import ChatBot from '@/components/ChatBot';
-import SectionNavigation from '@/components/SectionNavigation';
+
+const ChatBot = lazy(() => import('@/components/ChatBot'));
+const SectionNavigation = lazy(() => import('@/components/SectionNavigation'));
 import {
   TrendingUp,
   Award,
@@ -98,9 +99,10 @@ export default function Home() {
       
       <Footer />
       
-      <SectionNavigation />
-      
-      <ChatBot />
+      <Suspense fallback={null}>
+        <SectionNavigation />
+        <ChatBot />
+      </Suspense>
     </div>
   );
 }

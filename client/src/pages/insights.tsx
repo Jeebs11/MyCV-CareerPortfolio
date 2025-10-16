@@ -204,6 +204,8 @@ export default function InsightsPage() {
                       src={post.heroImage} 
                       alt={post.title}
                       className="w-full h-full object-cover"
+                      loading="lazy"
+                      decoding="async"
                     />
                   </div>
                 )}
@@ -317,6 +319,8 @@ export default function InsightsPage() {
                 src={selectedPost.heroImage} 
                 alt={selectedPost.title}
                 className="w-full h-64 object-cover"
+                loading="lazy"
+                decoding="async"
               />
             </div>
           )}
