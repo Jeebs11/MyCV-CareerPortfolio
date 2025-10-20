@@ -320,12 +320,24 @@ function VerticalCareerTimeline() {
               >
                 <div className="space-y-2">
                   <div className="flex items-start justify-between gap-2">
-                    <Badge 
-                      className="text-xs bg-gradient-to-r from-[hsl(190,85%,55%)]/20 to-[hsl(220,90%,60%)]/20 border-[hsl(190,85%,55%)]/30 text-white"
-                      data-testid={`badge-career-period-${project.id}`}
-                    >
-                      {project.period}
-                    </Badge>
+                    <div className="flex flex-wrap gap-1.5">
+                      <Badge 
+                        className="text-xs bg-gradient-to-r from-[hsl(190,85%,55%)]/20 to-[hsl(220,90%,60%)]/20 border-[hsl(190,85%,55%)]/30 text-white"
+                        data-testid={`badge-career-period-${project.id}`}
+                      >
+                        {project.period}
+                      </Badge>
+                      <Badge 
+                        className={`text-xs ${
+                          project.employmentType === 'Contract' 
+                            ? 'bg-orange-500/20 border-orange-500/30 text-orange-300' 
+                            : 'bg-blue-500/20 border-blue-500/30 text-blue-300'
+                        }`}
+                        data-testid={`badge-career-employment-${project.id}`}
+                      >
+                        {project.employmentType}
+                      </Badge>
+                    </div>
                     {project.current && (
                       <Badge className="text-xs bg-green-500/20 border-green-500/30 text-green-300" data-testid={`badge-career-current-${project.id}`}>
                         Current
@@ -382,12 +394,24 @@ function VerticalCareerTimeline() {
               >
                 <div className="space-y-2">
                   <div className="flex items-start justify-between gap-2">
-                    <Badge 
-                      className="text-xs bg-gradient-to-r from-[hsl(190,85%,55%)]/20 to-[hsl(220,90%,60%)]/20 border-[hsl(190,85%,55%)]/30 text-white"
-                      data-testid={`badge-career-mobile-period-${project.id}`}
-                    >
-                      {project.period}
-                    </Badge>
+                    <div className="flex flex-wrap gap-1.5">
+                      <Badge 
+                        className="text-xs bg-gradient-to-r from-[hsl(190,85%,55%)]/20 to-[hsl(220,90%,60%)]/20 border-[hsl(190,85%,55%)]/30 text-white"
+                        data-testid={`badge-career-mobile-period-${project.id}`}
+                      >
+                        {project.period}
+                      </Badge>
+                      <Badge 
+                        className={`text-xs ${
+                          project.employmentType === 'Contract' 
+                            ? 'bg-orange-500/20 border-orange-500/30 text-orange-300' 
+                            : 'bg-blue-500/20 border-blue-500/30 text-blue-300'
+                        }`}
+                        data-testid={`badge-career-mobile-employment-${project.id}`}
+                      >
+                        {project.employmentType}
+                      </Badge>
+                    </div>
                     {project.current && (
                       <Badge className="text-xs bg-green-500/20 border-green-500/30 text-green-300" data-testid={`badge-career-mobile-current-${project.id}`}>
                         Current
@@ -483,6 +507,22 @@ function VerticalCareerTimeline() {
                     <div>
                       <p className="text-xs text-white/60">Project Type</p>
                       <p className="text-sm font-medium text-white" data-testid="text-dialog-type">{selectedProject.projectType}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Briefcase className="w-4 h-4 text-white/60" />
+                    <div>
+                      <p className="text-xs text-white/60">Employment Type</p>
+                      <Badge 
+                        className={`text-xs ${
+                          selectedProject.employmentType === 'Contract' 
+                            ? 'bg-orange-500/20 border-orange-500/30 text-orange-300' 
+                            : 'bg-blue-500/20 border-blue-500/30 text-blue-300'
+                        }`}
+                        data-testid="text-dialog-employment"
+                      >
+                        {selectedProject.employmentType}
+                      </Badge>
                     </div>
                   </div>
                 </div>
@@ -679,12 +719,24 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
                 >
                   <div className="space-y-3">
                     <div className="flex items-start justify-between gap-2 flex-wrap">
-                      <Badge 
-                        className="text-xs bg-gradient-to-r from-[hsl(190,85%,55%)]/20 to-[hsl(220,90%,60%)]/20 border-[hsl(190,85%,55%)]/30 text-white"
-                        data-testid={`badge-period-${project.id}`}
-                      >
-                        {project.period}
-                      </Badge>
+                      <div className="flex flex-wrap gap-1.5">
+                        <Badge 
+                          className="text-xs bg-gradient-to-r from-[hsl(190,85%,55%)]/20 to-[hsl(220,90%,60%)]/20 border-[hsl(190,85%,55%)]/30 text-white"
+                          data-testid={`badge-period-${project.id}`}
+                        >
+                          {project.period}
+                        </Badge>
+                        <Badge 
+                          className={`text-xs ${
+                            project.employmentType === 'Contract' 
+                              ? 'bg-orange-500/20 border-orange-500/30 text-orange-300' 
+                              : 'bg-blue-500/20 border-blue-500/30 text-blue-300'
+                          }`}
+                          data-testid={`badge-employment-${project.id}`}
+                        >
+                          {project.employmentType}
+                        </Badge>
+                      </div>
                       {project.current && (
                         <Badge className="text-xs bg-green-500/20 border-green-500/30 text-green-300" data-testid={`badge-current-${project.id}`}>
                           Current
@@ -781,6 +833,15 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
                         {selectedProject.projectType}
                       </Badge>
                     )}
+                    <Badge 
+                      className={`text-xs ${
+                        selectedProject.employmentType === 'Contract' 
+                          ? 'bg-orange-500/20 border-orange-500/30 text-orange-300' 
+                          : 'bg-blue-500/20 border-blue-500/30 text-blue-300'
+                      }`}
+                    >
+                      {selectedProject.employmentType}
+                    </Badge>
                     {selectedProject.budget && (
                       <Badge className="text-xs bg-[hsl(190,85%,55%)]/20 border-[hsl(190,85%,55%)]/30 text-[hsl(190,85%,65%)]">
                         Budget: {selectedProject.budget}

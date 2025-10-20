@@ -77,6 +77,7 @@ export interface Experience {
   achievements: string[];
   region: 'europe' | 'mena' | 'us' | 'asia' | 'uk';
   industry: string;
+  employmentType: 'Permanent' | 'Contract';
 }
 
 export interface Skill {
@@ -101,6 +102,7 @@ export const experiences: Experience[] = [
     current: true,
     region: 'mena',
     industry: 'Engineering/Battery Recycling',
+    employmentType: 'Permanent',
     achievements: [
       'Built the PMO function from the ground up, bringing structure to multi-million Euro EU-funded battery recycling research programmes',
       'Managing cross-border delivery teams spanning Europe and the Middle East, keeping technical and non-technical workstreams aligned',
@@ -116,6 +118,7 @@ export const experiences: Experience[] = [
     current: false,
     region: 'uk',
     industry: 'Insurance',
+    employmentType: 'Contract',
     achievements: [
       'Transformed a core mutual agreement insurance product, directly boosting profit margins',
       'Led workshops with stakeholders to map workflows and spot inefficiencies, then fixed them',
@@ -131,6 +134,7 @@ export const experiences: Experience[] = [
     current: false,
     region: 'uk',
     industry: 'Insurance',
+    employmentType: 'Contract',
     achievements: [
       'Shipped a £1.2M commercial insurance product built on microservices and APIs, with a team of 34 specialists',
       'Ran the company\'s 10-year anniversary Global Hackathon, then coached the winning team to secure sponsorship and build their MVP',
@@ -147,6 +151,7 @@ export const experiences: Experience[] = [
     current: false,
     region: 'uk',
     industry: 'Insurance',
+    employmentType: 'Contract',
     achievements: [
       'Led global employee benefits platform rollouts for Fortune 500 clients including Amazon, Estée Lauder, and Marsh & McLennan',
       'Created process maps and onboarding playbooks that made complex regional rollouts smoother',
@@ -162,6 +167,7 @@ export const experiences: Experience[] = [
     current: false,
     region: 'us',
     industry: 'Events Technology',
+    employmentType: 'Permanent',
     achievements: [
       'Ran virtual event programmes simultaneously across 6 time zones (Europe, US, MENA, South East Asia) during the pandemic pivot',
       'Coordinated Agile engineering teams around the clock to keep major events like university graduations and international exhibitions running',
@@ -177,6 +183,7 @@ export const experiences: Experience[] = [
     current: false,
     region: 'uk',
     industry: 'Telecoms',
+    employmentType: 'Contract',
     achievements: [
       'Built and launched the Energy Consumption Benchmark Tool in partnership with the UN\'s 2030 Sustainability Goals',
       'Helped major operators (Vodafone, Verizon, China Telecom) cut their energy consumption by up to 35%',
@@ -192,6 +199,7 @@ export const experiences: Experience[] = [
     current: false,
     region: 'mena',
     industry: 'Education',
+    employmentType: 'Contract',
     achievements: [
       'Led the digital pivot when COVID hit, getting data systems and remote learning platforms live fast',
       'Trained staff and students on new tools so classes could continue without interruption',
@@ -207,6 +215,7 @@ export const experiences: Experience[] = [
     current: false,
     region: 'uk',
     industry: 'Healthcare',
+    employmentType: 'Permanent',
     achievements: [
       'Deployed digital dictation systems across NHS Trusts including St George\'s, Royal Free, and Nuffield Health',
       'Cut turnaround times and costs by digitizing clinical documentation workflows',
@@ -222,6 +231,7 @@ export const experiences: Experience[] = [
     current: false,
     region: 'uk',
     industry: 'Engineering/Construction',
+    employmentType: 'Permanent',
     achievements: [
       'Delivered high-profile construction projects including The Hilton Brighton and Offplan developments',
       'Managed fit-out, procurement, and engineering across multiple commercial and hospitality sites',
@@ -237,6 +247,7 @@ export const experiences: Experience[] = [
     current: false,
     region: 'uk',
     industry: 'Engineering',
+    employmentType: 'Permanent',
     achievements: [
       'Engineered heat transfer solutions for The Shard, London 2012 Olympic Aquatic Centre, and 20 Fenchurch Street',
       'Improved operational efficiency for landmark UK infrastructure through technical consulting',
@@ -537,6 +548,7 @@ export interface TimelineProject {
   budget?: string;
   teamSize?: number;
   technologies?: string[];
+  employmentType: 'Permanent' | 'Contract';
 }
 
 export interface CareerMetric {
@@ -574,6 +586,7 @@ export const timelineProjects: TimelineProject[] = [
     current: true,
     industry: 'Engineering Tech',
     projectType: 'PMO Leadership',
+    employmentType: 'Permanent',
     description: "Oversaw project delivery and governance across EU-funded engineering programmes, building the company's PMO function from scratch. The role blended strategic oversight and hands-on delivery, aligning international teams and embedding scalable systems across R&D and operations.",
     keyAchievements: [
       'Built the company\'s PMO from the ground up',
@@ -595,6 +608,7 @@ export const timelineProjects: TimelineProject[] = [
     current: false,
     industry: 'Insurance',
     projectType: 'Product Transformation',
+    employmentType: 'Contract',
     description: 'Led the technical modernisation of insurance products and mutual agreement products, managing ERP and vendor integrations. Focused on improving operational visibility, process efficiency, and alignment between IT and business units.',
     keyAchievements: [
       'Redesigned a core insurance product, improving profitability',
@@ -617,6 +631,7 @@ export const timelineProjects: TimelineProject[] = [
     projectType: 'FCA Compliance',
     budget: '£1.2M',
     teamSize: 34,
+    employmentType: 'Contract',
     description: 'Directed large-scale digital transformation projects in a regulated insurance environment. Drove the rollout of FCA-compliant platforms and introduced delivery frameworks that improved efficiency and governance across multiple workstreams.',
     keyAchievements: [
       'Delivered a £1.2m insurance product using microservices to enhance speed and scalability',
@@ -636,6 +651,7 @@ export const timelineProjects: TimelineProject[] = [
     current: false,
     industry: 'Insurance',
     projectType: 'Digital Transformation',
+    employmentType: 'Contract',
     description: 'Managed multinational transformation projects for global clients in HR and ERP modernisation. Oversaw regional delivery teams and budgets across EMEA, APAC, and the Americas, ensuring complex solutions met compliance and scalability requirements.',
     keyAchievements: [
       'Developed BA deliverables such as process maps and onboarding playbooks, ensuring clear requirements and smoother adoption across regions',
@@ -655,6 +671,7 @@ export const timelineProjects: TimelineProject[] = [
     current: false,
     industry: 'Events Tech',
     projectType: 'Global Delivery',
+    employmentType: 'Permanent',
     description: 'Delivered enterprise SaaS implementations during the global shift to virtual engagement. Streamlined implementation frameworks to improve delivery speed, reliability, and user experience for high-profile corporate clients.',
     keyAchievements: [
       'Unified delivery across distributed Agile teams in six time zones',
@@ -674,6 +691,7 @@ export const timelineProjects: TimelineProject[] = [
     current: false,
     industry: 'Education',
     projectType: 'Digital Transformation',
+    employmentType: 'Contract',
     description: 'Led the digital transition of a traditional school during the pandemic, introducing virtual learning platforms and staff training programmes. Focused on operational continuity, accessibility, and stakeholder adoption.',
     keyAchievements: [
       'Led full digital transition during COVID-19, implementing e-learning platforms and data systems',
@@ -691,6 +709,7 @@ export const timelineProjects: TimelineProject[] = [
     current: false,
     industry: 'Telecoms',
     projectType: 'Sustainability',
+    employmentType: 'Contract',
     description: 'Partnered with leading telecom operators to define sustainability standards and develop industry energy benchmarking frameworks. Played a key role in advancing the sector\'s global approach to efficiency and environmental impact as well as future technology adoption.',
     keyAchievements: [
       'Led delivery of the Energy Consumption Benchmark Tool supporting UN 2030 Sustainability Goals',
@@ -710,6 +729,7 @@ export const timelineProjects: TimelineProject[] = [
     current: false,
     industry: 'Blockchain',
     projectType: 'Content Creation',
+    employmentType: 'Contract',
     description: 'Produced financial journalism and analysis covering cryptocurrency markets and blockchain technology. Contributed to audience growth and brand positioning during a period of rapid industry evolution.',
     keyAchievements: [
       'Created insightful crypto and blockchain content',
@@ -728,6 +748,7 @@ export const timelineProjects: TimelineProject[] = [
     current: false,
     industry: 'Insurance',
     projectType: 'SaaS Implementation',
+    employmentType: 'Permanent',
     description: 'Delivered SaaS-based employee benefits transformation projects for enterprise clients including Hitachi and Transport for London. Improved project efficiency by 34% through workflow optimisation and close coordination between IT, operations, and client stakeholders.',
     keyAchievements: [
       'Improved project efficiency by 34% by automating a number of key repetitive tasks in the processes',
@@ -746,6 +767,7 @@ export const timelineProjects: TimelineProject[] = [
     current: false,
     industry: 'Healthcare',
     projectType: 'Software Implementation',
+    employmentType: 'Permanent',
     description: 'Managed SaaS deployments across NHS Trusts, improving efficiency in clinical documentation and reporting workflows. Oversaw the full implementation cycle, from requirements to onboarding, ensuring seamless adoption in high-compliance environments.',
     keyAchievements: [
       'Revived a failing project with strong stakeholder management',
@@ -765,6 +787,7 @@ export const timelineProjects: TimelineProject[] = [
     current: false,
     industry: 'Engineering',
     projectType: 'Construction Management',
+    employmentType: 'Permanent',
     description: 'Delivered sustainable construction and fit-out projects, coordinating design, engineering, and on-site teams. Ensured projects met technical, safety, and compliance standards within tight operational deadlines.',
     keyAchievements: [
       'Strengthened coordination between design, engineering, and commercial functions'
@@ -781,6 +804,7 @@ export const timelineProjects: TimelineProject[] = [
     current: false,
     industry: 'Engineering',
     projectType: 'Engineering Projects',
+    employmentType: 'Permanent',
     description: 'Supported delivery of high-profile energy-efficient engineering projects (heat transfer solutions), for high profile construction sites like The Shard and the 2012 Olympic Aquatic Centre. Contributed to design, testing, and installation phases to ensure optimal performance and compliance.',
     keyAchievements: [
       'Supported design and installation of energy-efficient systems for The Shard and the 2012 Olympic Aquatic Centre',
