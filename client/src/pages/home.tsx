@@ -1036,15 +1036,27 @@ function TimelineCard({ experience, index, onHover, onLeave }: { experience: any
               </div>
               
               <div className="flex flex-col sm:items-end gap-2">
-                <Badge 
-                  className={`${
-                    experience.current 
-                      ? 'bg-[hsl(145,70%,50%)]/20 border-[hsl(145,70%,50%)]/30 text-[hsl(145,70%,70%)]' 
-                      : 'bg-white/10 border-white/20 text-white/70'
-                  } backdrop-blur-md text-xs`}
-                >
-                  {experience.period}
-                </Badge>
+                <div className="flex flex-wrap gap-1.5 justify-end">
+                  <Badge 
+                    className={`${
+                      experience.current 
+                        ? 'bg-[hsl(145,70%,50%)]/20 border-[hsl(145,70%,50%)]/30 text-[hsl(145,70%,70%)]' 
+                        : 'bg-white/10 border-white/20 text-white/70'
+                    } backdrop-blur-md text-xs`}
+                  >
+                    {experience.period}
+                  </Badge>
+                  <Badge 
+                    className={`text-xs ${
+                      experience.employmentType === 'Contract' 
+                        ? 'bg-orange-500/20 border-orange-500/30 text-orange-300' 
+                        : 'bg-blue-500/20 border-blue-500/30 text-blue-300'
+                    }`}
+                    data-testid={`badge-timeline-employment-${index}`}
+                  >
+                    {experience.employmentType}
+                  </Badge>
+                </div>
                 <p className="text-xs sm:text-sm text-white/50">{experience.location}</p>
               </div>
             </div>
