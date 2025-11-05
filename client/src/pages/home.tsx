@@ -40,7 +40,9 @@ import {
   ChevronRight,
   ChevronUp,
   GraduationCap,
-  Menu
+  Menu,
+  Phone,
+  MessageCircle
 } from 'lucide-react';
 
 const iconMap: Record<string, any> = {
@@ -82,8 +84,11 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[hsl(270,8%,12%)] via-[hsl(260,10%,15%)] to-[hsl(240,12%,18%)]">
       <Navigation scrollToSection={scrollToSection} />
+      <StickyContactBar />
       
       <HeroSection scrollToSection={scrollToSection} />
+      
+      <FlagshipAchievements />
       
       <MetricsDashboard />
       
@@ -263,6 +268,207 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
       {/* CV Download Dialog */}
       <CVDownloadDialog open={showCVDialog} onOpenChange={setShowCVDialog} />
     </nav>
+  );
+}
+
+function StickyContactBar() {
+  const [isVisible, setIsVisible] = useState(false);
+  const [showCVDialog, setShowCVDialog] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsVisible(window.scrollY > 600); // Show after scrolling past hero
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  if (!isVisible) return null;
+
+  return (
+    <>
+      <div className="fixed top-20 right-4 z-40 flex flex-col gap-2 sm:flex-row sm:gap-3" data-testid="sticky-contact-bar">
+        <Button
+          size="sm"
+          variant="outline"
+          className="bg-white/10 backdrop-blur-xl border-white/20 text-white hover:bg-white/20 shadow-lg"
+          onClick={() => setShowCVDialog(true)}
+          data-testid="button-sticky-cv"
+        >
+          <Download className="w-4 h-4 sm:mr-2" />
+          <span className="hidden sm:inline">CV</span>
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="bg-white/10 backdrop-blur-xl border-white/20 text-white hover:bg-white/20 shadow-lg"
+          onClick={() => window.location.href = 'mailto:odmlawal@gmail.com'}
+          data-testid="button-sticky-email"
+        >
+          <Mail className="w-4 h-4 sm:mr-2" />
+          <span className="hidden sm:inline">Email</span>
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="bg-white/10 backdrop-blur-xl border-white/20 text-white hover:bg-white/20 shadow-lg"
+          onClick={() => window.open('https://wa.me/YOUR_WHATSAPP_NUMBER', '_blank')}
+          data-testid="button-sticky-whatsapp"
+        >
+          <MessageCircle className="w-4 h-4 sm:mr-2" />
+          <span className="hidden sm:inline">WhatsApp</span>
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="bg-white/10 backdrop-blur-xl border-white/20 text-white hover:bg-white/20 shadow-lg"
+          onClick={() => window.open('https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/', '_blank')}
+          data-testid="button-sticky-linkedin"
+        >
+          <Linkedin className="w-4 h-4 sm:mr-2" />
+          <span className="hidden sm:inline">LinkedIn</span>
+        </Button>
+      </div>
+      
+      <CVDownloadDialog open={showCVDialog} onOpenChange={setShowCVDialog} />
+    </>
+  );
+}
+
+function FlagshipAchievements() {
+  const flagshipProjects = [
+    {
+      id: 'flagship-1',
+      title: 'Built PMO from Ground Up',
+      company: 'Novocycle Technology',
+      period: '2024',
+      challenge: 'Multi-million Euro EU-funded battery recycling programmes lacked structure, governance, and stakeholder visibility',
+      impact: [
+        'Established PMO function from scratch for complex R&D programmes',
+        'Reduced reporting overhead by 36% through Jira & Confluence optimization',
+        'Aligned cross-border teams spanning Europe and Middle East',
+        'Embedded scalable governance systems across business units'
+      ],
+      metrics: ['36% efficiency gain', '15+ team members', 'EU-funded programmes'],
+      icon: Target,
+      color: 'from-blue-500 to-cyan-500'
+    },
+    {
+      id: 'flagship-2',
+      title: '£1.2M FCA-Regulated Programme',
+      company: 'Simply Business',
+      period: '2022-2023',
+      challenge: 'Deliver FCA-compliant insurance platform under strict regulatory oversight with multi-workstream Agile teams',
+      impact: [
+        'Delivered £1.2M microservices-based insurance product on time',
+        'Managed FCA Consumer Duty & Operation Resilience compliance',
+        'Led 34-person multi-workstream Agile delivery',
+        'Coached winning Hackathon team to secure MVP sponsorship'
+      ],
+      metrics: ['£1.2M budget', '34 team members', 'FCA compliance'],
+      icon: ShieldCheck,
+      color: 'from-orange-500 to-red-500'
+    },
+    {
+      id: 'flagship-3',
+      title: '35% Energy Reduction for UN SDGs',
+      company: 'GSMA',
+      period: '2019-2020',
+      challenge: 'Define sustainability standards and energy benchmarking framework for global telecom sector aligned with UN 2030 goals',
+      impact: [
+        'Led Energy Consumption Benchmark Tool supporting UN 2030 Sustainability Goals',
+        'Partnered with Vodafone, Verizon to achieve up to 35% energy reduction',
+        'Onboarded 8 new telecom technologies with mobile operators',
+        'Advanced industry-wide approach to efficiency & environmental impact'
+      ],
+      metrics: ['35% energy reduction', '8 tech onboardings', 'UN SDG alignment'],
+      icon: Leaf,
+      color: 'from-green-500 to-emerald-500'
+    }
+  ];
+
+  return (
+    <section id="flagship-wins" className="relative py-16 md:py-24" data-testid="section-flagship">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-12 md:mb-16">
+          <Badge className="bg-white/10 backdrop-blur-md border border-white/20 text-white mb-4">
+            Signature Wins
+          </Badge>
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
+            Three Flagship Achievements
+          </h2>
+          <p className="text-lg md:text-xl text-white/60 max-w-3xl mx-auto">
+            Tangible business impact across regulated delivery, PMO leadership, and sustainability initiatives
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
+          {flagshipProjects.map((project, index) => {
+            const Icon = project.icon;
+            return (
+              <Card
+                key={project.id}
+                className="bg-white/5 backdrop-blur-sm border-white/10 p-6 md:p-8 hover-elevate transition-all group"
+                data-testid={`card-flagship-${index + 1}`}
+                style={{ animationDelay: `${index * 150}ms` }}
+              >
+                <div className="space-y-5">
+                  {/* Icon & Title */}
+                  <div className="space-y-3">
+                    <div className={`w-14 h-14 rounded-lg bg-gradient-to-br ${project.color} p-3 flex items-center justify-center`}>
+                      <Icon className="w-full h-full text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-display text-xl md:text-2xl font-bold text-white mb-2 leading-tight">
+                        {project.title}
+                      </h3>
+                      <div className="flex items-center gap-2 text-sm text-white/60">
+                        <span className="text-[hsl(190,85%,55%)] font-medium">{project.company}</span>
+                        <span>•</span>
+                        <span>{project.period}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Challenge */}
+                  <div className="space-y-2">
+                    <p className="text-xs font-semibold text-white/50 uppercase tracking-wider">Challenge</p>
+                    <p className="text-sm text-white/70 leading-relaxed">
+                      {project.challenge}
+                    </p>
+                  </div>
+
+                  {/* Impact */}
+                  <div className="space-y-3">
+                    <p className="text-xs font-semibold text-white/50 uppercase tracking-wider">Impact</p>
+                    <ul className="space-y-2">
+                      {project.impact.map((item, idx) => (
+                        <li key={idx} className="flex items-start gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-[hsl(190,85%,55%)] mt-0.5 flex-shrink-0" />
+                          <span className="text-sm text-white/80 leading-relaxed">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Metrics */}
+                  <div className="flex flex-wrap gap-2 pt-2 border-t border-white/10">
+                    {project.metrics.map((metric, idx) => (
+                      <Badge 
+                        key={idx}
+                        className="text-xs bg-white/5 border-white/10 text-white/70"
+                      >
+                        {metric}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -607,6 +813,7 @@ function VerticalCareerTimeline() {
 function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => void }) {
   const topRoles = timelineProjects.slice(0, 3);
   const [selectedProject, setSelectedProject] = useState<typeof timelineProjects[0] | null>(null);
+  const [showCVDialog, setShowCVDialog] = useState(false);
 
   return (
     <section id="journey" className="relative min-h-[85vh] md:min-h-screen flex items-center justify-center overflow-hidden pt-20 md:pt-24" data-testid="section-hero">
@@ -627,79 +834,106 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
                 </span>
               </div>
               
-              <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight" data-testid="text-hero-title">
-                Project and Operation Delivery Expert
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)]">
-                  7 Industries . 4 Continents
+              <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.1]" data-testid="text-hero-title">
+                Senior Programme Manager
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] mt-2">
+                  £50M+ Delivery | 17+ Years
                 </span>
               </h1>
               
-              <p className="text-base sm:text-lg md:text-xl text-white/80 max-w-xl leading-relaxed" data-testid="text-hero-subtitle">
-                Fortune 500-trusted PM specialist delivering regulated, multi-million pound programmes on time and within budget
-              </p>
+              <div className="space-y-3">
+                <p className="text-lg sm:text-xl md:text-2xl text-white/90 max-w-2xl leading-relaxed font-medium" data-testid="text-hero-subtitle">
+                  Regulated programme delivery specialist trusted by Fortune 500 companies across Insurance, Engineering, Healthcare & Telecoms
+                </p>
+                
+                <div className="flex flex-wrap gap-3 text-sm sm:text-base text-white/70">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-[hsl(190,85%,55%)]" />
+                    <span>FCA Compliance Expert</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-[hsl(190,85%,55%)]" />
+                    <span>Global Team Leadership</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-[hsl(190,85%,55%)]" />
+                    <span>PMO Build Specialist</span>
+                  </div>
+                </div>
+              </div>
 
-              {/* Social Proof */}
-              <div className="pt-2">
-                <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Trusted By</p>
-                <div className="flex flex-wrap items-center gap-2 md:gap-3 text-xs sm:text-sm text-white/60">
-                  <span>Amazon</span>
-                  <span>•</span>
-                  <span>Estée Lauder</span>
-                  <span>•</span>
-                  <span>Simply Business</span>
-                  <span>•</span>
-                  <span>Mercer</span>
+              {/* Company Logo Trust Bar */}
+              <div className="pt-4">
+                <p className="text-xs text-white/40 uppercase tracking-wider mb-3">Trusted By Global Leaders</p>
+                <div className="flex flex-wrap items-center gap-4 md:gap-6">
+                  <div className="px-4 py-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg">
+                    <span className="text-sm font-semibold text-white/70">Mercer</span>
+                  </div>
+                  <div className="px-4 py-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg">
+                    <span className="text-sm font-semibold text-white/70">GSMA</span>
+                  </div>
+                  <div className="px-4 py-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg">
+                    <span className="text-sm font-semibold text-white/70">Simply Business</span>
+                  </div>
+                  <div className="px-4 py-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg">
+                    <span className="text-sm font-semibold text-white/70">6Connex</span>
+                  </div>
                 </div>
               </div>
             </div>
             
-            <div className="flex flex-col sm:flex-row flex-wrap gap-3">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-start">
               <Button 
                 size="lg"
-                className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0 hover-elevate active-elevate-2 text-sm md:text-base px-6 md:px-8 w-full sm:w-auto"
-                onClick={() => scrollToSection('contact')}
+                className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0 hover-elevate active-elevate-2 text-base md:text-lg px-8 md:px-10 py-6 md:py-7 w-full sm:w-auto font-semibold"
+                onClick={() => setShowCVDialog(true)}
                 data-testid="button-primary-cta"
               >
-                Schedule a Call <ArrowRight className="ml-2 w-4 h-4 md:w-5 md:h-5" />
+                <Download className="mr-2 w-5 h-5" /> Download CV
               </Button>
               
               <Button 
                 size="lg"
                 variant="outline"
-                className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10 text-sm md:text-base w-full sm:w-auto"
-                onClick={() => scrollToSection('experience')}
+                className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10 text-base md:text-lg px-8 md:px-10 py-6 md:py-7 w-full sm:w-auto"
+                onClick={() => scrollToSection('contact')}
                 data-testid="button-secondary-cta"
               >
-                View Track Record
-              </Button>
-              
-              <Button 
-                size="lg"
-                variant="outline"
-                className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10 text-sm md:text-base w-full sm:w-auto"
-                onClick={() => window.open('https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/', '_blank')}
-                data-testid="button-download-cv"
-              >
-                <Linkedin className="mr-2 w-4 h-4 md:w-5 md:h-5" /> LinkedIn
+                <Mail className="mr-2 w-5 h-5" /> Get in Touch
               </Button>
             </div>
             
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 pt-2">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 pt-2 text-sm text-white/70">
               <a 
                 href="mailto:odmlawal@gmail.com"
-                className="text-white/60 hover:text-white transition-colors flex items-center gap-2"
+                className="hover:text-white transition-colors flex items-center gap-2"
                 data-testid="link-email"
               >
-                <Mail className="w-4 h-4 md:w-5 md:h-5" />
-                <span className="text-sm sm:hidden">odmlawal@gmail.com</span>
+                <Mail className="w-4 h-4" />
+                <span>odmlawal@gmail.com</span>
               </a>
               <span className="text-white/30 hidden sm:block">|</span>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/20 border border-green-500/30">
-                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                <span className="text-xs sm:text-sm font-medium text-green-300 leading-relaxed">
-                  Available: Immediate Start • Remote/Hybrid/Freelance/No Visa Needed - Self Sponsored
-                </span>
-              </div>
+              <a 
+                href="https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white transition-colors flex items-center gap-2"
+                data-testid="link-linkedin"
+              >
+                <Linkedin className="w-4 h-4" />
+                <span>LinkedIn Profile</span>
+              </a>
+              <span className="text-white/30 hidden sm:block">|</span>
+              <a 
+                href="https://wa.me/YOUR_WHATSAPP_NUMBER"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white transition-colors flex items-center gap-2"
+                data-testid="link-whatsapp"
+              >
+                <MessageCircle className="w-4 h-4" />
+                <span>WhatsApp</span>
+              </a>
             </div>
           </div>
           
@@ -880,6 +1114,8 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
           <ChevronDown className="w-8 h-8" />
         </button>
       </div>
+      
+      <CVDownloadDialog open={showCVDialog} onOpenChange={setShowCVDialog} />
     </section>
   );
 }
