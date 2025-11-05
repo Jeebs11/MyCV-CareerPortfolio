@@ -598,7 +598,7 @@ function CollapsibleCareerJourney() {
     'Finimize': new URL('@assets/image_1762334568530.png', import.meta.url).href,
     'Novocycle Technology': new URL('@assets/image_1762334605591.png', import.meta.url).href,
     'Caravan and Motorhome Club': new URL('@assets/image_1762334620134.png', import.meta.url).href,
-    'JLT': new URL('@assets/image_1762336992439.png', import.meta.url).href,
+    'Jardine Lloyd Thompson': new URL('@assets/image_1762337194949.png', import.meta.url).href,
   };
 
   // Company domain mapping for logo fetching via Clearbit (fallback)
