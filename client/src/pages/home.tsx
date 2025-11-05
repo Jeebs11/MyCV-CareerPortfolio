@@ -655,7 +655,7 @@ function CollapsibleCareerJourney() {
 
   return (
     <section id="career-journey" className="relative py-16 md:py-24" data-testid="section-career-journey">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12 md:mb-16">
           <Badge className="bg-white/10 backdrop-blur-md border border-white/20 text-white mb-4">
             Full Career History
@@ -1163,9 +1163,9 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] md:w-[600px] md:h-[600px] bg-[hsl(270,65%,35%)]/10 rounded-full blur-3xl" />
       </div>
       
-      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-12 md:py-20">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-20">
         <div className="flex flex-col items-center text-center">
-          <div className="space-y-6 md:space-y-8 max-w-4xl">
+          <div className="space-y-6 md:space-y-8 max-w-5xl">
             <div className="space-y-4 md:space-y-6">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-green-500/20 border border-green-500/30">
                 <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
