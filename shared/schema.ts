@@ -167,7 +167,7 @@ export const experiences: Experience[] = [
     current: false,
     region: 'us',
     industry: 'Events Technology',
-    employmentType: 'Permanent',
+    employmentType: 'Contract',
     achievements: [
       'Ran virtual event programmes simultaneously across 6 time zones (Europe, US, MENA, South East Asia) during the pandemic pivot',
       'Coordinated Agile engineering teams around the clock to keep major events like university graduations and international exhibitions running',
@@ -671,7 +671,7 @@ export const timelineProjects: TimelineProject[] = [
     current: false,
     industry: 'Events Tech',
     projectType: 'Global Delivery',
-    employmentType: 'Permanent',
+    employmentType: 'Contract',
     description: 'Delivered enterprise SaaS implementations during the global shift to virtual engagement. Streamlined implementation frameworks to improve delivery speed, reliability, and user experience for high-profile corporate clients.',
     keyAchievements: [
       'Unified delivery across distributed Agile teams in six time zones',
