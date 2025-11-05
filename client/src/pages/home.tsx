@@ -420,17 +420,14 @@ function SkillsAndCertificationsGrid() {
     tools: [
       'Jira', 'Confluence', 'MS Project', 'PowerBI', 'Tableau', 'Azure DevOps', 'Smartsheet'
     ],
-    certifications: [
-      { name: 'Prince2 Practitioner', issuer: 'AXELOS' },
-      { name: 'Agile PM Foundation', issuer: 'APMG' },
-      { name: 'Scrum Master', issuer: 'Scrum Alliance' },
-      { name: 'Change Management', issuer: 'APMG' }
-    ],
-    experience: [
-      { metric: 'Team Size', value: 'Up to 34 people', icon: Users },
-      { metric: 'Budget Authority', value: '£50M+ total', icon: DollarSign },
-      { metric: 'Programme Complexity', value: 'Multi-workstream', icon: BarChart3 },
-      { metric: 'Compliance', value: 'FCA Regulated', icon: ShieldCheck }
+    methodologyExperience: [
+      { name: 'Prince2', status: 'certified' },
+      { name: 'Agile', status: 'certified' },
+      { name: 'Waterfall', status: 'experienced' },
+      { name: 'Scrum Master', status: 'certified' },
+      { name: 'Change Management', status: 'certified' },
+      { name: 'PMP', status: 'pursuing' },
+      { name: 'CompTIA Security+', status: 'pursuing' }
     ],
     industries: [
       'Insurance & Financial Services',
@@ -507,7 +504,7 @@ function SkillsAndCertificationsGrid() {
             </div>
           </Card>
 
-          {/* Professional Certifications */}
+          {/* Methodology Experience and Certification */}
           <Card className="bg-white/5 backdrop-blur-sm border-white/10 p-6 md:p-8">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
@@ -515,16 +512,22 @@ function SkillsAndCertificationsGrid() {
                   <Award className="w-full h-full text-white" />
                 </div>
                 <h3 className="font-display text-xl md:text-2xl font-bold text-white">
-                  Professional Certifications
+                  Methodology Experience and Certification
                 </h3>
               </div>
               <div className="space-y-3">
-                {skillsData.certifications.map((cert, idx) => (
+                {skillsData.methodologyExperience.map((method, idx) => (
                   <div key={idx} className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[hsl(190,85%,55%)] mt-1 flex-shrink-0" />
+                    {method.status === 'pursuing' ? (
+                      <div className="w-4 h-4 mt-1 flex-shrink-0 rounded-full border-2 border-[hsl(190,85%,55%)] border-dashed" />
+                    ) : (
+                      <CheckCircle2 className="w-4 h-4 text-[hsl(190,85%,55%)] mt-1 flex-shrink-0" />
+                    )}
                     <div>
-                      <p className="text-white font-medium">{cert.name}</p>
-                      <p className="text-sm text-white/60">{cert.issuer}</p>
+                      <p className="text-white font-medium">{method.name}</p>
+                      <p className="text-sm text-white/60">
+                        {method.status === 'pursuing' ? 'Currently Pursuing' : method.status === 'certified' ? 'Certified' : 'Experienced'}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -532,39 +535,11 @@ function SkillsAndCertificationsGrid() {
             </div>
           </Card>
 
-          {/* Scale & Complexity */}
+          {/* Industry Experience */}
           <Card className="bg-white/5 backdrop-blur-sm border-white/10 p-6 md:p-8">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 p-2.5 flex items-center justify-center">
-                  <TrendingUp className="w-full h-full text-white" />
-                </div>
-                <h3 className="font-display text-xl md:text-2xl font-bold text-white">
-                  Scale & Complexity
-                </h3>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                {skillsData.experience.map((exp, idx) => {
-                  const Icon = exp.icon;
-                  return (
-                    <div key={idx} className="space-y-2">
-                      <div className="flex items-center gap-2 text-white/60">
-                        <Icon className="w-4 h-4" />
-                        <p className="text-xs font-semibold uppercase tracking-wider">{exp.metric}</p>
-                      </div>
-                      <p className="text-white font-semibold">{exp.value}</p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </Card>
-
-          {/* Industry Experience - Full Width */}
-          <Card className="bg-white/5 backdrop-blur-sm border-white/10 p-6 md:p-8 lg:col-span-2">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 p-2.5 flex items-center justify-center">
                   <Briefcase className="w-full h-full text-white" />
                 </div>
                 <h3 className="font-display text-xl md:text-2xl font-bold text-white">
@@ -575,7 +550,7 @@ function SkillsAndCertificationsGrid() {
                 {skillsData.industries.map((industry, idx) => (
                   <Badge 
                     key={idx}
-                    className="text-sm bg-cyan-500/10 border-cyan-500/20 text-cyan-300"
+                    className="text-sm bg-orange-500/10 border-orange-500/20 text-orange-300"
                   >
                     {industry}
                   </Badge>
