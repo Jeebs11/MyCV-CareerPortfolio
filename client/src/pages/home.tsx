@@ -1180,27 +1180,6 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
                   £50M+ Delivery | 17+ Years
                 </span>
               </h1>
-              
-              <div className="space-y-3">
-                <p className="text-lg sm:text-xl md:text-2xl text-white/90 max-w-2xl leading-relaxed font-medium" data-testid="text-hero-subtitle">
-                  Regulated programme delivery specialist trusted by Fortune 500 companies across Insurance, Engineering, Healthcare & Telecoms
-                </p>
-                
-                <div className="flex flex-wrap gap-3 text-sm sm:text-base text-white/70">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-[hsl(190,85%,55%)]" />
-                    <span>FCA Compliance Expert</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-[hsl(190,85%,55%)]" />
-                    <span>Global Team Leadership</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-[hsl(190,85%,55%)]" />
-                    <span>PMO Build Specialist</span>
-                  </div>
-                </div>
-              </div>
 
               {/* Company Logo Trust Bar */}
               <div className="pt-4">
