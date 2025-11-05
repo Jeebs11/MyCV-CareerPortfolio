@@ -564,24 +564,62 @@ function SkillsAndCertificationsGrid() {
   );
 }
 
+function CompanyLogo({ companyName, logoUrl }: { companyName: string; logoUrl: string | null }) {
+  const [imageError, setImageError] = useState(false);
+
+  if (!logoUrl || imageError) {
+    return (
+      <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-lg bg-white p-2 flex items-center justify-center">
+        <span className="text-sm font-bold text-gray-800">
+          {companyName.substring(0, 2).toUpperCase()}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-lg bg-white p-2 flex items-center justify-center">
+      <img 
+        src={logoUrl} 
+        alt={`${companyName} logo`}
+        className="w-full h-full object-contain"
+        onError={() => setImageError(true)}
+      />
+    </div>
+  );
+}
+
 function CollapsibleCareerJourney() {
-  // Company domain mapping for logo fetching via Clearbit
+  // Custom company logos (prioritized over Clearbit)
+  const customLogos: Record<string, string> = {
+    'dictate.it': new URL('@assets/image_1762334497200.png', import.meta.url).href,
+    'Alfa Laval': new URL('@assets/image_1762334520974.png', import.meta.url).href,
+    'BSS Corporate': new URL('@assets/image_1762334544922.png', import.meta.url).href,
+    'Finimize': new URL('@assets/image_1762334568530.png', import.meta.url).href,
+    'Novocycle Technology': new URL('@assets/image_1762334605591.png', import.meta.url).href,
+    'Caravan and Motorhome Club': new URL('@assets/image_1762334620134.png', import.meta.url).href,
+    'JLT': new URL('@assets/image_1762334708452.png', import.meta.url).href,
+  };
+
+  // Company domain mapping for logo fetching via Clearbit (fallback)
   const companyDomains: Record<string, string> = {
-    'Novocycle Technology': 'novocycle.com',
     'Simply Business': 'simplybusiness.com',
     'Mercer': 'mercer.com',
     'GSMA': 'gsma.com',
     '6Connex': '6connex.com',
-    'Verizon': 'verizon.com',
-    'Reed': 'reed.com',
-    'BAM Nuttall': 'bamnuttall.co.uk',
-    'MedPlus': 'medplus.in',
-    'Netscribes': 'netscribes.com',
-    'Zenta Healthcare': 'zenta.co.uk',
-    'TLC': 'tlc.org'
+    'Best Future Education Centre': 'bestfuture.edu.ng',
+    'People Planet Projects': 'peopleplanetprojects.com',
+    'CorProfit': 'deloitte.com',
+    'Nigerian Prison Service': 'prisons.gov.ng',
   };
 
   const getCompanyLogo = (companyName: string) => {
+    // Prioritize custom logos
+    if (customLogos[companyName]) {
+      return customLogos[companyName];
+    }
+    
+    // Fallback to Clearbit
     const domain = companyDomains[companyName];
     return domain ? `https://logo.clearbit.com/${domain}` : null;
   };
@@ -615,30 +653,7 @@ function CollapsibleCareerJourney() {
                 <AccordionTrigger className="px-4 md:px-6 py-4 hover:no-underline hover-elevate">
                   <div className="flex items-center gap-3 md:gap-4 w-full text-left">
                     {/* Company Logo */}
-                    {logoUrl ? (
-                      <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-lg bg-white p-2 flex items-center justify-center">
-                        <img 
-                          src={logoUrl} 
-                          alt={`${project.company} logo`}
-                          className="w-full h-full object-contain"
-                          onError={(e) => {
-                            // Fallback to initials if logo fails to load
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                            const parent = target.parentElement;
-                            if (parent) {
-                              parent.innerHTML = `<span class="text-sm font-bold text-gray-800">${project.company.substring(0, 2).toUpperCase()}</span>`;
-                            }
-                          }}
-                        />
-                      </div>
-                    ) : (
-                      <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-lg bg-white p-2 flex items-center justify-center">
-                        <span className="text-sm font-bold text-gray-800">
-                          {project.company.substring(0, 2).toUpperCase()}
-                        </span>
-                      </div>
-                    )}
+                    <CompanyLogo companyName={project.company} logoUrl={logoUrl} />
 
                     {/* Role & Company Info */}
                     <div className="flex-1 min-w-0">
