@@ -1180,25 +1180,6 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
                   £50M+ Delivery | 17+ Years
                 </span>
               </h1>
-
-              {/* Company Logo Trust Bar */}
-              <div className="pt-4">
-                <p className="text-xs text-white/40 uppercase tracking-wider mb-3">Trusted By Global Leaders</p>
-                <div className="flex flex-wrap items-center gap-4 md:gap-6">
-                  <div className="px-4 py-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg">
-                    <span className="text-sm font-semibold text-white/70">Mercer</span>
-                  </div>
-                  <div className="px-4 py-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg">
-                    <span className="text-sm font-semibold text-white/70">GSMA</span>
-                  </div>
-                  <div className="px-4 py-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg">
-                    <span className="text-sm font-semibold text-white/70">Simply Business</span>
-                  </div>
-                  <div className="px-4 py-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg">
-                    <span className="text-sm font-semibold text-white/70">6Connex</span>
-                  </div>
-                </div>
-              </div>
             </div>
             
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-center justify-center">
