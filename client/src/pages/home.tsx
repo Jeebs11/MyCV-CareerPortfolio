@@ -143,56 +143,54 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
       }`}
       data-testid="navigation"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-        <div className="flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-md bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center font-display font-bold text-white">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center font-display font-bold text-white text-sm">
               ML
             </div>
-            <span className="font-display text-lg sm:text-xl text-white hidden sm:block">Mujeeb Lawal</span>
+            <span className="font-display text-lg font-semibold text-white hidden sm:block">Mujeeb Lawal</span>
           </div>
           
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-8">
             <button 
               onClick={() => scrollToSection('career-journey')}
-              className="text-sm text-white/70 hover:text-white transition-colors"
+              className="text-sm font-medium text-white/70 hover:text-white transition-colors"
               data-testid="link-journey"
             >
               Journey
             </button>
             <a 
               href="/insights"
-              className="text-sm text-white/70 hover:text-white transition-colors"
+              className="text-sm font-medium text-white/70 hover:text-white transition-colors"
               data-testid="link-insights"
             >
               Thought Leadership
             </a>
-            <Button
-              onClick={() => setShowCVDialog(true)}
-              variant="outline"
+            <Button 
+              onClick={() => scrollToSection('contact')}
               size="sm"
-              className="bg-transparent border-white/20 text-white hover:bg-white/10"
-              data-testid="button-download-cv"
+              className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0 px-6"
+              data-testid="button-cta-nav"
             >
-              <Download className="w-4 h-4 mr-2" />
-              Download CV
+              Get in Touch
             </Button>
           </div>
           
-          <div className="flex items-center gap-2">
-            {/* Mobile Menu Button */}
-            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="md:hidden text-white hover:bg-white/10"
-                  data-testid="button-mobile-menu"
-                >
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
+          {/* Mobile Menu Button */}
+          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            <SheetTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden text-white hover:bg-white/10"
+                data-testid="button-mobile-menu"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
               <SheetContent 
                 side="right" 
                 className="bg-[hsl(270,8%,12%)]/95 backdrop-blur-xl border-white/10 w-[280px] sm:w-[320px]"
@@ -237,16 +235,6 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
                 </div>
               </SheetContent>
             </Sheet>
-
-            {/* CTA Button - Hidden on small mobile, visible on sm and up */}
-            <Button 
-              onClick={() => scrollToSection('contact')}
-              className="hidden sm:flex bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0"
-              data-testid="button-cta-nav"
-            >
-              Get in Touch
-            </Button>
-          </div>
         </div>
       </div>
       
