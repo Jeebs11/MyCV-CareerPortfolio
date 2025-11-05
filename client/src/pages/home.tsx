@@ -515,21 +515,19 @@ function SkillsAndCertificationsGrid() {
                   Methodology Experience and Certification
                 </h3>
               </div>
-              <div className="space-y-3">
+              <div className="flex flex-wrap gap-2">
                 {skillsData.methodologyExperience.map((method, idx) => (
-                  <div key={idx} className="flex items-start gap-2">
-                    {method.status === 'pursuing' ? (
-                      <div className="w-4 h-4 mt-1 flex-shrink-0 rounded-full border-2 border-[hsl(190,85%,55%)] border-dashed" />
-                    ) : (
-                      <CheckCircle2 className="w-4 h-4 text-[hsl(190,85%,55%)] mt-1 flex-shrink-0" />
-                    )}
-                    <div>
-                      <p className="text-white font-medium">{method.name}</p>
-                      <p className="text-sm text-white/60">
-                        {method.status === 'pursuing' ? 'Currently Pursuing' : method.status === 'certified' ? 'Certified' : 'Experienced'}
-                      </p>
-                    </div>
-                  </div>
+                  <Badge 
+                    key={idx}
+                    className={`text-sm ${
+                      method.status === 'pursuing' 
+                        ? 'bg-green-500/5 border-green-500/30 border-dashed text-green-300' 
+                        : 'bg-green-500/10 border-green-500/20 text-green-300'
+                    }`}
+                  >
+                    {method.name}
+                    {method.status === 'pursuing' && ' ⋯'}
+                  </Badge>
                 ))}
               </div>
             </div>
