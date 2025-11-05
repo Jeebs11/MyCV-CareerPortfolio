@@ -4,26 +4,22 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTr
 import {
   Compass,
   Rocket,
-  BarChart3,
-  Briefcase,
-  Globe,
+  Trophy,
   Award,
-  Building2,
+  Briefcase,
   Mail
 } from 'lucide-react';
 
 const sections = [
-  { id: 'journey', label: 'Journey', icon: Rocket },
-  { id: 'metrics', label: 'Impact', icon: BarChart3 },
-  { id: 'experience', label: 'Timeline', icon: Briefcase },
-  { id: 'industries', label: 'Industries', icon: Building2 },
-  { id: 'global', label: 'Global', icon: Globe },
-  { id: 'certifications', label: 'Certifications', icon: Award },
+  { id: 'hero', label: 'Home', icon: Rocket },
+  { id: 'flagship-wins', label: 'Top Wins', icon: Trophy },
+  { id: 'skills', label: 'Skills', icon: Award },
+  { id: 'career-journey', label: 'Career', icon: Briefcase },
   { id: 'contact', label: 'Contact', icon: Mail },
 ];
 
 export default function SectionNavigation() {
-  const [activeSection, setActiveSection] = useState('journey');
+  const [activeSection, setActiveSection] = useState('hero');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
