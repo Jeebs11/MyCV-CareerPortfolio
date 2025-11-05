@@ -312,7 +312,7 @@ function StickyContactBar() {
           size="sm"
           variant="outline"
           className="bg-white/10 backdrop-blur-xl border-white/20 text-white hover:bg-white/20 shadow-lg"
-          onClick={() => window.open('https://wa.me/YOUR_WHATSAPP_NUMBER', '_blank')}
+          onClick={() => window.open('https://wa.me/971509082234', '_blank')}
           data-testid="button-sticky-whatsapp"
         >
           <MessageCircle className="w-4 h-4 sm:mr-2" />
@@ -811,8 +811,6 @@ function VerticalCareerTimeline() {
 }
 
 function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => void }) {
-  const topRoles = timelineProjects.slice(0, 3);
-  const [selectedProject, setSelectedProject] = useState<typeof timelineProjects[0] | null>(null);
   const [showCVDialog, setShowCVDialog] = useState(false);
 
   return (
@@ -823,9 +821,9 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] md:w-[600px] md:h-[600px] bg-[hsl(270,65%,35%)]/10 rounded-full blur-3xl" />
       </div>
       
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-20">
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          <div className="space-y-6 md:space-y-8">
+      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-12 md:py-20">
+        <div className="flex flex-col items-center text-center">
+          <div className="space-y-6 md:space-y-8 max-w-4xl">
             <div className="space-y-4 md:space-y-6">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-green-500/20 border border-green-500/30">
                 <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
@@ -882,7 +880,7 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
               </div>
             </div>
             
-            <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-start">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-center justify-center">
               <Button 
                 size="lg"
                 className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0 hover-elevate active-elevate-2 text-base md:text-lg px-8 md:px-10 py-6 md:py-7 w-full sm:w-auto font-semibold"
@@ -903,7 +901,7 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
               </Button>
             </div>
             
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 pt-2 text-sm text-white/70">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 pt-2 text-sm text-white/70 justify-center">
               <a 
                 href="mailto:odmlawal@gmail.com"
                 className="hover:text-white transition-colors flex items-center gap-2"
@@ -925,7 +923,7 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
               </a>
               <span className="text-white/30 hidden sm:block">|</span>
               <a 
-                href="https://wa.me/YOUR_WHATSAPP_NUMBER"
+                href="https://wa.me/971509082234"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-white transition-colors flex items-center gap-2"
@@ -936,175 +934,7 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
               </a>
             </div>
           </div>
-          
-          <div className="relative w-full lg:w-auto">
-            <div className="mb-3 md:mb-4">
-              <h3 className="font-display text-lg md:text-xl font-bold text-white mb-1" data-testid="text-recent-roles-title">
-                Recent Impact
-              </h3>
-              <p className="text-xs md:text-sm text-white/50">Latest leadership roles</p>
-            </div>
-            <div className="space-y-3">
-              {topRoles.map((project) => (
-                <Card
-                  key={project.id}
-                  className="bg-white/5 backdrop-blur-xl border-white/10 p-4 md:p-5 hover-elevate transition-all"
-                  data-testid={`card-recent-${project.id}`}
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-start justify-between gap-2 flex-wrap">
-                      <div className="flex flex-wrap gap-1.5">
-                        <Badge 
-                          className="text-xs bg-gradient-to-r from-[hsl(190,85%,55%)]/20 to-[hsl(220,90%,60%)]/20 border-[hsl(190,85%,55%)]/30 text-white"
-                          data-testid={`badge-period-${project.id}`}
-                        >
-                          {project.period}
-                        </Badge>
-                        <Badge 
-                          className={`text-xs ${
-                            project.employmentType === 'Contract' 
-                              ? 'bg-orange-500/20 border-orange-500/30 text-orange-300' 
-                              : 'bg-blue-500/20 border-blue-500/30 text-blue-300'
-                          }`}
-                          data-testid={`badge-employment-${project.id}`}
-                        >
-                          {project.employmentType}
-                        </Badge>
-                      </div>
-                      {project.current && (
-                        <Badge className="text-xs bg-green-500/20 border-green-500/30 text-green-300" data-testid={`badge-current-${project.id}`}>
-                          Current
-                        </Badge>
-                      )}
-                    </div>
-
-                    <div>
-                      <h4 className="font-semibold text-white text-sm md:text-base leading-tight mb-1" data-testid={`text-role-${project.id}`}>
-                        {project.role}
-                      </h4>
-                      <p className="text-[hsl(190,85%,55%)] text-xs md:text-sm mb-2" data-testid={`text-company-${project.id}`}>
-                        {project.company}
-                      </p>
-                      {project.description && (
-                        <p className="text-white/60 text-xs md:text-sm leading-relaxed" data-testid={`text-description-${project.id}`}>
-                          {project.description}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:items-center sm:justify-between">
-                      <div className="flex flex-wrap gap-2">
-                        <Badge className="text-xs bg-white/5 border-white/10 text-white/70">
-                          {project.industry}
-                        </Badge>
-                        {project.projectType && (
-                          <Badge className="text-xs bg-white/5 border-white/10 text-white/70">
-                            {project.projectType}
-                          </Badge>
-                        )}
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="text-xs text-[hsl(190,85%,55%)] hover:text-[hsl(190,85%,65%)] h-auto py-2 px-3 w-full sm:w-auto justify-center sm:justify-start"
-                        onClick={() => setSelectedProject(project)}
-                        data-testid={`button-view-impact-${project.id}`}
-                      >
-                        View Impact <ArrowRight className="ml-1 w-3 h-3" />
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
         </div>
-        
-        {/* Impact Dialog */}
-        <Dialog open={selectedProject !== null} onOpenChange={(open) => { if (!open) setSelectedProject(null); }}>
-          <DialogContent className="bg-[hsl(270,8%,12%)] border-white/10 text-white max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
-            {selectedProject && (
-              <>
-                <DialogHeader>
-                  <DialogTitle className="font-display text-xl sm:text-2xl text-white pr-6">
-                    {selectedProject.role}
-                  </DialogTitle>
-                  <DialogDescription className="text-[hsl(190,85%,55%)] text-sm sm:text-base">
-                    {selectedProject.company} • {selectedProject.period}
-                  </DialogDescription>
-                </DialogHeader>
-                
-                <div className="space-y-4">
-                  {selectedProject.description && (
-                    <div>
-                      <p className="text-base text-white/80 leading-relaxed" data-testid="text-recent-dialog-description">
-                        {selectedProject.description}
-                      </p>
-                    </div>
-                  )}
-
-                  <div>
-                    <h3 className="text-sm font-semibold text-white/70 mb-3 flex items-center gap-2">
-                      <Target className="w-4 h-4" />
-                      Full Impact
-                    </h3>
-                    <ul className="space-y-2">
-                      {selectedProject.keyAchievements.map((achievement, idx) => (
-                        <li key={idx} className="flex items-start gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-[hsl(190,85%,55%)] mt-0.5 flex-shrink-0" />
-                          <span className="text-sm text-white/80">{achievement}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 pt-2">
-                    <Badge className="text-xs bg-white/5 border-white/10 text-white/70">
-                      {selectedProject.industry}
-                    </Badge>
-                    {selectedProject.projectType && (
-                      <Badge className="text-xs bg-white/5 border-white/10 text-white/70">
-                        {selectedProject.projectType}
-                      </Badge>
-                    )}
-                    <Badge 
-                      className={`text-xs ${
-                        selectedProject.employmentType === 'Contract' 
-                          ? 'bg-orange-500/20 border-orange-500/30 text-orange-300' 
-                          : 'bg-blue-500/20 border-blue-500/30 text-blue-300'
-                      }`}
-                    >
-                      {selectedProject.employmentType}
-                    </Badge>
-                    {selectedProject.budget && (
-                      <Badge className="text-xs bg-[hsl(190,85%,55%)]/20 border-[hsl(190,85%,55%)]/30 text-[hsl(190,85%,65%)]">
-                        Budget: {selectedProject.budget}
-                      </Badge>
-                    )}
-                    {selectedProject.teamSize && (
-                      <Badge className="text-xs bg-white/5 border-white/10 text-white/70">
-                        Team: {selectedProject.teamSize} people
-                      </Badge>
-                    )}
-                  </div>
-
-                  {selectedProject.technologies && selectedProject.technologies.length > 0 && (
-                    <div>
-                      <h3 className="text-sm font-semibold text-white/70 mb-2">Technologies & Tools</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {selectedProject.technologies.map((tech, idx) => (
-                          <Badge key={idx} className="text-xs bg-white/5 border-white/10 text-white/70">
-                            {tech}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
-          </DialogContent>
-        </Dialog>
         
         <button 
           onClick={() => scrollToSection('metrics')}
