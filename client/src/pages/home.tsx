@@ -415,17 +415,14 @@ function FlagshipAchievements() {
 function SkillsAndCertificationsGrid() {
   const skillsData = {
     methodologies: [
-      'Agile (Scrum/Kanban)', 'Waterfall', 'Lean', 'SAFe', 'Prince2'
+      'Agile (Scrum/Kanban)', 'Waterfall', 'Lean', 'SAFe', 'Prince2', 'Change Management', 'Rapid Application Development (RAD)', 'Software Development Life Cycle (SDLC)'
     ],
     tools: [
       'Jira', 'Confluence', 'MS Project', 'PowerBI', 'Tableau', 'Azure DevOps', 'Smartsheet'
     ],
-    methodologyExperience: [
-      { name: 'Prince2', status: 'certified' },
-      { name: 'Agile', status: 'certified' },
-      { name: 'Waterfall', status: 'experienced' },
+    certifications: [
+      { name: 'Prince2 Agile', status: 'certified' },
       { name: 'Scrum Master', status: 'certified' },
-      { name: 'Change Management', status: 'certified' },
       { name: 'PMP', status: 'pursuing' },
       { name: 'CompTIA Security+', status: 'pursuing' }
     ],
@@ -504,7 +501,7 @@ function SkillsAndCertificationsGrid() {
             </div>
           </Card>
 
-          {/* Methodology Experience and Certification */}
+          {/* Certifications */}
           <Card className="bg-white/5 backdrop-blur-sm border-white/10 p-6 md:p-8">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
@@ -512,24 +509,24 @@ function SkillsAndCertificationsGrid() {
                   <Award className="w-full h-full text-white" />
                 </div>
                 <h3 className="font-display text-xl md:text-2xl font-bold text-white">
-                  Methodology Experience and Certification
+                  Certifications
                 </h3>
               </div>
               <div className="flex flex-wrap gap-2">
-                {skillsData.methodologyExperience.map((method, idx) => (
+                {skillsData.certifications.map((cert, idx) => (
                   <Badge 
                     key={idx}
                     className={`text-sm ${
-                      method.status === 'pursuing' 
+                      cert.status === 'pursuing' 
                         ? 'bg-green-500/5 border-green-500/30 border-dashed text-green-300' 
                         : 'bg-green-500/10 border-green-500/20 text-green-300'
                     }`}
                   >
-                    {method.name}
-                    {method.status === 'pursuing' && (
+                    {cert.name}
+                    {cert.status === 'pursuing' && (
                       <span className="ml-1 text-xs opacity-70">(Pursuing)</span>
                     )}
-                    {method.status === 'certified' && (
+                    {cert.status === 'certified' && (
                       <span className="ml-1 text-xs opacity-70">✓</span>
                     )}
                   </Badge>
