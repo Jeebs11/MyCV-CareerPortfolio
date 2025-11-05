@@ -2,15 +2,26 @@
 
 ## Overview
 
-This is a personal portfolio website for Mujeeb Lawal, a Senior Project Manager with 17+ years of international experience. The site showcases professional experience, skills, achievements, and career highlights through an interactive, dashboard-style interface inspired by Figma's aesthetic. Built with React, TypeScript, and modern web technologies, the portfolio emphasizes visual storytelling through metrics, geographic data visualization, and glassmorphic design elements. Key capabilities include:
+This is a professional portfolio website for Mujeeb Lawal, a Senior Project Manager with 17+ years of international experience, **optimized specifically to target recruiters and maximize employment opportunities**. Built with React, TypeScript, and modern web technologies, the portfolio follows a recruiter-first information architecture with reduced scroll weight, immediate credibility signals, and scannable value propositions. Recent redesign (Nov 2025) pivoted from dashboard aesthetic to executive-focused presentation. Key capabilities include:
 
--   **Hero Section with Recent Impact**: Displays 3 most recent roles with role descriptions, period, company, industry badges, and employment type indicators (Contract/Permanent). "View Impact" buttons open dialogs showing role description followed by "Full Impact" section with detailed achievements.
--   **Career Journey Timeline**: Comprehensive view of all 12 career positions from 2008-2024 with role descriptions, location, industry, project type, and employment type badges (blue for Permanent roles, orange for Contract/Freelance positions). Each position includes a description field separate from the detailed impact information shown in expandable dialogs.
--   **Industry Experience Map**: 7 sectors with expandable project cards showing global delivery experience.
--   **Certifications Wall of Fame**: Interactive expandable cards showcasing professional certifications with detailed descriptions and validation links.
+-   **Recruiter-Focused Hero Section**: Centered single-column layout with powerful headline "Senior Programme Manager | £50M+ Delivery | 17+ Years", company logo trust bar (Mercer, GSMA, Simply Business, 6Connex), dual CTAs (Download CV + Contact), and immediate contact access (Email, LinkedIn, WhatsApp: +971 509082234).
+-   **Sticky Contact Bar**: Appears after 600px scroll with always-visible Email, WhatsApp, LinkedIn, and CV download buttons for friction-free engagement.
+-   **Top 3 Flagship Achievements**: Challenge → Impact cards showcasing signature wins: (1) PMO build with 36% efficiency gain, (2) £1.2M FCA-regulated programme with 34-person team, (3) 35% energy reduction for UN SDGs.
+-   **Skills & Certifications Grid**: Scannable 5-card layout displaying Methodologies (Agile, Waterfall, SAFe, Prince2), Tools (Jira, Confluence, PowerBI, Tableau), Professional Certifications (Prince2 Practitioner, Scrum Master), Scale & Complexity metrics (team sizes, budget authority, compliance), and Industry Experience across 7 sectors.
+-   **Collapsible Career Journey**: Accordion-based component showing all 12 roles (2008-2024) collapsed by default with company logos (via Clearbit Logo API), role title, period, and employment type badges (blue for Permanent, orange for Contract). Expandable on click to reveal full role description, key achievements, metrics, and technologies. Significantly reduces scroll weight while maintaining comprehensive career detail.
 -   **Self-Managed Blog System with Rich Content**: A complete CMS for thought leadership featuring ReactQuill WYSIWYG editor with cyan-to-blue gradient toolbar, rich text formatting, hero image support for visual storytelling, DOMPurify HTML sanitization for security, and database-backed storage with admin panel.
 -   **CV Download with Contact Capture**: Visitors can download the CV by providing their name, email, and optional phone number through a form modal. CV downloads trigger immediately upon form submission.
 -   **Admin Dashboard with CV Management**: Tab-based admin interface for managing blog posts and CV downloads. Features include CV file upload (PDF, DOC, DOCX), viewing all contact submissions with download timestamps, and CSV export of contact data for lead management.
+
+## Recent Changes (Nov 2025)
+
+### Recruiter-First Redesign
+Streamlined page structure to prioritize recruiter engagement and reduce cognitive load:
+- **Removed sections**: MetricsDashboard, IndustryExperienceMap, GeographicMap, CertificationsWall (consolidated into Skills Grid)
+- **New structure**: Hero → Flagship Wins → Skills → Collapsible Career Journey → Contact → Footer
+- **Reduced scroll weight**: From ~8 full-page sections to 4 focused sections
+- **Company logos**: Integrated Clearbit Logo API for visual company recognition in career journey
+- **Contact optimization**: WhatsApp (+971 509082234) added across all contact points for global reach
 
 ## User Preferences
 

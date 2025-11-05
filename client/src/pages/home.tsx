@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from '@/components/ui/sheet';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 const ChatBot = lazy(() => import('@/components/ChatBot'));
 const SectionNavigation = lazy(() => import('@/components/SectionNavigation'));
@@ -61,7 +62,6 @@ const iconMap: Record<string, any> = {
 
 export default function Home() {
   const [isVisible, setIsVisible] = useState(false);
-  const [activeRegion, setActiveRegion] = useState<string | null>(null);
 
   useEffect(() => {
     setIsVisible(true);
@@ -90,15 +90,9 @@ export default function Home() {
       
       <FlagshipAchievements />
       
-      <MetricsDashboard />
+      <SkillsAndCertificationsGrid />
       
-      <CareerTimeline activeRegion={activeRegion} setActiveRegion={setActiveRegion} />
-      
-      <IndustryExperienceMap />
-      
-      <GeographicMap activeRegion={activeRegion} setActiveRegion={setActiveRegion} />
-      
-      <CertificationsWall />
+      <CollapsibleCareerJourney />
       
       <ContactSection />
       
@@ -161,7 +155,7 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
             <button 
-              onClick={() => scrollToSection('journey')}
+              onClick={() => scrollToSection('career-journey')}
               className="text-sm text-white/70 hover:text-white transition-colors"
               data-testid="link-journey"
             >
@@ -467,6 +461,366 @@ function FlagshipAchievements() {
             );
           })}
         </div>
+      </div>
+    </section>
+  );
+}
+
+function SkillsAndCertificationsGrid() {
+  const skillsData = {
+    methodologies: [
+      'Agile (Scrum/Kanban)', 'Waterfall', 'Lean', 'SAFe', 'Prince2'
+    ],
+    tools: [
+      'Jira', 'Confluence', 'MS Project', 'PowerBI', 'Tableau', 'Azure DevOps', 'Smartsheet'
+    ],
+    certifications: [
+      { name: 'Prince2 Practitioner', issuer: 'AXELOS' },
+      { name: 'Agile PM Foundation', issuer: 'APMG' },
+      { name: 'Scrum Master', issuer: 'Scrum Alliance' },
+      { name: 'Change Management', issuer: 'APMG' }
+    ],
+    experience: [
+      { metric: 'Team Size', value: 'Up to 34 people', icon: Users },
+      { metric: 'Budget Authority', value: '£50M+ total', icon: DollarSign },
+      { metric: 'Programme Complexity', value: 'Multi-workstream', icon: BarChart3 },
+      { metric: 'Compliance', value: 'FCA Regulated', icon: ShieldCheck }
+    ],
+    industries: [
+      'Insurance & Financial Services',
+      'Telecommunications',
+      'Healthcare & Life Sciences',
+      'Engineering & Technology',
+      'Public Sector',
+      'Events & Hospitality',
+      'Energy & Sustainability'
+    ]
+  };
+
+  return (
+    <section id="skills" className="relative py-16 md:py-24" data-testid="section-skills">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-12 md:mb-16">
+          <Badge className="bg-white/10 backdrop-blur-md border border-white/20 text-white mb-4">
+            Expertise Overview
+          </Badge>
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
+            Skills & Certifications
+          </h2>
+          <p className="text-lg md:text-xl text-white/60 max-w-3xl mx-auto">
+            Proven methodologies, tools, and credentials for enterprise-level programme delivery
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-6 md:gap-8">
+          {/* Methodologies & Frameworks */}
+          <Card className="bg-white/5 backdrop-blur-sm border-white/10 p-6 md:p-8">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 p-2.5 flex items-center justify-center">
+                  <Target className="w-full h-full text-white" />
+                </div>
+                <h3 className="font-display text-xl md:text-2xl font-bold text-white">
+                  Methodologies & Frameworks
+                </h3>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {skillsData.methodologies.map((method, idx) => (
+                  <Badge 
+                    key={idx}
+                    className="text-sm bg-blue-500/10 border-blue-500/20 text-blue-300"
+                  >
+                    {method}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          </Card>
+
+          {/* Tools & Technologies */}
+          <Card className="bg-white/5 backdrop-blur-sm border-white/10 p-6 md:p-8">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 p-2.5 flex items-center justify-center">
+                  <Code className="w-full h-full text-white" />
+                </div>
+                <h3 className="font-display text-xl md:text-2xl font-bold text-white">
+                  Tools & Platforms
+                </h3>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {skillsData.tools.map((tool, idx) => (
+                  <Badge 
+                    key={idx}
+                    className="text-sm bg-purple-500/10 border-purple-500/20 text-purple-300"
+                  >
+                    {tool}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          </Card>
+
+          {/* Professional Certifications */}
+          <Card className="bg-white/5 backdrop-blur-sm border-white/10 p-6 md:p-8">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 p-2.5 flex items-center justify-center">
+                  <Award className="w-full h-full text-white" />
+                </div>
+                <h3 className="font-display text-xl md:text-2xl font-bold text-white">
+                  Professional Certifications
+                </h3>
+              </div>
+              <div className="space-y-3">
+                {skillsData.certifications.map((cert, idx) => (
+                  <div key={idx} className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-[hsl(190,85%,55%)] mt-1 flex-shrink-0" />
+                    <div>
+                      <p className="text-white font-medium">{cert.name}</p>
+                      <p className="text-sm text-white/60">{cert.issuer}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Card>
+
+          {/* Scale & Complexity */}
+          <Card className="bg-white/5 backdrop-blur-sm border-white/10 p-6 md:p-8">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 p-2.5 flex items-center justify-center">
+                  <TrendingUp className="w-full h-full text-white" />
+                </div>
+                <h3 className="font-display text-xl md:text-2xl font-bold text-white">
+                  Scale & Complexity
+                </h3>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                {skillsData.experience.map((exp, idx) => {
+                  const Icon = exp.icon;
+                  return (
+                    <div key={idx} className="space-y-2">
+                      <div className="flex items-center gap-2 text-white/60">
+                        <Icon className="w-4 h-4" />
+                        <p className="text-xs font-semibold uppercase tracking-wider">{exp.metric}</p>
+                      </div>
+                      <p className="text-white font-semibold">{exp.value}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </Card>
+
+          {/* Industry Experience - Full Width */}
+          <Card className="bg-white/5 backdrop-blur-sm border-white/10 p-6 md:p-8 lg:col-span-2">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 p-2.5 flex items-center justify-center">
+                  <Briefcase className="w-full h-full text-white" />
+                </div>
+                <h3 className="font-display text-xl md:text-2xl font-bold text-white">
+                  Industry Experience (7 Sectors)
+                </h3>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {skillsData.industries.map((industry, idx) => (
+                  <Badge 
+                    key={idx}
+                    className="text-sm bg-cyan-500/10 border-cyan-500/20 text-cyan-300"
+                  >
+                    {industry}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          </Card>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CollapsibleCareerJourney() {
+  // Company domain mapping for logo fetching via Clearbit
+  const companyDomains: Record<string, string> = {
+    'Novocycle Technology': 'novocycle.com',
+    'Simply Business': 'simplybusiness.com',
+    'Mercer': 'mercer.com',
+    'GSMA': 'gsma.com',
+    '6Connex': '6connex.com',
+    'Verizon': 'verizon.com',
+    'Reed': 'reed.com',
+    'BAM Nuttall': 'bamnuttall.co.uk',
+    'MedPlus': 'medplus.in',
+    'Netscribes': 'netscribes.com',
+    'Zenta Healthcare': 'zenta.co.uk',
+    'TLC': 'tlc.org'
+  };
+
+  const getCompanyLogo = (companyName: string) => {
+    const domain = companyDomains[companyName];
+    return domain ? `https://logo.clearbit.com/${domain}` : null;
+  };
+
+  return (
+    <section id="career-journey" className="relative py-16 md:py-24" data-testid="section-career-journey">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-12 md:mb-16">
+          <Badge className="bg-white/10 backdrop-blur-md border border-white/20 text-white mb-4">
+            Full Career History
+          </Badge>
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
+            17-Year Career Journey
+          </h2>
+          <p className="text-lg md:text-xl text-white/60 max-w-3xl mx-auto">
+            12 companies • 7 industries • £50M+ delivered across regulated and complex programmes
+          </p>
+        </div>
+
+        <Accordion type="single" collapsible className="space-y-3">
+          {timelineProjects.map((project, index) => {
+            const logoUrl = getCompanyLogo(project.company);
+            
+            return (
+              <AccordionItem 
+                key={project.id} 
+                value={project.id}
+                className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden"
+                data-testid={`accordion-career-${index}`}
+              >
+                <AccordionTrigger className="px-4 md:px-6 py-4 hover:no-underline hover-elevate">
+                  <div className="flex items-center gap-3 md:gap-4 w-full text-left">
+                    {/* Company Logo */}
+                    {logoUrl ? (
+                      <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-lg bg-white p-2 flex items-center justify-center">
+                        <img 
+                          src={logoUrl} 
+                          alt={`${project.company} logo`}
+                          className="w-full h-full object-contain"
+                          onError={(e) => {
+                            // Fallback to initials if logo fails to load
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const parent = target.parentElement;
+                            if (parent) {
+                              parent.innerHTML = `<span class="text-sm font-bold text-gray-800">${project.company.substring(0, 2).toUpperCase()}</span>`;
+                            }
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-lg bg-white p-2 flex items-center justify-center">
+                        <span className="text-sm font-bold text-gray-800">
+                          {project.company.substring(0, 2).toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Role & Company Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-1">
+                        <h3 className="font-semibold text-white text-sm md:text-base truncate">
+                          {project.role}
+                        </h3>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <Badge 
+                            className={`text-xs ${
+                              project.employmentType === 'Contract' 
+                                ? 'bg-orange-500/20 border-orange-500/30 text-orange-300' 
+                                : 'bg-blue-500/20 border-blue-500/30 text-blue-300'
+                            }`}
+                          >
+                            {project.employmentType}
+                          </Badge>
+                          {project.current && (
+                            <Badge className="text-xs bg-green-500/20 border-green-500/30 text-green-300">
+                              Current
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs md:text-sm text-white/60">
+                        <span className="text-[hsl(190,85%,55%)]">{project.company}</span>
+                        <span>•</span>
+                        <span>{project.period}</span>
+                        <span className="hidden sm:inline">•</span>
+                        <span className="hidden sm:inline">{project.location}</span>
+                      </div>
+                    </div>
+                  </div>
+                </AccordionTrigger>
+                
+                <AccordionContent className="px-4 md:px-6 pb-4">
+                  <div className="space-y-4 pt-2">
+                    {/* Role Description */}
+                    {project.description && (
+                      <div>
+                        <p className="text-white/80 text-sm md:text-base leading-relaxed">
+                          {project.description}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Key Achievements */}
+                    <div>
+                      <h4 className="text-sm font-semibold text-white/70 mb-3 flex items-center gap-2">
+                        <Target className="w-4 h-4" />
+                        Key Impact
+                      </h4>
+                      <ul className="space-y-2">
+                        {project.keyAchievements.map((achievement, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-[hsl(190,85%,55%)] mt-0.5 flex-shrink-0" />
+                            <span className="text-sm text-white/80">{achievement}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* Metrics & Details */}
+                    <div className="flex flex-wrap gap-2 pt-2 border-t border-white/10">
+                      <Badge className="text-xs bg-white/5 border-white/10 text-white/70">
+                        {project.industry}
+                      </Badge>
+                      {project.projectType && (
+                        <Badge className="text-xs bg-white/5 border-white/10 text-white/70">
+                          {project.projectType}
+                        </Badge>
+                      )}
+                      {project.budget && (
+                        <Badge className="text-xs bg-[hsl(190,85%,55%)]/20 border-[hsl(190,85%,55%)]/30 text-[hsl(190,85%,65%)]">
+                          Budget: {project.budget}
+                        </Badge>
+                      )}
+                      {project.teamSize && (
+                        <Badge className="text-xs bg-white/5 border-white/10 text-white/70">
+                          Team: {project.teamSize} people
+                        </Badge>
+                      )}
+                    </div>
+
+                    {/* Technologies */}
+                    {project.technologies && project.technologies.length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-semibold text-white/70 mb-2">Technologies & Tools</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {project.technologies.map((tech, idx) => (
+                            <Badge key={idx} className="text-xs bg-white/5 border-white/10 text-white/70">
+                              {tech}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            );
+          })}
+        </Accordion>
       </div>
     </section>
   );
@@ -814,7 +1168,7 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
   const [showCVDialog, setShowCVDialog] = useState(false);
 
   return (
-    <section id="journey" className="relative min-h-[85vh] md:min-h-screen flex items-center justify-center overflow-hidden pt-20 md:pt-24" data-testid="section-hero">
+    <section id="hero" className="relative min-h-[85vh] md:min-h-screen flex items-center justify-center overflow-hidden pt-20 md:pt-24" data-testid="section-hero">
       <div className="absolute inset-0">
         <div className="absolute top-1/4 left-1/4 w-64 h-64 md:w-96 md:h-96 bg-[hsl(190,85%,55%)]/20 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-64 h-64 md:w-96 md:h-96 bg-[hsl(220,90%,60%)]/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
@@ -937,7 +1291,7 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
         </div>
         
         <button 
-          onClick={() => scrollToSection('metrics')}
+          onClick={() => scrollToSection('flagship-wins')}
           className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/40 hover:text-white/60 transition-colors animate-bounce"
           data-testid="button-scroll-indicator"
         >
