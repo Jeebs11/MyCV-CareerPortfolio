@@ -1111,7 +1111,7 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
               </div>
               
               <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.1]" data-testid="text-hero-title">
-                Senior Programme Manager
+                Senior Project Manager
                 <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] mt-2">
                   £50M+ Delivery | 17+ Years
                 </span>
