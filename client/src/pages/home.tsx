@@ -592,13 +592,13 @@ function CompanyLogo({ companyName, logoUrl }: { companyName: string; logoUrl: s
 function CollapsibleCareerJourney() {
   // Custom company logos (prioritized over Clearbit)
   const customLogos: Record<string, string> = {
-    'dictate.it': new URL('@assets/image_1762334497200.png', import.meta.url).href,
+    'Dictate.IT': new URL('@assets/image_1762336983383.png', import.meta.url).href,
     'Alfa Laval': new URL('@assets/image_1762334520974.png', import.meta.url).href,
-    'BSS Corporate': new URL('@assets/image_1762334544922.png', import.meta.url).href,
+    'BSS Industrial': new URL('@assets/image_1762336971805.png', import.meta.url).href,
     'Finimize': new URL('@assets/image_1762334568530.png', import.meta.url).href,
     'Novocycle Technology': new URL('@assets/image_1762334605591.png', import.meta.url).href,
     'Caravan and Motorhome Club': new URL('@assets/image_1762334620134.png', import.meta.url).href,
-    'JLT': new URL('@assets/image_1762334708452.png', import.meta.url).href,
+    'JLT': new URL('@assets/image_1762336992439.png', import.meta.url).href,
   };
 
   // Company domain mapping for logo fetching via Clearbit (fallback)
