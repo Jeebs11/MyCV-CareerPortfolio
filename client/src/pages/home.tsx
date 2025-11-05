@@ -324,30 +324,16 @@ function FlagshipAchievements() {
       title: 'Built PMO from Ground Up',
       company: 'Novocycle Technology',
       period: '2024',
-      challenge: 'Multi-million Euro EU-funded battery recycling programmes lacked structure, governance, and stakeholder visibility',
-      impact: [
-        'Established PMO function from scratch for complex R&D programmes',
-        'Reduced reporting overhead by 36% through Jira & Confluence optimization',
-        'Aligned cross-border teams spanning Europe and Middle East',
-        'Embedded scalable governance systems across business units'
-      ],
       metrics: ['36% efficiency gain', '15+ team members', 'EU-funded programmes'],
       icon: Target,
       color: 'from-blue-500 to-cyan-500'
     },
     {
       id: 'flagship-2',
-      title: '£1.2M FCA-Regulated Programme',
-      company: 'Simply Business',
-      period: '2022-2023',
-      challenge: 'Deliver FCA-compliant insurance platform under strict regulatory oversight with multi-workstream Agile teams',
-      impact: [
-        'Delivered £1.2M microservices-based insurance product on time',
-        'Managed FCA Consumer Duty & Operation Resilience compliance',
-        'Led 34-person multi-workstream Agile delivery',
-        'Coached winning Hackathon team to secure MVP sponsorship'
-      ],
-      metrics: ['£1.2M budget', '34 team members', 'FCA compliance'],
+      title: '34% Project Efficiency Improvement',
+      company: 'JLT Specialty (Marsh & McLennan)',
+      period: '2018',
+      metrics: ['34% efficiency gain', 'Insurance sector', 'Process optimization'],
       icon: ShieldCheck,
       color: 'from-orange-500 to-red-500'
     },
@@ -356,13 +342,6 @@ function FlagshipAchievements() {
       title: '35% Energy Reduction for UN SDGs',
       company: 'GSMA',
       period: '2019-2020',
-      challenge: 'Define sustainability standards and energy benchmarking framework for global telecom sector aligned with UN 2030 goals',
-      impact: [
-        'Led Energy Consumption Benchmark Tool supporting UN 2030 Sustainability Goals',
-        'Partnered with Vodafone, Verizon to achieve up to 35% energy reduction',
-        'Onboarded 8 new telecom technologies with mobile operators',
-        'Advanced industry-wide approach to efficiency & environmental impact'
-      ],
       metrics: ['35% energy reduction', '8 tech onboardings', 'UN SDG alignment'],
       icon: Leaf,
       color: 'from-green-500 to-emerald-500'
@@ -394,7 +373,7 @@ function FlagshipAchievements() {
                 data-testid={`card-flagship-${index + 1}`}
                 style={{ animationDelay: `${index * 150}ms` }}
               >
-                <div className="space-y-5">
+                <div className="space-y-4">
                   {/* Icon & Title */}
                   <div className="space-y-3">
                     <div className={`w-14 h-14 rounded-lg bg-gradient-to-br ${project.color} p-3 flex items-center justify-center`}>
@@ -412,29 +391,8 @@ function FlagshipAchievements() {
                     </div>
                   </div>
 
-                  {/* Challenge */}
-                  <div className="space-y-2">
-                    <p className="text-xs font-semibold text-white/50 uppercase tracking-wider">Challenge</p>
-                    <p className="text-sm text-white/70 leading-relaxed">
-                      {project.challenge}
-                    </p>
-                  </div>
-
-                  {/* Impact */}
-                  <div className="space-y-3">
-                    <p className="text-xs font-semibold text-white/50 uppercase tracking-wider">Impact</p>
-                    <ul className="space-y-2">
-                      {project.impact.map((item, idx) => (
-                        <li key={idx} className="flex items-start gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-[hsl(190,85%,55%)] mt-0.5 flex-shrink-0" />
-                          <span className="text-sm text-white/80 leading-relaxed">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
                   {/* Metrics */}
-                  <div className="flex flex-wrap gap-2 pt-2 border-t border-white/10">
+                  <div className="flex flex-wrap gap-2 pt-2">
                     {project.metrics.map((metric, idx) => (
                       <Badge 
                         key={idx}
