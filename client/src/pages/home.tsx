@@ -614,24 +614,6 @@ function CollapsibleCareerJourney() {
               >
                 <AccordionTrigger className="px-4 md:px-6 py-4 hover:no-underline hover-elevate">
                   <div className="flex items-center gap-3 md:gap-4 w-full text-left">
-                    {/* Status Badges - Far Left */}
-                    <div className="flex flex-col gap-1.5 flex-shrink-0">
-                      <Badge 
-                        className={`text-xs ${
-                          project.employmentType === 'Contract' 
-                            ? 'bg-orange-500/20 border-orange-500/30 text-orange-300' 
-                            : 'bg-blue-500/20 border-blue-500/30 text-blue-300'
-                        }`}
-                      >
-                        {project.employmentType}
-                      </Badge>
-                      {project.current && (
-                        <Badge className="text-xs bg-green-500/20 border-green-500/30 text-green-300">
-                          Current
-                        </Badge>
-                      )}
-                    </div>
-
                     {/* Company Logo */}
                     {logoUrl ? (
                       <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-lg bg-white p-2 flex items-center justify-center">
@@ -670,6 +652,24 @@ function CollapsibleCareerJourney() {
                         <span className="hidden sm:inline">•</span>
                         <span className="hidden sm:inline">{project.location}</span>
                       </div>
+                    </div>
+
+                    {/* Status Badges - Far Right */}
+                    <div className="flex flex-col gap-1.5 flex-shrink-0 items-end ml-auto">
+                      <Badge 
+                        className={`text-xs ${
+                          project.employmentType === 'Contract' 
+                            ? 'bg-orange-500/20 border-orange-500/30 text-orange-300' 
+                            : 'bg-blue-500/20 border-blue-500/30 text-blue-300'
+                        }`}
+                      >
+                        {project.employmentType}
+                      </Badge>
+                      {project.current && (
+                        <Badge className="text-xs bg-green-500/20 border-green-500/30 text-green-300">
+                          Current
+                        </Badge>
+                      )}
                     </div>
                   </div>
                 </AccordionTrigger>
