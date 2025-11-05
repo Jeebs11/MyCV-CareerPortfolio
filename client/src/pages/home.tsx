@@ -526,7 +526,12 @@ function SkillsAndCertificationsGrid() {
                     }`}
                   >
                     {method.name}
-                    {method.status === 'pursuing' && ' ⋯'}
+                    {method.status === 'pursuing' && (
+                      <span className="ml-1 text-xs opacity-70">(Pursuing)</span>
+                    )}
+                    {method.status === 'certified' && (
+                      <span className="ml-1 text-xs opacity-70">✓</span>
+                    )}
                   </Badge>
                 ))}
               </div>
