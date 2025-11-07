@@ -48,6 +48,13 @@ const adminAuth = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // ============ AUTHENTICATION ROUTES ============
+  
+  // Verify admin password (protected endpoint for login verification)
+  app.post("/api/auth/verify", adminAuth, (req, res) => {
+    res.json({ success: true });
+  });
+
   // ============ BLOG POST ROUTES ============
   
   // Get all blog posts (public)

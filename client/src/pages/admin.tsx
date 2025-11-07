@@ -267,16 +267,37 @@ export default function AdminPage() {
     },
   });
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Test authentication by making a simple request
-    if (password) {
-      setAdminPassword(password);
-      setIsAuthenticated(true);
-      setAuthError('');
-      refetch();
-    } else {
+    
+    if (!password) {
       setAuthError('Password is required');
+      return;
+    }
+
+    try {
+      // Verify password by making a test request to the auth verification endpoint
+      const res = await fetch('/api/auth/verify', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${password}`,
+        },
+      });
+
+      if (res.ok) {
+        // Password is valid
+        setAdminPassword(password);
+        setIsAuthenticated(true);
+        setAuthError('');
+        refetch();
+      } else {
+        // Password is invalid
+        setAuthError('Invalid password');
+        setPassword('');
+      }
+    } catch (error) {
+      setAuthError('Login failed. Please try again.');
+      setPassword('');
     }
   };
 
