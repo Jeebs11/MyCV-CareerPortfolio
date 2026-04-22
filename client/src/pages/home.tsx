@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
 import { experiences, skills, keyAchievements, detailedCertifications, timelineProjects, industryExperience, education } from '@shared/schema';
+import type { CareerRoleRow, FlagshipWinRow, SiteSkillRow } from '@shared/schema';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -335,35 +337,11 @@ function StickyContactBar() {
 }
 
 function FlagshipAchievements() {
-  const flagshipProjects = [
-    {
-      id: 'flagship-1',
-      title: 'Built PMO from Ground Up',
-      company: 'Novocycle Technology',
-      period: '2024',
-      metrics: ['36% efficiency gain', '15+ team members', 'EU-funded programmes'],
-      icon: Target,
-      color: 'from-blue-500 to-cyan-500'
-    },
-    {
-      id: 'flagship-2',
-      title: '34% Project Efficiency Improvement',
-      company: 'JLT Specialty (Marsh & McLennan)',
-      period: '2018',
-      metrics: ['34% efficiency gain', 'Insurance sector', 'Process optimization'],
-      icon: ShieldCheck,
-      color: 'from-orange-500 to-red-500'
-    },
-    {
-      id: 'flagship-3',
-      title: '35% Energy Reduction for UN SDGs',
-      company: 'GSMA',
-      period: '2019-2020',
-      metrics: ['35% energy reduction', '8 tech onboardings', 'UN SDG alignment'],
-      icon: Leaf,
-      color: 'from-green-500 to-emerald-500'
-    }
-  ];
+  const { data: settings = {} } = useQuery<Record<string, string>>({ queryKey: ['/api/site/settings'] });
+  const { data: wins = [], isLoading } = useQuery<FlagshipWinRow[]>({ queryKey: ['/api/site/flagship-wins'] });
+
+  const heading = settings['flagship.heading'] || 'Three Flagship Achievements';
+  const subheading = settings['flagship.subheading'] || 'Tangible business impact across regulated delivery, PMO leadership, and sustainability initiatives';
 
   return (
     <section id="flagship-wins" className="relative py-16 md:py-24" data-testid="section-flagship">
@@ -373,16 +351,21 @@ function FlagshipAchievements() {
             Signature Wins
           </Badge>
           <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
-            Three Flagship Achievements
+            {heading}
           </h2>
           <p className="text-lg md:text-xl text-white/60 max-w-3xl mx-auto">
-            Tangible business impact across regulated delivery, PMO leadership, and sustainability initiatives
+            {subheading}
           </p>
         </div>
 
+        {isLoading ? (
+          <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
+            {[0, 1, 2].map(i => <Card key={i} className="bg-white/5 border-white/10 p-8 h-64 animate-pulse" />)}
+          </div>
+        ) : (
         <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
-          {flagshipProjects.map((project, index) => {
-            const Icon = project.icon;
+          {wins.map((project, index) => {
+            const Icon = (iconMap[project.icon] as React.ComponentType<{ className?: string }>) || Target;
             return (
               <Card
                 key={project.id}
@@ -393,7 +376,7 @@ function FlagshipAchievements() {
                 <div className="space-y-4">
                   {/* Icon & Title */}
                   <div className="space-y-3">
-                    <div className={`w-14 h-14 rounded-lg bg-gradient-to-br ${project.color} p-3 flex items-center justify-center`}>
+                    <div className={`w-14 h-14 rounded-lg bg-gradient-to-br ${project.colorGradient} p-3 flex items-center justify-center`}>
                       <Icon className="w-full h-full text-white" />
                     </div>
                     <div>
@@ -424,35 +407,25 @@ function FlagshipAchievements() {
             );
           })}
         </div>
+        )}
       </div>
     </section>
   );
 }
 
 function SkillsAndCertificationsGrid() {
+  const { data: settings = {} } = useQuery<Record<string, string>>({ queryKey: ['/api/site/settings'] });
+  const { data: skillsList = [] } = useQuery<SiteSkillRow[]>({ queryKey: ['/api/site/skills'] });
+
   const skillsData = {
-    methodologies: [
-      'Agile (Scrum/Kanban)', 'Waterfall', 'Lean', 'SAFe', 'Prince2', 'Change Management', 'Rapid Application Development (RAD)', 'Software Development Life Cycle (SDLC)'
-    ],
-    tools: [
-      'Jira', 'Confluence', 'MS Project', 'PowerBI', 'Tableau', 'Azure DevOps', 'Smartsheet'
-    ],
-    certifications: [
-      { name: 'Prince2 Agile', status: 'certified' },
-      { name: 'Scrum Master', status: 'certified' },
-      { name: 'PMP', status: 'pursuing' },
-      { name: 'CompTIA Security+', status: 'pursuing' }
-    ],
-    industries: [
-      'Insurance & Financial Services',
-      'Telecommunications',
-      'Healthcare & Life Sciences',
-      'Engineering & Technology',
-      'Public Sector',
-      'Events & Hospitality',
-      'Energy & Sustainability'
-    ]
+    methodologies: skillsList.filter(s => s.category === 'methodology').map(s => s.name),
+    tools: skillsList.filter(s => s.category === 'tool').map(s => s.name),
+    certifications: skillsList.filter(s => s.category === 'certification').map(s => ({ name: s.name, status: s.status || 'certified' })),
+    industries: skillsList.filter(s => s.category === 'industry').map(s => s.name),
   };
+
+  const heading = settings['skills.heading'] || 'Skills & Certifications';
+  const subheading = settings['skills.subheading'] || 'Proven methodologies, tools, and credentials for enterprise-level programme delivery';
 
   return (
     <section id="skills" className="relative py-16 md:py-24" data-testid="section-skills">
@@ -462,10 +435,10 @@ function SkillsAndCertificationsGrid() {
             Expertise Overview
           </Badge>
           <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
-            Skills & Certifications
+            {heading}
           </h2>
           <p className="text-lg md:text-xl text-white/60 max-w-3xl mx-auto">
-            Proven methodologies, tools, and credentials for enterprise-level programme delivery
+            {subheading}
           </p>
         </div>
 
@@ -607,6 +580,12 @@ function CompanyLogo({ companyName, logoUrl }: { companyName: string; logoUrl: s
 }
 
 function CollapsibleCareerJourney() {
+  const { data: settings = {} } = useQuery<Record<string, string>>({ queryKey: ['/api/site/settings'] });
+  const { data: careerRoles = [], isLoading } = useQuery<CareerRoleRow[]>({ queryKey: ['/api/site/career-roles'] });
+
+  const heading = settings['career.heading'] || '17-Year Career Journey';
+  const subheading = settings['career.subheading'] || '12 companies • 7 industries • £50M+ delivered across regulated and complex programmes';
+
   // Custom company logos (prioritized over Clearbit)
   const customLogos: Record<string, string> = {
     'Dictate.IT': new URL('@assets/image_1762336983383.png', import.meta.url).href,
@@ -649,21 +628,26 @@ function CollapsibleCareerJourney() {
             Full Career History
           </Badge>
           <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
-            17-Year Career Journey
+            {heading}
           </h2>
           <p className="text-lg md:text-xl text-white/60 max-w-3xl mx-auto">
-            12 companies • 7 industries • £50M+ delivered across regulated and complex programmes
+            {subheading}
           </p>
         </div>
 
+        {isLoading ? (
+          <div className="space-y-3">
+            {[0, 1, 2, 3].map(i => <Card key={i} className="bg-white/5 border-white/10 h-20 animate-pulse" />)}
+          </div>
+        ) : (
         <Accordion type="single" collapsible className="space-y-3">
-          {timelineProjects.map((project, index) => {
-            const logoUrl = getCompanyLogo(project.company);
+          {careerRoles.map((project, index) => {
+            const logoUrl = project.logoUrl || getCompanyLogo(project.company);
             
             return (
               <AccordionItem 
                 key={project.id} 
-                value={project.id}
+                value={String(project.id)}
                 className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden"
                 data-testid={`accordion-career-${index}`}
               >
@@ -774,6 +758,7 @@ function CollapsibleCareerJourney() {
             );
           })}
         </Accordion>
+        )}
       </div>
     </section>
   );
@@ -1119,6 +1104,16 @@ function VerticalCareerTimeline() {
 
 function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => void }) {
   const [showCVDialog, setShowCVDialog] = useState(false);
+  const { data: settings = {} } = useQuery<Record<string, string>>({ queryKey: ['/api/site/settings'] });
+
+  const statusBadge = settings['hero.status_badge'] || 'Open to new opportunities';
+  const headlineMain = settings['hero.headline_main'] || 'Senior Project Manager';
+  const headlineSub1 = settings['hero.headline_sub1'] || 'Senior Program Manager';
+  const headlineSub2 = settings['hero.headline_sub2'] || 'PMO Lead';
+  const headlineAccent = settings['hero.headline_accent'] || '£50M+ Delivery | 17+ Years';
+  const email = settings['contact.email'] || 'odmlawal@gmail.com';
+  const linkedinUrl = settings['contact.linkedin_url'] || 'https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/';
+  const whatsapp = settings['contact.whatsapp'] || '971509082234';
 
   return (
     <section id="hero" className="relative min-h-[85vh] md:min-h-screen flex items-center justify-center overflow-hidden pt-20 md:pt-24" data-testid="section-hero">
@@ -1135,20 +1130,20 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
               <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-green-500/20 border border-green-500/30">
                 <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                 <span className="text-xs md:text-sm font-medium text-green-300" data-testid="badge-status">
-                  Open to new opportunities
+                  {statusBadge}
                 </span>
               </div>
               
               <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.1]" data-testid="text-hero-title">
-                Senior Project Manager
+                {headlineMain}
                 <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white/70 mt-1">
-                  Senior Program Manager
+                  {headlineSub1}
                 </span>
                 <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white/70 mt-1">
-                  PMO Lead
+                  {headlineSub2}
                 </span>
                 <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] mt-2">
-                  £50M+ Delivery | 17+ Years
+                  {headlineAccent}
                 </span>
               </h1>
             </div>
@@ -1187,16 +1182,16 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
             
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 pt-2 text-sm text-white/70 justify-center">
               <a 
-                href="mailto:odmlawal@gmail.com"
+                href={`mailto:${email}`}
                 className="hover:text-white transition-colors flex items-center gap-2"
                 data-testid="link-email"
               >
                 <Mail className="w-4 h-4" />
-                <span>odmlawal@gmail.com</span>
+                <span>{email}</span>
               </a>
               <span className="text-white/30 hidden sm:block">|</span>
               <a 
-                href="https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/"
+                href={linkedinUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-white transition-colors flex items-center gap-2"
@@ -1207,7 +1202,7 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
               </a>
               <span className="text-white/30 hidden sm:block">|</span>
               <a 
-                href="https://wa.me/971509082234"
+                href={`https://wa.me/${whatsapp}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-white transition-colors flex items-center gap-2"
@@ -1776,57 +1771,70 @@ function IndustryExperienceMap() {
 function ContactSection() {
   return (
     <section id="contact" className="relative py-12 md:py-20" data-testid="section-contact">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6">
-        <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6 sm:p-8 md:p-12">
-          <div className="text-center space-y-4 md:space-y-6">
-            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white">
-              Let's Work Together
-            </h2>
-            
-            <p className="text-base md:text-lg text-white/70 max-w-2xl mx-auto px-2">
-              Looking for an experienced project manager to deliver your next critical programme? 
-              Let's discuss how I can help drive your success.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 pt-2 md:pt-4">
-              <Button
-                size="lg"
-                className="w-full sm:w-auto bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0 hover-elevate active-elevate-2 min-h-12"
-                onClick={() => window.location.href = 'mailto:odmlawal@gmail.com'}
-                data-testid="button-email-contact"
-              >
-                <Mail className="mr-2 w-5 h-5" />
-                odmlawal@gmail.com
-              </Button>
-              
-              <Button
-                size="lg"
-                variant="outline"
-                className="w-full sm:w-auto bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10 min-h-12"
-                onClick={() => window.open('https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/', '_blank')}
-                data-testid="button-linkedin-contact"
-              >
-                <Linkedin className="mr-2 w-5 h-5" />
-                Connect on LinkedIn
-              </Button>
-            </div>
-            
-            <div className="pt-8 border-t border-white/10">
+      <ContactSectionInner />
+    </section>
+  );
+}
+
+function ContactSectionInner() {
+  const { data: settings = {} } = useQuery<Record<string, string>>({ queryKey: ['/api/site/settings'] });
+  const heading = settings['contact.heading'] || "Let's Work Together";
+  const tagline = settings['contact.tagline'] || "Looking for an experienced project manager to deliver your next critical programme? Let's discuss how I can help drive your success.";
+  const email = settings['contact.email'] || 'odmlawal@gmail.com';
+  const linkedinUrl = settings['contact.linkedin_url'] || 'https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/';
+  const phoneUk = settings['contact.phone_uk'] || '+44 (0) 7908226038';
+  const phoneUae = settings['contact.phone_uae'] || '+971 (0) 509082234';
+
+  return (
+    <div className="max-w-4xl mx-auto px-4 sm:px-6">
+      <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6 sm:p-8 md:p-12">
+        <div className="text-center space-y-4 md:space-y-6">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white">
+            {heading}
+          </h2>
+          <p className="text-base md:text-lg text-white/70 max-w-2xl mx-auto px-2">
+            {tagline}
+          </p>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 pt-2 md:pt-4">
+            <Button
+              size="lg"
+              className="w-full sm:w-auto bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0 hover-elevate active-elevate-2 min-h-12"
+              onClick={() => window.location.href = `mailto:${email}`}
+              data-testid="button-email-contact"
+            >
+              <Mail className="mr-2 w-5 h-5" />
+              {email}
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="w-full sm:w-auto bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10 min-h-12"
+              onClick={() => window.open(linkedinUrl, '_blank')}
+              data-testid="button-linkedin-contact"
+            >
+              <Linkedin className="mr-2 w-5 h-5" />
+              Connect on LinkedIn
+            </Button>
+          </div>
+          <div className="pt-8 border-t border-white/10">
+            {phoneUk && (
               <p className="text-white/50 text-sm">
-                <span className="font-mono">+44 (0) 7908226038</span>
+                <span className="font-mono">{phoneUk}</span>
                 <span className="mx-3">•</span>
                 <span>London, UK</span>
               </p>
+            )}
+            {phoneUae && (
               <p className="text-white/50 text-sm mt-2">
-                <span className="font-mono">+971 (0) 509082234</span>
+                <span className="font-mono">{phoneUae}</span>
                 <span className="mx-3">•</span>
                 <span>Dubai, UAE</span>
               </p>
-            </div>
+            )}
           </div>
-        </Card>
-      </div>
-    </section>
+        </div>
+      </Card>
+    </div>
   );
 }
 

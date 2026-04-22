@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, text, timestamp, boolean, integer } from 'drizzle-orm/pg-core';
+import { pgTable, serial, varchar, text, timestamp, boolean, integer, jsonb } from 'drizzle-orm/pg-core';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
@@ -79,9 +79,9 @@ export const projectsTable = pgTable('projects', {
   challenge: text('challenge').notNull(),
   impact: text('impact').notNull(),
   description: text('description'),
-  outcomes: text('outcomes').array(),
-  techStack: text('tech_stack').array(),
-  galleryImages: text('gallery_images').array(),
+  outcomes: jsonb('outcomes').$type<string[]>(),
+  techStack: jsonb('tech_stack').$type<string[]>(),
+  galleryImages: jsonb('gallery_images').$type<string[]>(),
   role: varchar('role', { length: 200 }),
   logo: varchar('logo', { length: 500 }),
   heroImage: varchar('hero_image', { length: 500 }),
@@ -103,6 +103,95 @@ export const updateProjectSchema = insertProjectSchema.partial();
 export type ProjectRow = typeof projectsTable.$inferSelect;
 export type InsertProject = z.infer<typeof insertProjectSchema>;
 export type UpdateProject = z.infer<typeof updateProjectSchema>;
+
+// Career Roles Table (12 roles for the career journey accordion)
+export const careerRolesTable = pgTable('career_roles', {
+  id: serial('id').primaryKey(),
+  role: varchar('role', { length: 300 }).notNull(),
+  company: varchar('company', { length: 200 }).notNull(),
+  location: varchar('location', { length: 200 }),
+  period: varchar('period', { length: 100 }).notNull(),
+  startDate: varchar('start_date', { length: 20 }),
+  endDate: varchar('end_date', { length: 20 }),
+  current: boolean('current').default(false).notNull(),
+  industry: varchar('industry', { length: 200 }),
+  projectType: varchar('project_type', { length: 200 }),
+  description: text('description'),
+  keyAchievements: jsonb('key_achievements').$type<string[]>().notNull(),
+  budget: varchar('budget', { length: 100 }),
+  teamSize: integer('team_size'),
+  technologies: jsonb('technologies').$type<string[]>(),
+  employmentType: varchar('employment_type', { length: 50 }).notNull(),
+  logoUrl: varchar('logo_url', { length: 500 }),
+  sortOrder: integer('sort_order').default(0).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const insertCareerRoleSchema = createInsertSchema(careerRolesTable).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export const updateCareerRoleSchema = insertCareerRoleSchema.partial();
+export type CareerRoleRow = typeof careerRolesTable.$inferSelect;
+export type InsertCareerRole = z.infer<typeof insertCareerRoleSchema>;
+export type UpdateCareerRole = z.infer<typeof updateCareerRoleSchema>;
+
+// Flagship Wins Table (3 cards on home page)
+export const flagshipWinsTable = pgTable('flagship_wins', {
+  id: serial('id').primaryKey(),
+  title: varchar('title', { length: 300 }).notNull(),
+  company: varchar('company', { length: 200 }).notNull(),
+  period: varchar('period', { length: 100 }).notNull(),
+  metrics: jsonb('metrics').$type<string[]>().notNull(),
+  icon: varchar('icon', { length: 50 }).notNull(),
+  colorGradient: varchar('color_gradient', { length: 100 }).notNull(),
+  sortOrder: integer('sort_order').default(0).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+export const insertFlagshipWinSchema = createInsertSchema(flagshipWinsTable).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export const updateFlagshipWinSchema = insertFlagshipWinSchema.partial();
+export type FlagshipWinRow = typeof flagshipWinsTable.$inferSelect;
+export type InsertFlagshipWin = z.infer<typeof insertFlagshipWinSchema>;
+export type UpdateFlagshipWin = z.infer<typeof updateFlagshipWinSchema>;
+
+// Site Skills Table (methodologies, tools, certifications, industries)
+export const siteSkillsTable = pgTable('site_skills', {
+  id: serial('id').primaryKey(),
+  category: varchar('category', { length: 30 }).notNull(),
+  name: varchar('name', { length: 200 }).notNull(),
+  status: varchar('status', { length: 30 }),
+  sortOrder: integer('sort_order').default(0).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+export const insertSiteSkillSchema = createInsertSchema(siteSkillsTable).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export const updateSiteSkillSchema = insertSiteSkillSchema.partial();
+export type SiteSkillRow = typeof siteSkillsTable.$inferSelect;
+export type InsertSiteSkill = z.infer<typeof insertSiteSkillSchema>;
+export type UpdateSiteSkill = z.infer<typeof updateSiteSkillSchema>;
+
+// Site Settings Table (key/value text)
+export const siteSettingsTable = pgTable('site_settings', {
+  key: varchar('key', { length: 100 }).primaryKey(),
+  value: text('value').notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+export const upsertSiteSettingSchema = createInsertSchema(siteSettingsTable).omit({
+  updatedAt: true,
+});
+export type SiteSettingRow = typeof siteSettingsTable.$inferSelect;
+export type UpsertSiteSetting = z.infer<typeof upsertSiteSettingSchema>;
 
 // ============ INTERFACES ============
 

@@ -2,7 +2,14 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { chatWithAssistantStream } from "./openai";
-import { insertBlogPostSchema, updateBlogPostSchema, insertCVContactSchema, insertProjectSchema, updateProjectSchema } from "@shared/schema";
+import {
+  insertBlogPostSchema, updateBlogPostSchema, insertCVContactSchema,
+  insertProjectSchema, updateProjectSchema,
+  insertCareerRoleSchema, updateCareerRoleSchema,
+  insertFlagshipWinSchema, updateFlagshipWinSchema,
+  insertSiteSkillSchema, updateSiteSkillSchema,
+  upsertSiteSettingSchema,
+} from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 import { z } from "zod";
 import path from "path";
@@ -465,6 +472,145 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to upload image" });
     }
   });
+
+  // ============ SITE CONTENT ROUTES ============
+  const reorderSchema = z.array(z.object({ id: z.number(), sortOrder: z.number() }));
+
+  // ----- Career Roles -----
+  app.get("/api/site/career-roles", async (_req, res) => {
+    try { res.json(await storage.getAllCareerRoles()); }
+    catch (e) { console.error(e); res.status(500).json({ error: "Failed to fetch career roles" }); }
+  });
+  app.post("/api/site/career-roles", adminAuth, async (req, res) => {
+    const v = insertCareerRoleSchema.safeParse(req.body);
+    if (!v.success) return res.status(400).json({ error: fromZodError(v.error).toString() });
+    try { res.status(201).json(await storage.createCareerRole(v.data)); }
+    catch (e) { console.error(e); res.status(500).json({ error: "Failed to create" }); }
+  });
+  app.patch("/api/site/career-roles/:id", adminAuth, async (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+    const v = updateCareerRoleSchema.safeParse(req.body);
+    if (!v.success) return res.status(400).json({ error: fromZodError(v.error).toString() });
+    try {
+      const r = await storage.updateCareerRole(id, v.data);
+      if (!r) return res.status(404).json({ error: "Not found" });
+      res.json(r);
+    } catch (e) { console.error(e); res.status(500).json({ error: "Failed to update" }); }
+  });
+  app.delete("/api/site/career-roles/:id", adminAuth, async (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+    try {
+      const ok = await storage.deleteCareerRole(id);
+      if (!ok) return res.status(404).json({ error: "Not found" });
+      res.json({ success: true });
+    } catch (e) { console.error(e); res.status(500).json({ error: "Failed to delete" }); }
+  });
+  app.post("/api/site/career-roles/reorder", adminAuth, async (req, res) => {
+    const p = reorderSchema.safeParse(req.body?.orders);
+    if (!p.success) return res.status(400).json({ error: "Invalid payload" });
+    try { await storage.reorderCareerRoles(p.data); res.json({ success: true }); }
+    catch (e) { console.error(e); res.status(500).json({ error: "Failed to reorder" }); }
+  });
+
+  // ----- Flagship Wins -----
+  app.get("/api/site/flagship-wins", async (_req, res) => {
+    try { res.json(await storage.getAllFlagshipWins()); }
+    catch (e) { console.error(e); res.status(500).json({ error: "Failed to fetch" }); }
+  });
+  app.post("/api/site/flagship-wins", adminAuth, async (req, res) => {
+    const v = insertFlagshipWinSchema.safeParse(req.body);
+    if (!v.success) return res.status(400).json({ error: fromZodError(v.error).toString() });
+    try { res.status(201).json(await storage.createFlagshipWin(v.data)); }
+    catch (e) { console.error(e); res.status(500).json({ error: "Failed to create" }); }
+  });
+  app.patch("/api/site/flagship-wins/:id", adminAuth, async (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+    const v = updateFlagshipWinSchema.safeParse(req.body);
+    if (!v.success) return res.status(400).json({ error: fromZodError(v.error).toString() });
+    try {
+      const r = await storage.updateFlagshipWin(id, v.data);
+      if (!r) return res.status(404).json({ error: "Not found" });
+      res.json(r);
+    } catch (e) { console.error(e); res.status(500).json({ error: "Failed to update" }); }
+  });
+  app.delete("/api/site/flagship-wins/:id", adminAuth, async (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+    try {
+      const ok = await storage.deleteFlagshipWin(id);
+      if (!ok) return res.status(404).json({ error: "Not found" });
+      res.json({ success: true });
+    } catch (e) { console.error(e); res.status(500).json({ error: "Failed to delete" }); }
+  });
+  app.post("/api/site/flagship-wins/reorder", adminAuth, async (req, res) => {
+    const p = reorderSchema.safeParse(req.body?.orders);
+    if (!p.success) return res.status(400).json({ error: "Invalid payload" });
+    try { await storage.reorderFlagshipWins(p.data); res.json({ success: true }); }
+    catch (e) { console.error(e); res.status(500).json({ error: "Failed to reorder" }); }
+  });
+
+  // ----- Site Skills -----
+  app.get("/api/site/skills", async (_req, res) => {
+    try { res.json(await storage.getAllSiteSkills()); }
+    catch (e) { console.error(e); res.status(500).json({ error: "Failed to fetch" }); }
+  });
+  app.post("/api/site/skills", adminAuth, async (req, res) => {
+    const v = insertSiteSkillSchema.safeParse(req.body);
+    if (!v.success) return res.status(400).json({ error: fromZodError(v.error).toString() });
+    try { res.status(201).json(await storage.createSiteSkill(v.data)); }
+    catch (e) { console.error(e); res.status(500).json({ error: "Failed to create" }); }
+  });
+  app.patch("/api/site/skills/:id", adminAuth, async (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+    const v = updateSiteSkillSchema.safeParse(req.body);
+    if (!v.success) return res.status(400).json({ error: fromZodError(v.error).toString() });
+    try {
+      const r = await storage.updateSiteSkill(id, v.data);
+      if (!r) return res.status(404).json({ error: "Not found" });
+      res.json(r);
+    } catch (e) { console.error(e); res.status(500).json({ error: "Failed to update" }); }
+  });
+  app.delete("/api/site/skills/:id", adminAuth, async (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+    try {
+      const ok = await storage.deleteSiteSkill(id);
+      if (!ok) return res.status(404).json({ error: "Not found" });
+      res.json({ success: true });
+    } catch (e) { console.error(e); res.status(500).json({ error: "Failed to delete" }); }
+  });
+
+  // ----- Site Settings (key/value) -----
+  app.get("/api/site/settings", async (_req, res) => {
+    try {
+      const rows = await storage.getAllSiteSettings();
+      const map: Record<string, string> = {};
+      rows.forEach(r => { map[r.key] = r.value; });
+      res.json(map);
+    } catch (e) { console.error(e); res.status(500).json({ error: "Failed to fetch" }); }
+  });
+  app.put("/api/site/settings", adminAuth, async (req, res) => {
+    const v = z.array(upsertSiteSettingSchema).safeParse(req.body?.entries);
+    if (!v.success) return res.status(400).json({ error: fromZodError(v.error).toString() });
+    try { await storage.upsertSiteSettings(v.data); res.json({ success: true }); }
+    catch (e) { console.error(e); res.status(500).json({ error: "Failed to save" }); }
+  });
+
+  // Generic site image upload (logos, etc.) — reuses project image multer
+  app.post("/api/site/upload-image", adminAuth, projectImageUpload.single('image'), async (req, res) => {
+    try {
+      if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+      res.status(201).json({ url: `/uploads/projects/${req.file.filename}` });
+    } catch (e) { console.error(e); res.status(500).json({ error: "Failed to upload" }); }
+  });
+
+  // Seed defaults from constants if tables are empty
+  try { await storage.seedSiteContentIfEmpty(); }
+  catch (e) { console.error("Seed error:", e); }
 
   const httpServer = createServer(app);
 

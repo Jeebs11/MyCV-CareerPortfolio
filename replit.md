@@ -13,6 +13,11 @@ This is a professional portfolio website for Mujeeb Lawal, a Senior Project Mana
 -   **CV Download with Contact Capture**: Visitors can download the CV by providing their name, email, and optional phone number through a form modal. CV downloads trigger immediately upon form submission.
 -   **Admin Dashboard with CV Management**: Tab-based admin interface for managing blog posts and CV downloads. Features include CV file upload (PDF, DOC, DOCX), viewing all contact submissions with download timestamps, and CSV export of contact data for lead management.
 
+## Recent Changes (Apr 2026)
+
+### Admin-Managed Site Content
+All visible site content (hero copy, contact details, flagship wins, skills, career roles, section headings) is now stored in the database and editable from the admin dashboard. Public read endpoints under `/api/site/*` feed the home page; admin CRUD/reorder/upsert endpoints (Bearer-auth protected) live alongside. Logo uploads use `/api/site/upload-logo` (Multer). The home page now hydrates Hero, Flagship Achievements, Skills Grid, Collapsible Career Journey, and Contact section from the API with sensible fallbacks while loading.
+
 ## Recent Changes (Nov 2025)
 
 ### Recruiter-First Redesign
