@@ -92,7 +92,11 @@ export const projectsTable = pgTable('projects', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-export const insertProjectSchema = createInsertSchema(projectsTable).omit({
+export const insertProjectSchema = createInsertSchema(projectsTable, {
+  outcomes: z.array(z.string()).nullable().optional(),
+  techStack: z.array(z.string()).nullable().optional(),
+  galleryImages: z.array(z.string()).nullable().optional(),
+}).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
@@ -128,7 +132,10 @@ export const careerRolesTable = pgTable('career_roles', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-export const insertCareerRoleSchema = createInsertSchema(careerRolesTable).omit({
+export const insertCareerRoleSchema = createInsertSchema(careerRolesTable, {
+  keyAchievements: z.array(z.string()),
+  technologies: z.array(z.string()).nullable().optional(),
+}).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
@@ -151,7 +158,9 @@ export const flagshipWinsTable = pgTable('flagship_wins', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
-export const insertFlagshipWinSchema = createInsertSchema(flagshipWinsTable).omit({
+export const insertFlagshipWinSchema = createInsertSchema(flagshipWinsTable, {
+  metrics: z.array(z.string()),
+}).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
@@ -197,7 +206,9 @@ export const siteCertificationsTable = pgTable('site_certifications', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
-export const insertSiteCertificationSchema = createInsertSchema(siteCertificationsTable).omit({
+export const insertSiteCertificationSchema = createInsertSchema(siteCertificationsTable, {
+  skills: z.array(z.string()),
+}).omit({
   id: true, createdAt: true, updatedAt: true,
 });
 export const updateSiteCertificationSchema = insertSiteCertificationSchema.partial();
@@ -218,7 +229,9 @@ export const siteEducationTable = pgTable('site_education', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
-export const insertSiteEducationSchema = createInsertSchema(siteEducationTable).omit({
+export const insertSiteEducationSchema = createInsertSchema(siteEducationTable, {
+  achievements: z.array(z.string()).nullable().optional(),
+}).omit({
   id: true, createdAt: true, updatedAt: true,
 });
 export const updateSiteEducationSchema = insertSiteEducationSchema.partial();

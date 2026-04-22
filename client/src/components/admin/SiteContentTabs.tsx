@@ -373,6 +373,22 @@ export function SiteSkillsAdmin({ adminPassword }: AdminProps) {
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['/api/site/skills'] }); toast({ title: 'Deleted' }); },
   });
 
+  const reorderMutation = useMutation({
+    mutationFn: async (orders: { id: number; sortOrder: number }[]) =>
+      authedFetch('/api/site/skills/reorder', 'POST', adminPassword, { orders }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['/api/site/skills'] }),
+  });
+
+  const move = (skill: SiteSkillRow, dir: -1 | 1) => {
+    const sameCat = skills.filter(s => s.category === skill.category);
+    const idx = sameCat.findIndex(s => s.id === skill.id);
+    const target = idx + dir;
+    if (target < 0 || target >= sameCat.length) return;
+    const arr = [...sameCat];
+    [arr[idx], arr[target]] = [arr[target], arr[idx]];
+    reorderMutation.mutate(arr.map((r, i) => ({ id: r.id, sortOrder: i })));
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center gap-3 flex-wrap">
@@ -398,7 +414,11 @@ export function SiteSkillsAdmin({ adminPassword }: AdminProps) {
       {isLoading ? <p className="text-white/60">Loading...</p> : (
         <div className="grid sm:grid-cols-2 gap-2">
           {filtered.map(s => (
-            <Card key={s.id} className="bg-white/5 border-white/10 p-3 flex items-center gap-3" data-testid={`card-skill-${s.id}`}>
+            <Card key={s.id} className="bg-white/5 border-white/10 p-3 flex items-center gap-2" data-testid={`card-skill-${s.id}`}>
+              <div className="flex flex-col">
+                <Button size="icon" variant="ghost" onClick={() => move(s, -1)} className="text-white/60 h-6 w-6" data-testid={`button-skill-up-${s.id}`}><ArrowUp className="w-3 h-3" /></Button>
+                <Button size="icon" variant="ghost" onClick={() => move(s, 1)} className="text-white/60 h-6 w-6" data-testid={`button-skill-down-${s.id}`}><ArrowDown className="w-3 h-3" /></Button>
+              </div>
               <div className="flex-1 min-w-0">
                 <div className="font-medium text-white truncate">{s.name}</div>
                 <div className="text-xs text-white/50">{s.category}{s.status ? ` · ${s.status}` : ''}</div>

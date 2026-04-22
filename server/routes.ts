@@ -585,6 +585,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true });
     } catch (e) { console.error(e); res.status(500).json({ error: "Failed to delete" }); }
   });
+  app.post("/api/site/skills/reorder", adminAuth, async (req, res) => {
+    const p = reorderSchema.safeParse(req.body?.orders);
+    if (!p.success) return res.status(400).json({ error: "Invalid payload" });
+    try { await storage.reorderSiteSkills(p.data); res.json({ success: true }); }
+    catch (e) { console.error(e); res.status(500).json({ error: "Failed to reorder" }); }
+  });
 
   // ----- Site Certifications -----
   app.get("/api/site/certifications", async (_req, res) => {

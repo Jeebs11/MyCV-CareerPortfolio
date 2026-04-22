@@ -373,7 +373,7 @@ function FlagshipAchievements() {
           </div>
         ) : (
         <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
-          {wins.map((project, index) => {
+          {wins.slice(0, 3).map((project, index) => {
             const Icon = (iconMap[project.icon] as React.ComponentType<{ className?: string }>) || Target;
             return (
               <Card
