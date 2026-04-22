@@ -1,7 +1,17 @@
 import OpenAI from "openai";
 import { experiences, skills, keyAchievements } from "@shared/schema";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+let openaiClient: OpenAI | null = null;
+
+function getOpenAIClient(): OpenAI {
+  if (!openaiClient) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error("OPENAI_API_KEY is not set");
+    }
+    openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  return openaiClient;
+}
 
 // Create a knowledge base about Mujeeb's experience
 const knowledgeBase = `
@@ -60,7 +70,7 @@ When answering questions:
 
 export async function chatWithAssistant(message: string): Promise<string> {
   try {
-    const response = await openai.chat.completions.create({
+    const response = await getOpenAIClient().chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
@@ -84,7 +94,7 @@ export async function chatWithAssistant(message: string): Promise<string> {
 
 export async function chatWithAssistantStream(message: string) {
   try {
-    const stream = await openai.chat.completions.create({
+    const stream = await getOpenAIClient().chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
