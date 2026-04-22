@@ -181,6 +181,51 @@ export type SiteSkillRow = typeof siteSkillsTable.$inferSelect;
 export type InsertSiteSkill = z.infer<typeof insertSiteSkillSchema>;
 export type UpdateSiteSkill = z.infer<typeof updateSiteSkillSchema>;
 
+// Site Certifications Table (rich)
+export const siteCertificationsTable = pgTable('site_certifications', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 200 }).notNull(),
+  issuer: varchar('issuer', { length: 200 }).notNull(),
+  dateObtained: varchar('date_obtained', { length: 50 }).notNull(),
+  validUntil: varchar('valid_until', { length: 50 }),
+  credentialId: varchar('credential_id', { length: 200 }),
+  verificationUrl: varchar('verification_url', { length: 500 }),
+  badgeImage: varchar('badge_image', { length: 500 }),
+  description: text('description').notNull(),
+  skills: jsonb('skills').$type<string[]>().notNull(),
+  sortOrder: integer('sort_order').default(0).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+export const insertSiteCertificationSchema = createInsertSchema(siteCertificationsTable).omit({
+  id: true, createdAt: true, updatedAt: true,
+});
+export const updateSiteCertificationSchema = insertSiteCertificationSchema.partial();
+export type SiteCertificationRow = typeof siteCertificationsTable.$inferSelect;
+export type InsertSiteCertification = z.infer<typeof insertSiteCertificationSchema>;
+export type UpdateSiteCertification = z.infer<typeof updateSiteCertificationSchema>;
+
+// Site Education Table
+export const siteEducationTable = pgTable('site_education', {
+  id: serial('id').primaryKey(),
+  degree: varchar('degree', { length: 200 }).notNull(),
+  institution: varchar('institution', { length: 200 }).notNull(),
+  location: varchar('location', { length: 200 }),
+  period: varchar('period', { length: 100 }).notNull(),
+  fieldOfStudy: varchar('field_of_study', { length: 200 }),
+  achievements: jsonb('achievements').$type<string[]>(),
+  sortOrder: integer('sort_order').default(0).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+export const insertSiteEducationSchema = createInsertSchema(siteEducationTable).omit({
+  id: true, createdAt: true, updatedAt: true,
+});
+export const updateSiteEducationSchema = insertSiteEducationSchema.partial();
+export type SiteEducationRow = typeof siteEducationTable.$inferSelect;
+export type InsertSiteEducation = z.infer<typeof insertSiteEducationSchema>;
+export type UpdateSiteEducation = z.infer<typeof updateSiteEducationSchema>;
+
 // Site Settings Table (key/value text)
 export const siteSettingsTable = pgTable('site_settings', {
   key: varchar('key', { length: 100 }).primaryKey(),

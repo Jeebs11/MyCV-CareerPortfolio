@@ -16,7 +16,9 @@ This is a professional portfolio website for Mujeeb Lawal, a Senior Project Mana
 ## Recent Changes (Apr 2026)
 
 ### Admin-Managed Site Content
-All visible site content (hero copy, contact details, flagship wins, skills, career roles, section headings) is now stored in the database and editable from the admin dashboard. Public read endpoints under `/api/site/*` feed the home page; admin CRUD/reorder/upsert endpoints (Bearer-auth protected) live alongside. Logo uploads use `/api/site/upload-logo` (Multer). The home page now hydrates Hero, Flagship Achievements, Skills Grid, Collapsible Career Journey, and Contact section from the API with sensible fallbacks while loading.
+All visible site content (hero copy, contact details, flagship wins, skills, certifications, education, career roles, section headings, footer copyright) is now stored in the database and editable from the admin dashboard. Public read endpoints under `/api/site/*` feed the home page; admin CRUD/reorder/upsert endpoints (Bearer-auth protected) live alongside. Image uploads (company logos, certification badges) use `/api/site/upload-image` (Multer) via a reusable `ImageUploadField` admin widget. The home page now hydrates Hero, Flagship Achievements, Skills Grid, Collapsible Career Journey, Certifications, Education, Contact section, sticky contact bar, and Footer from the API with sensible fallbacks while loading.
+
+Rich Certifications include issuer, date obtained, valid-until, credential ID, verification URL, badge image, description, and skills. Education entries include degree, institution, location, period, field of study, and achievement bullets.
 
 ## Recent Changes (Nov 2025)
 

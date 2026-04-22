@@ -14,6 +14,8 @@ import type {
   CareerRoleRow, InsertCareerRole,
   FlagshipWinRow, InsertFlagshipWin,
   SiteSkillRow, InsertSiteSkill,
+  SiteCertificationRow, InsertSiteCertification,
+  SiteEducationRow, InsertSiteEducation,
 } from '@shared/schema';
 
 interface AdminProps { adminPassword: string; }
@@ -179,7 +181,7 @@ export function CareerRolesAdmin({ adminPassword }: AdminProps) {
               <Input type="number" placeholder="Team size" value={form.teamSize ?? ''} onChange={e => setForm({ ...form, teamSize: e.target.value ? Number(e.target.value) : null })} className={inputCls} />
               <Input placeholder="Budget (e.g. £1.2M)" value={form.budget || ''} onChange={e => setForm({ ...form, budget: e.target.value })} className={inputCls} />
             </div>
-            <Input placeholder="Logo URL (optional, used in career card)" value={form.logoUrl || ''} onChange={e => setForm({ ...form, logoUrl: e.target.value })} className={inputCls} />
+            <ImageUploadField label="Company logo" value={form.logoUrl} onChange={v => setForm({ ...form, logoUrl: v })} adminPassword={adminPassword} testIdSuffix={`career-${editing?.id ?? 'new'}`} />
             <Textarea placeholder="Description" value={form.description || ''} onChange={e => setForm({ ...form, description: e.target.value })} className={inputCls} rows={3} />
             <Textarea placeholder="Key achievements (one per line) *" value={form.keyAchievementsText || ''} onChange={e => setForm({ ...form, keyAchievementsText: e.target.value })} className={inputCls} rows={5} />
             <Textarea placeholder="Technologies (one per line)" value={form.technologiesText || ''} onChange={e => setForm({ ...form, technologiesText: e.target.value })} className={inputCls} rows={3} />
@@ -539,6 +541,295 @@ export function SiteSettingsAdmin({ adminPassword }: AdminProps) {
           ))}
         </Card>
       ))}
+    </div>
+  );
+}
+
+// ============ IMAGE UPLOAD WIDGET ============
+function ImageUploadField({
+  value, onChange, label, adminPassword, testIdSuffix,
+}: { value: string | null | undefined; onChange: (url: string | null) => void; label: string; adminPassword: string; testIdSuffix: string }) {
+  const { toast } = useToast();
+  const [uploading, setUploading] = useState(false);
+
+  const handleUpload = async (file: File) => {
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('image', file);
+      const res = await fetch('/api/site/upload-image', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${adminPassword}` },
+        body: fd,
+      });
+      if (!res.ok) throw new Error(await res.text());
+      const data = await res.json();
+      onChange(data.url);
+      toast({ title: 'Image uploaded' });
+    } catch (e) {
+      toast({ title: 'Upload failed', description: (e as Error).message, variant: 'destructive' });
+    } finally { setUploading(false); }
+  };
+
+  return (
+    <div className="space-y-2">
+      <label className="text-xs text-white/60">{label}</label>
+      <div className="flex items-center gap-3">
+        {value ? (
+          <img src={value} alt="" className="w-12 h-12 rounded object-contain bg-white/10" />
+        ) : (
+          <div className="w-12 h-12 rounded bg-white/5 border border-white/10" />
+        )}
+        <Input
+          placeholder="https://... or upload below"
+          value={value || ''}
+          onChange={e => onChange(e.target.value || null)}
+          className={inputCls}
+          data-testid={`input-image-url-${testIdSuffix}`}
+        />
+      </div>
+      <div className="flex items-center gap-2">
+        <Input
+          type="file"
+          accept="image/*"
+          onChange={e => { const f = e.target.files?.[0]; if (f) handleUpload(f); }}
+          disabled={uploading}
+          className={`${inputCls} file:text-white file:bg-white/10 file:border-0 file:rounded file:px-2 file:py-1 file:mr-2 text-sm`}
+          data-testid={`input-image-file-${testIdSuffix}`}
+        />
+        {value && (
+          <Button size="sm" variant="outline" onClick={() => onChange(null)} data-testid={`button-clear-image-${testIdSuffix}`}>
+            Clear
+          </Button>
+        )}
+      </div>
+      {uploading && <p className="text-xs text-white/60">Uploading…</p>}
+    </div>
+  );
+}
+
+// ============ CERTIFICATIONS TAB ============
+type CertFormState = Partial<InsertSiteCertification> & { skillsText?: string };
+
+export function SiteCertificationsAdmin({ adminPassword }: AdminProps) {
+  const { toast } = useToast();
+  const { data: certs = [], isLoading } = useQuery<SiteCertificationRow[]>({ queryKey: ['/api/site/certifications'] });
+  const [editing, setEditing] = useState<SiteCertificationRow | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [form, setForm] = useState<CertFormState>({});
+
+  const openCreate = () => { setEditing(null); setForm({ skillsText: '' }); setCreating(true); };
+  const openEdit = (c: SiteCertificationRow) => { setEditing(c); setForm({ ...c, skillsText: arrayToText(c.skills ?? []) }); setCreating(true); };
+
+  const saveMutation = useMutation({
+    mutationFn: async (data: CertFormState) => {
+      const payload = {
+        name: data.name,
+        issuer: data.issuer,
+        dateObtained: data.dateObtained,
+        validUntil: data.validUntil || null,
+        credentialId: data.credentialId || null,
+        verificationUrl: data.verificationUrl || null,
+        badgeImage: data.badgeImage || null,
+        description: data.description || null,
+        skills: textToArray(data.skillsText || ''),
+        sortOrder: data.sortOrder ?? certs.length,
+      };
+      if (editing) return authedFetch(`/api/site/certifications/${editing.id}`, 'PATCH', adminPassword, payload);
+      return authedFetch('/api/site/certifications', 'POST', adminPassword, payload);
+    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['/api/site/certifications'] }); setCreating(false); toast({ title: 'Saved' }); },
+    onError: (err: Error) => toast({ title: 'Save failed', description: err.message, variant: 'destructive' }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => authedFetch(`/api/site/certifications/${id}`, 'DELETE', adminPassword),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['/api/site/certifications'] }); toast({ title: 'Deleted' }); },
+  });
+
+  const reorderMutation = useMutation({
+    mutationFn: async (orders: { id: number; sortOrder: number }[]) =>
+      authedFetch('/api/site/certifications/reorder', 'POST', adminPassword, { orders }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['/api/site/certifications'] }),
+  });
+
+  const move = (idx: number, dir: -1 | 1) => {
+    const target = idx + dir;
+    if (target < 0 || target >= certs.length) return;
+    const arr = [...certs];
+    [arr[idx], arr[target]] = [arr[target], arr[idx]];
+    reorderMutation.mutate(arr.map((r, i) => ({ id: r.id, sortOrder: i })));
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center gap-3">
+        <div>
+          <h3 className="text-xl font-semibold text-white">Certifications</h3>
+          <p className="text-sm text-white/60">{certs.length} certification{certs.length !== 1 ? 's' : ''} on home page</p>
+        </div>
+        <Button onClick={openCreate} data-testid="button-add-certification"
+          className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0">
+          <Plus className="w-4 h-4 mr-2" /> Add Certification
+        </Button>
+      </div>
+      {isLoading ? <p className="text-white/60">Loading...</p> : (
+        <div className="space-y-2">
+          {certs.map((c, idx) => (
+            <Card key={c.id} className="bg-white/5 border-white/10 p-4 flex items-center gap-3" data-testid={`card-cert-${c.id}`}>
+              <div className="flex flex-col gap-1">
+                <Button size="icon" variant="ghost" onClick={() => move(idx, -1)} disabled={idx === 0} className="text-white/60 h-7 w-7"><ArrowUp className="w-3 h-3" /></Button>
+                <Button size="icon" variant="ghost" onClick={() => move(idx, 1)} disabled={idx === certs.length - 1} className="text-white/60 h-7 w-7"><ArrowDown className="w-3 h-3" /></Button>
+              </div>
+              {c.badgeImage && <img src={c.badgeImage} alt="" className="w-10 h-10 rounded object-contain bg-white/10" />}
+              <div className="flex-1 min-w-0">
+                <div className="font-medium text-white truncate">{c.name}</div>
+                <div className="text-sm text-white/60 truncate">{c.issuer} · {c.dateObtained}</div>
+              </div>
+              <Button size="icon" variant="ghost" onClick={() => openEdit(c)} className="text-white/80" data-testid={`button-edit-cert-${c.id}`}><Pencil className="w-4 h-4" /></Button>
+              <Button size="icon" variant="ghost" onClick={() => { if (confirm(`Delete "${c.name}"?`)) deleteMutation.mutate(c.id); }} className="text-red-400" data-testid={`button-delete-cert-${c.id}`}><Trash2 className="w-4 h-4" /></Button>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      <Dialog open={creating} onOpenChange={setCreating}>
+        <DialogContent className="bg-[hsl(270,8%,12%)] border-white/20 text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>{editing ? 'Edit Certification' : 'Add Certification'}</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <Input placeholder="Certification name *" value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} className={inputCls} data-testid="input-cert-name" />
+            <div className="grid grid-cols-2 gap-3">
+              <Input placeholder="Issuer *" value={form.issuer || ''} onChange={e => setForm({ ...form, issuer: e.target.value })} className={inputCls} data-testid="input-cert-issuer" />
+              <Input placeholder="Date obtained (e.g. 2018) *" value={form.dateObtained || ''} onChange={e => setForm({ ...form, dateObtained: e.target.value })} className={inputCls} />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Input placeholder="Valid until (optional)" value={form.validUntil || ''} onChange={e => setForm({ ...form, validUntil: e.target.value || null })} className={inputCls} />
+              <Input placeholder="Credential ID (optional)" value={form.credentialId || ''} onChange={e => setForm({ ...form, credentialId: e.target.value || null })} className={inputCls} />
+            </div>
+            <Input placeholder="Verification URL (optional)" value={form.verificationUrl || ''} onChange={e => setForm({ ...form, verificationUrl: e.target.value || null })} className={inputCls} />
+            <ImageUploadField label="Badge image" value={form.badgeImage} onChange={v => setForm({ ...form, badgeImage: v })} adminPassword={adminPassword} testIdSuffix="cert-badge" />
+            <Textarea placeholder="Description" value={form.description || ''} onChange={e => setForm({ ...form, description: e.target.value })} className={inputCls} rows={3} />
+            <Textarea placeholder="Skills (one per line)" value={form.skillsText || ''} onChange={e => setForm({ ...form, skillsText: e.target.value })} className={inputCls} rows={3} />
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="outline" onClick={() => setCreating(false)}>Cancel</Button>
+              <Button onClick={() => saveMutation.mutate(form)} disabled={saveMutation.isPending}
+                className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0" data-testid="button-save-cert">
+                <Save className="w-4 h-4 mr-2" /> Save
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+// ============ EDUCATION TAB ============
+type EduFormState = Partial<InsertSiteEducation> & { achievementsText?: string };
+
+export function SiteEducationAdmin({ adminPassword }: AdminProps) {
+  const { toast } = useToast();
+  const { data: items = [], isLoading } = useQuery<SiteEducationRow[]>({ queryKey: ['/api/site/education'] });
+  const [editing, setEditing] = useState<SiteEducationRow | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [form, setForm] = useState<EduFormState>({});
+
+  const openCreate = () => { setEditing(null); setForm({ achievementsText: '' }); setCreating(true); };
+  const openEdit = (e: SiteEducationRow) => { setEditing(e); setForm({ ...e, achievementsText: arrayToText(e.achievements ?? []) }); setCreating(true); };
+
+  const saveMutation = useMutation({
+    mutationFn: async (data: EduFormState) => {
+      const ach = textToArray(data.achievementsText || '');
+      const payload = {
+        degree: data.degree,
+        institution: data.institution,
+        location: data.location || null,
+        period: data.period,
+        fieldOfStudy: data.fieldOfStudy || null,
+        achievements: ach.length ? ach : null,
+        sortOrder: data.sortOrder ?? items.length,
+      };
+      if (editing) return authedFetch(`/api/site/education/${editing.id}`, 'PATCH', adminPassword, payload);
+      return authedFetch('/api/site/education', 'POST', adminPassword, payload);
+    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['/api/site/education'] }); setCreating(false); toast({ title: 'Saved' }); },
+    onError: (err: Error) => toast({ title: 'Save failed', description: err.message, variant: 'destructive' }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => authedFetch(`/api/site/education/${id}`, 'DELETE', adminPassword),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['/api/site/education'] }); toast({ title: 'Deleted' }); },
+  });
+
+  const reorderMutation = useMutation({
+    mutationFn: async (orders: { id: number; sortOrder: number }[]) =>
+      authedFetch('/api/site/education/reorder', 'POST', adminPassword, { orders }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['/api/site/education'] }),
+  });
+
+  const move = (idx: number, dir: -1 | 1) => {
+    const target = idx + dir;
+    if (target < 0 || target >= items.length) return;
+    const arr = [...items];
+    [arr[idx], arr[target]] = [arr[target], arr[idx]];
+    reorderMutation.mutate(arr.map((r, i) => ({ id: r.id, sortOrder: i })));
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center gap-3">
+        <div>
+          <h3 className="text-xl font-semibold text-white">Education</h3>
+          <p className="text-sm text-white/60">{items.length} entr{items.length !== 1 ? 'ies' : 'y'} on home page</p>
+        </div>
+        <Button onClick={openCreate} data-testid="button-add-education"
+          className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0">
+          <Plus className="w-4 h-4 mr-2" /> Add Education
+        </Button>
+      </div>
+      {isLoading ? <p className="text-white/60">Loading...</p> : (
+        <div className="space-y-2">
+          {items.map((e, idx) => (
+            <Card key={e.id} className="bg-white/5 border-white/10 p-4 flex items-center gap-3" data-testid={`card-edu-${e.id}`}>
+              <div className="flex flex-col gap-1">
+                <Button size="icon" variant="ghost" onClick={() => move(idx, -1)} disabled={idx === 0} className="text-white/60 h-7 w-7"><ArrowUp className="w-3 h-3" /></Button>
+                <Button size="icon" variant="ghost" onClick={() => move(idx, 1)} disabled={idx === items.length - 1} className="text-white/60 h-7 w-7"><ArrowDown className="w-3 h-3" /></Button>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-medium text-white truncate">{e.degree}</div>
+                <div className="text-sm text-white/60 truncate">{e.institution} · {e.period}</div>
+              </div>
+              <Button size="icon" variant="ghost" onClick={() => openEdit(e)} className="text-white/80" data-testid={`button-edit-edu-${e.id}`}><Pencil className="w-4 h-4" /></Button>
+              <Button size="icon" variant="ghost" onClick={() => { if (confirm(`Delete "${e.degree}"?`)) deleteMutation.mutate(e.id); }} className="text-red-400" data-testid={`button-delete-edu-${e.id}`}><Trash2 className="w-4 h-4" /></Button>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      <Dialog open={creating} onOpenChange={setCreating}>
+        <DialogContent className="bg-[hsl(270,8%,12%)] border-white/20 text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>{editing ? 'Edit Education' : 'Add Education'}</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <Input placeholder="Degree / Programme *" value={form.degree || ''} onChange={e => setForm({ ...form, degree: e.target.value })} className={inputCls} data-testid="input-edu-degree" />
+            <div className="grid grid-cols-2 gap-3">
+              <Input placeholder="Institution *" value={form.institution || ''} onChange={e => setForm({ ...form, institution: e.target.value })} className={inputCls} data-testid="input-edu-institution" />
+              <Input placeholder="Location" value={form.location || ''} onChange={e => setForm({ ...form, location: e.target.value })} className={inputCls} />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Input placeholder="Period (e.g. 2010 - 2012) *" value={form.period || ''} onChange={e => setForm({ ...form, period: e.target.value })} className={inputCls} />
+              <Input placeholder="Field of study" value={form.fieldOfStudy || ''} onChange={e => setForm({ ...form, fieldOfStudy: e.target.value })} className={inputCls} />
+            </div>
+            <Textarea placeholder="Achievements (one per line)" value={form.achievementsText || ''} onChange={e => setForm({ ...form, achievementsText: e.target.value })} className={inputCls} rows={4} />
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="outline" onClick={() => setCreating(false)}>Cancel</Button>
+              <Button onClick={() => saveMutation.mutate(form)} disabled={saveMutation.isPending}
+                className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0" data-testid="button-save-edu">
+                <Save className="w-4 h-4 mr-2" /> Save
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

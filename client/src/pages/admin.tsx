@@ -54,7 +54,7 @@ import {
 import type { ProjectRow } from '@shared/schema';
 import { Link } from 'wouter';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CareerRolesAdmin, FlagshipWinsAdmin, SiteSkillsAdmin, SiteSettingsAdmin } from '@/components/admin/SiteContentTabs';
+import { CareerRolesAdmin, FlagshipWinsAdmin, SiteSkillsAdmin, SiteCertificationsAdmin, SiteEducationAdmin, SiteSettingsAdmin } from '@/components/admin/SiteContentTabs';
 
 interface BlogPost {
   id: string;
@@ -781,6 +781,8 @@ export default function AdminPage() {
             <TabsTrigger value="career" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(190,85%,55%)] data-[state=active]:to-[hsl(220,90%,60%)] data-[state=active]:text-white" data-testid="tab-career">Career Roles</TabsTrigger>
             <TabsTrigger value="flagship" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(190,85%,55%)] data-[state=active]:to-[hsl(220,90%,60%)] data-[state=active]:text-white" data-testid="tab-flagship">Flagship Wins</TabsTrigger>
             <TabsTrigger value="skills" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(190,85%,55%)] data-[state=active]:to-[hsl(220,90%,60%)] data-[state=active]:text-white" data-testid="tab-skills">Skills</TabsTrigger>
+            <TabsTrigger value="certifications" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(190,85%,55%)] data-[state=active]:to-[hsl(220,90%,60%)] data-[state=active]:text-white" data-testid="tab-certifications">Certifications</TabsTrigger>
+            <TabsTrigger value="education" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(190,85%,55%)] data-[state=active]:to-[hsl(220,90%,60%)] data-[state=active]:text-white" data-testid="tab-education">Education</TabsTrigger>
             <TabsTrigger value="settings" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(190,85%,55%)] data-[state=active]:to-[hsl(220,90%,60%)] data-[state=active]:text-white" data-testid="tab-settings">Site Content</TabsTrigger>
           </TabsList>
 
@@ -1752,6 +1754,12 @@ export default function AdminPage() {
           </TabsContent>
           <TabsContent value="skills" className="space-y-6">
             <SiteSkillsAdmin adminPassword={adminPassword} />
+          </TabsContent>
+          <TabsContent value="certifications" className="space-y-6">
+            <SiteCertificationsAdmin adminPassword={adminPassword} />
+          </TabsContent>
+          <TabsContent value="education" className="space-y-6">
+            <SiteEducationAdmin adminPassword={adminPassword} />
           </TabsContent>
           <TabsContent value="settings" className="space-y-6">
             <SiteSettingsAdmin adminPassword={adminPassword} />

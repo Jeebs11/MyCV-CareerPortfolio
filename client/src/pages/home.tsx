@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
 import { experiences, skills, keyAchievements, detailedCertifications, timelineProjects, industryExperience, education } from '@shared/schema';
-import type { CareerRoleRow, FlagshipWinRow, SiteSkillRow } from '@shared/schema';
+import type { CareerRoleRow, FlagshipWinRow, SiteSkillRow, SiteCertificationRow, SiteEducationRow } from '@shared/schema';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -97,7 +97,11 @@ export default function Home() {
       <SkillsAndCertificationsGrid />
       
       <CollapsibleCareerJourney />
-      
+
+      <CertificationsSection />
+
+      <EducationSection />
+
       <ContactSection />
       
       <Footer />
@@ -275,6 +279,11 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
 function StickyContactBar() {
   const [isVisible, setIsVisible] = useState(false);
   const [showCVDialog, setShowCVDialog] = useState(false);
+  const { data: settings = {} } = useQuery<Record<string, string>>({ queryKey: ['/api/site/settings'] });
+
+  const email = settings['contact.email'] || 'odmlawal@gmail.com';
+  const whatsapp = settings['contact.whatsapp'] || '971509082234';
+  const linkedinUrl = settings['contact.linkedin_url'] || 'https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -303,7 +312,7 @@ function StickyContactBar() {
           size="sm"
           variant="outline"
           className="bg-white/10 backdrop-blur-xl border-white/20 text-white hover:bg-white/20 shadow-lg"
-          onClick={() => window.location.href = 'mailto:odmlawal@gmail.com'}
+          onClick={() => window.location.href = `mailto:${email}`}
           data-testid="button-sticky-email"
         >
           <Mail className="w-4 h-4 sm:mr-2" />
@@ -313,7 +322,7 @@ function StickyContactBar() {
           size="sm"
           variant="outline"
           className="bg-white/10 backdrop-blur-xl border-white/20 text-white hover:bg-white/20 shadow-lg"
-          onClick={() => window.open('https://wa.me/971509082234', '_blank')}
+          onClick={() => window.open(`https://wa.me/${whatsapp}`, '_blank')}
           data-testid="button-sticky-whatsapp"
         >
           <MessageCircle className="w-4 h-4 sm:mr-2" />
@@ -323,7 +332,7 @@ function StickyContactBar() {
           size="sm"
           variant="outline"
           className="bg-white/10 backdrop-blur-xl border-white/20 text-white hover:bg-white/20 shadow-lg"
-          onClick={() => window.open('https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/', '_blank')}
+          onClick={() => window.open(linkedinUrl, '_blank')}
           data-testid="button-sticky-linkedin"
         >
           <Linkedin className="w-4 h-4 sm:mr-2" />
@@ -1980,6 +1989,11 @@ function CVDownloadDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
 }
 
 function Footer() {
+  const { data: settings = {} } = useQuery<Record<string, string>>({ queryKey: ['/api/site/settings'] });
+  const copyright = settings['footer.copyright'] || '© 2026 Mujeeb Lawal. All rights reserved.';
+  const email = settings['contact.email'] || 'odmlawal@gmail.com';
+  const linkedinUrl = settings['contact.linkedin_url'] || 'https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/';
+
   return (
     <footer className="relative py-12 border-t border-white/10" data-testid="footer">
       <div className="max-w-7xl mx-auto px-6">
@@ -1988,19 +2002,19 @@ function Footer() {
             <div className="w-8 h-8 rounded-md bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center font-display font-bold text-white text-sm">
               ML
             </div>
-            <span className="text-white/60 text-sm">© 2025 Mujeeb Lawal. All rights reserved.</span>
+            <span className="text-white/60 text-sm" data-testid="text-footer-copyright">{copyright}</span>
           </div>
-          
+
           <div className="flex items-center gap-6">
-            <a 
-              href="mailto:odmlawal@gmail.com"
+            <a
+              href={`mailto:${email}`}
               className="text-white/40 hover:text-white transition-colors"
               data-testid="link-footer-email"
             >
               <Mail className="w-5 h-5" />
             </a>
-            <a 
-              href="https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/"
+            <a
+              href={linkedinUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="text-white/40 hover:text-white transition-colors"
@@ -2012,5 +2026,123 @@ function Footer() {
         </div>
       </div>
     </footer>
+  );
+}
+
+function CertificationsSection() {
+  const { data: certs = [], isLoading } = useQuery<SiteCertificationRow[]>({ queryKey: ['/api/site/certifications'] });
+  if (!isLoading && certs.length === 0) return null;
+  return (
+    <section id="certifications" className="relative py-16 md:py-24 bg-white/[0.015]" data-testid="section-certifications">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-12">
+          <Badge className="bg-white/10 backdrop-blur-md border border-white/20 text-white mb-4">Credentials</Badge>
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">Certifications</h2>
+          <p className="text-lg text-white/60 max-w-2xl mx-auto">Verified credentials backing my delivery and leadership work.</p>
+        </div>
+        {isLoading ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[0,1,2,3].map(i => <Card key={i} className="bg-white/5 border-white/10 p-6 h-48 animate-pulse" />)}
+          </div>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {certs.map(cert => (
+              <Card key={cert.id} className="bg-white/5 border-white/10 p-6 hover-elevate transition" data-testid={`card-cert-${cert.id}`}>
+                <div className="flex items-start gap-4 mb-4">
+                  {cert.badgeImage ? (
+                    <img src={cert.badgeImage} alt="" className="w-14 h-14 rounded object-contain bg-white/10 flex-shrink-0" />
+                  ) : (
+                    <div className="w-14 h-14 rounded bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center flex-shrink-0">
+                      <Award className="w-7 h-7 text-white" />
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-display text-lg font-bold text-white leading-tight">{cert.name}</h3>
+                    <div className="text-sm text-[hsl(190,85%,55%)] font-medium mt-1">{cert.issuer}</div>
+                    <div className="text-xs text-white/50 mt-1">
+                      {cert.dateObtained}{cert.validUntil ? ` – ${cert.validUntil}` : ''}
+                    </div>
+                  </div>
+                </div>
+                {cert.description && (
+                  <p className="text-sm text-white/70 leading-relaxed mb-3">{cert.description}</p>
+                )}
+                {cert.skills && cert.skills.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mb-3">
+                    {cert.skills.map((s, i) => (
+                      <Badge key={i} variant="outline" className="border-white/20 text-white/70 text-xs">{s}</Badge>
+                    ))}
+                  </div>
+                )}
+                <div className="flex items-center justify-between text-xs text-white/50 pt-3 border-t border-white/10">
+                  <span className="truncate" data-testid={`text-cert-credential-${cert.id}`}>
+                    {cert.credentialId ? `ID: ${cert.credentialId}` : ''}
+                  </span>
+                  {cert.verificationUrl && (
+                    <a href={cert.verificationUrl} target="_blank" rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-[hsl(190,85%,55%)] hover:underline"
+                      data-testid={`link-cert-verify-${cert.id}`}>
+                      Verify <ExternalLink className="w-3 h-3" />
+                    </a>
+                  )}
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function EducationSection() {
+  const { data: items = [], isLoading } = useQuery<SiteEducationRow[]>({ queryKey: ['/api/site/education'] });
+  if (!isLoading && items.length === 0) return null;
+  return (
+    <section id="education" className="relative py-16 md:py-24" data-testid="section-education">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-12">
+          <Badge className="bg-white/10 backdrop-blur-md border border-white/20 text-white mb-4">Education</Badge>
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">Academic Background</h2>
+        </div>
+        {isLoading ? (
+          <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+            {[0,1].map(i => <Card key={i} className="bg-white/5 border-white/10 p-6 h-40 animate-pulse" />)}
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+            {items.map(edu => (
+              <Card key={edu.id} className="bg-white/5 border-white/10 p-6" data-testid={`card-edu-${edu.id}`}>
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-10 h-10 rounded bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center flex-shrink-0">
+                    <GraduationCap className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-display text-lg font-bold text-white leading-tight">{edu.degree}</h3>
+                    <div className="text-sm text-[hsl(190,85%,55%)] font-medium mt-1">{edu.institution}</div>
+                    <div className="text-xs text-white/50 mt-1">
+                      {edu.period}{edu.location ? ` · ${edu.location}` : ''}
+                    </div>
+                  </div>
+                </div>
+                {edu.fieldOfStudy && (
+                  <p className="text-sm text-white/70 mb-2"><span className="text-white/50">Field:</span> {edu.fieldOfStudy}</p>
+                )}
+                {edu.achievements && edu.achievements.length > 0 && (
+                  <ul className="space-y-1 mt-3">
+                    {edu.achievements.map((a, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-white/70">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[hsl(190,85%,55%)] mt-0.5 flex-shrink-0" />
+                        <span>{a}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
   );
 }

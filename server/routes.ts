@@ -8,6 +8,8 @@ import {
   insertCareerRoleSchema, updateCareerRoleSchema,
   insertFlagshipWinSchema, updateFlagshipWinSchema,
   insertSiteSkillSchema, updateSiteSkillSchema,
+  insertSiteCertificationSchema, updateSiteCertificationSchema,
+  insertSiteEducationSchema, updateSiteEducationSchema,
   upsertSiteSettingSchema,
 } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
@@ -582,6 +584,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!ok) return res.status(404).json({ error: "Not found" });
       res.json({ success: true });
     } catch (e) { console.error(e); res.status(500).json({ error: "Failed to delete" }); }
+  });
+
+  // ----- Site Certifications -----
+  app.get("/api/site/certifications", async (_req, res) => {
+    try { res.json(await storage.getAllSiteCertifications()); }
+    catch (e) { console.error(e); res.status(500).json({ error: "Failed to fetch" }); }
+  });
+  app.post("/api/site/certifications", adminAuth, async (req, res) => {
+    const v = insertSiteCertificationSchema.safeParse(req.body);
+    if (!v.success) return res.status(400).json({ error: fromZodError(v.error).toString() });
+    try { res.status(201).json(await storage.createSiteCertification(v.data)); }
+    catch (e) { console.error(e); res.status(500).json({ error: "Failed to create" }); }
+  });
+  app.patch("/api/site/certifications/:id", adminAuth, async (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+    const v = updateSiteCertificationSchema.safeParse(req.body);
+    if (!v.success) return res.status(400).json({ error: fromZodError(v.error).toString() });
+    try {
+      const r = await storage.updateSiteCertification(id, v.data);
+      if (!r) return res.status(404).json({ error: "Not found" });
+      res.json(r);
+    } catch (e) { console.error(e); res.status(500).json({ error: "Failed to update" }); }
+  });
+  app.delete("/api/site/certifications/:id", adminAuth, async (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+    try {
+      const ok = await storage.deleteSiteCertification(id);
+      if (!ok) return res.status(404).json({ error: "Not found" });
+      res.json({ success: true });
+    } catch (e) { console.error(e); res.status(500).json({ error: "Failed to delete" }); }
+  });
+  app.post("/api/site/certifications/reorder", adminAuth, async (req, res) => {
+    const p = reorderSchema.safeParse(req.body?.orders);
+    if (!p.success) return res.status(400).json({ error: "Invalid payload" });
+    try { await storage.reorderSiteCertifications(p.data); res.json({ success: true }); }
+    catch (e) { console.error(e); res.status(500).json({ error: "Failed to reorder" }); }
+  });
+
+  // ----- Site Education -----
+  app.get("/api/site/education", async (_req, res) => {
+    try { res.json(await storage.getAllSiteEducation()); }
+    catch (e) { console.error(e); res.status(500).json({ error: "Failed to fetch" }); }
+  });
+  app.post("/api/site/education", adminAuth, async (req, res) => {
+    const v = insertSiteEducationSchema.safeParse(req.body);
+    if (!v.success) return res.status(400).json({ error: fromZodError(v.error).toString() });
+    try { res.status(201).json(await storage.createSiteEducation(v.data)); }
+    catch (e) { console.error(e); res.status(500).json({ error: "Failed to create" }); }
+  });
+  app.patch("/api/site/education/:id", adminAuth, async (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+    const v = updateSiteEducationSchema.safeParse(req.body);
+    if (!v.success) return res.status(400).json({ error: fromZodError(v.error).toString() });
+    try {
+      const r = await storage.updateSiteEducation(id, v.data);
+      if (!r) return res.status(404).json({ error: "Not found" });
+      res.json(r);
+    } catch (e) { console.error(e); res.status(500).json({ error: "Failed to update" }); }
+  });
+  app.delete("/api/site/education/:id", adminAuth, async (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+    try {
+      const ok = await storage.deleteSiteEducation(id);
+      if (!ok) return res.status(404).json({ error: "Not found" });
+      res.json({ success: true });
+    } catch (e) { console.error(e); res.status(500).json({ error: "Failed to delete" }); }
+  });
+  app.post("/api/site/education/reorder", adminAuth, async (req, res) => {
+    const p = reorderSchema.safeParse(req.body?.orders);
+    if (!p.success) return res.status(400).json({ error: "Invalid payload" });
+    try { await storage.reorderSiteEducation(p.data); res.json({ success: true }); }
+    catch (e) { console.error(e); res.status(500).json({ error: "Failed to reorder" }); }
   });
 
   // ----- Site Settings (key/value) -----

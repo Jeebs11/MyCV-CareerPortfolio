@@ -28,10 +28,20 @@ import {
   type InsertSiteSkill,
   type UpdateSiteSkill,
   type SiteSkillRow,
+  siteCertificationsTable,
+  type InsertSiteCertification,
+  type UpdateSiteCertification,
+  type SiteCertificationRow,
+  siteEducationTable,
+  type InsertSiteEducation,
+  type UpdateSiteEducation,
+  type SiteEducationRow,
   siteSettingsTable,
   type UpsertSiteSetting,
   type SiteSettingRow,
   timelineProjects,
+  detailedCertifications,
+  education as educationDefaults,
 } from '@shared/schema';
 
 // Initialize database connection using HTTP (better for serverless/Replit environments)
@@ -89,6 +99,20 @@ export interface IStorage {
   updateSiteSkill(id: number, data: UpdateSiteSkill): Promise<SiteSkillRow | undefined>;
   deleteSiteSkill(id: number): Promise<boolean>;
   reorderSiteSkills(orders: { id: number; sortOrder: number }[]): Promise<void>;
+
+  // Site Certifications
+  getAllSiteCertifications(): Promise<SiteCertificationRow[]>;
+  createSiteCertification(data: InsertSiteCertification): Promise<SiteCertificationRow>;
+  updateSiteCertification(id: number, data: UpdateSiteCertification): Promise<SiteCertificationRow | undefined>;
+  deleteSiteCertification(id: number): Promise<boolean>;
+  reorderSiteCertifications(orders: { id: number; sortOrder: number }[]): Promise<void>;
+
+  // Site Education
+  getAllSiteEducation(): Promise<SiteEducationRow[]>;
+  createSiteEducation(data: InsertSiteEducation): Promise<SiteEducationRow>;
+  updateSiteEducation(id: number, data: UpdateSiteEducation): Promise<SiteEducationRow | undefined>;
+  deleteSiteEducation(id: number): Promise<boolean>;
+  reorderSiteEducation(orders: { id: number; sortOrder: number }[]): Promise<void>;
 
   // Site Settings
   getAllSiteSettings(): Promise<SiteSettingRow[]>;
@@ -311,6 +335,66 @@ export class DatabaseStorage implements IStorage {
     }).where(inArray(siteSkillsTable.id, ids));
   }
 
+  // Site Certifications
+  async getAllSiteCertifications(): Promise<SiteCertificationRow[]> {
+    try {
+      return await db.select().from(siteCertificationsTable).orderBy(asc(siteCertificationsTable.sortOrder), asc(siteCertificationsTable.id));
+    } catch (err) {
+      if (isNeonEmptyResultError(err)) return [];
+      throw err;
+    }
+  }
+  async createSiteCertification(data: InsertSiteCertification): Promise<SiteCertificationRow> {
+    const r = await db.insert(siteCertificationsTable).values(data).returning();
+    return r[0];
+  }
+  async updateSiteCertification(id: number, data: UpdateSiteCertification): Promise<SiteCertificationRow | undefined> {
+    const r = await db.update(siteCertificationsTable).set({ ...data, updatedAt: new Date() }).where(eq(siteCertificationsTable.id, id)).returning();
+    return r[0];
+  }
+  async deleteSiteCertification(id: number): Promise<boolean> {
+    const r = await db.delete(siteCertificationsTable).where(eq(siteCertificationsTable.id, id)).returning();
+    return r.length > 0;
+  }
+  async reorderSiteCertifications(orders: { id: number; sortOrder: number }[]): Promise<void> {
+    if (orders.length === 0) return;
+    const { ids, joined } = reorderCaseUpdate(siteCertificationsTable, orders);
+    await db.update(siteCertificationsTable).set({
+      sortOrder: sql<number>`CASE ${joined} END`,
+      updatedAt: new Date(),
+    }).where(inArray(siteCertificationsTable.id, ids));
+  }
+
+  // Site Education
+  async getAllSiteEducation(): Promise<SiteEducationRow[]> {
+    try {
+      return await db.select().from(siteEducationTable).orderBy(asc(siteEducationTable.sortOrder), asc(siteEducationTable.id));
+    } catch (err) {
+      if (isNeonEmptyResultError(err)) return [];
+      throw err;
+    }
+  }
+  async createSiteEducation(data: InsertSiteEducation): Promise<SiteEducationRow> {
+    const r = await db.insert(siteEducationTable).values(data).returning();
+    return r[0];
+  }
+  async updateSiteEducation(id: number, data: UpdateSiteEducation): Promise<SiteEducationRow | undefined> {
+    const r = await db.update(siteEducationTable).set({ ...data, updatedAt: new Date() }).where(eq(siteEducationTable.id, id)).returning();
+    return r[0];
+  }
+  async deleteSiteEducation(id: number): Promise<boolean> {
+    const r = await db.delete(siteEducationTable).where(eq(siteEducationTable.id, id)).returning();
+    return r.length > 0;
+  }
+  async reorderSiteEducation(orders: { id: number; sortOrder: number }[]): Promise<void> {
+    if (orders.length === 0) return;
+    const { ids, joined } = reorderCaseUpdate(siteEducationTable, orders);
+    await db.update(siteEducationTable).set({
+      sortOrder: sql<number>`CASE ${joined} END`,
+      updatedAt: new Date(),
+    }).where(inArray(siteEducationTable.id, ids));
+  }
+
   // Site Settings
   async getAllSiteSettings(): Promise<SiteSettingRow[]> {
     try {
@@ -436,6 +520,43 @@ export class DatabaseStorage implements IStorage {
       }
     } catch (err) {
       if (!isNeonEmptyResultError(err)) console.error('Seed site_skills failed:', err);
+    }
+
+    try {
+      if (await isEmpty(db.select({ id: siteCertificationsTable.id }).from(siteCertificationsTable).limit(1))) {
+        const seed: InsertSiteCertification[] = detailedCertifications.map((c, idx) => ({
+          name: c.name,
+          issuer: c.issuer,
+          dateObtained: c.dateObtained,
+          validUntil: c.validUntil || null,
+          credentialId: c.credentialId || null,
+          verificationUrl: c.verificationUrl || null,
+          badgeImage: c.logo || null,
+          description: c.description,
+          skills: c.skills,
+          sortOrder: idx,
+        }));
+        for (const s of seed) await db.insert(siteCertificationsTable).values(s);
+      }
+    } catch (err) {
+      if (!isNeonEmptyResultError(err)) console.error('Seed site_certifications failed:', err);
+    }
+
+    try {
+      if (await isEmpty(db.select({ id: siteEducationTable.id }).from(siteEducationTable).limit(1))) {
+        const seed: InsertSiteEducation[] = educationDefaults.map((e, idx) => ({
+          degree: e.degree,
+          institution: e.institution,
+          location: e.location || null,
+          period: e.period,
+          fieldOfStudy: e.fieldOfStudy || null,
+          achievements: e.achievements || null,
+          sortOrder: idx,
+        }));
+        for (const s of seed) await db.insert(siteEducationTable).values(s);
+      }
+    } catch (err) {
+      if (!isNeonEmptyResultError(err)) console.error('Seed site_education failed:', err);
     }
 
     try {
