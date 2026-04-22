@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from '@/components/ui/sheet';
+import { Link } from 'wouter';
 import {
   Compass,
   Rocket,
   Trophy,
   Award,
   Briefcase,
-  Mail
+  Mail,
+  FolderKanban
 } from 'lucide-react';
 
 const sections = [
@@ -70,6 +72,21 @@ export default function SectionNavigation() {
       {/* Desktop: Floating Navigation Dots */}
       <div className="hidden md:block fixed right-8 top-1/2 -translate-y-1/2 z-40">
         <div className="flex flex-col gap-4 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full p-3">
+          <Link href="/portfolio">
+            <button
+              className="group relative transition-all duration-300 hover:scale-110"
+              data-testid="nav-dot-portfolio"
+              aria-label="Open Portfolio"
+            >
+              <div className="w-3 h-3 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 ring-2 ring-cyan-400/30" />
+              <div className="absolute right-full mr-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-lg px-3 py-2 flex items-center gap-2">
+                  <FolderKanban className="w-4 h-4 text-[hsl(190,85%,55%)]" />
+                  <span className="text-sm font-medium text-white">Portfolio</span>
+                </div>
+              </div>
+            </button>
+          </Link>
           {sections.map((section) => {
             const Icon = section.icon;
             const isActive = activeSection === section.id;
@@ -131,6 +148,17 @@ export default function SectionNavigation() {
           </SheetHeader>
           
           <div className="grid grid-cols-2 gap-3 pb-6">
+            <Link href="/portfolio">
+              <Button
+                onClick={() => setMobileMenuOpen(false)}
+                variant="default"
+                className="h-auto py-4 flex-col gap-2 w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white border-0"
+                data-testid="mobile-nav-portfolio"
+              >
+                <FolderKanban className="w-5 h-5" />
+                <span className="text-sm font-medium">Portfolio</span>
+              </Button>
+            </Link>
             {sections.map((section) => {
               const Icon = section.icon;
               const isActive = activeSection === section.id;

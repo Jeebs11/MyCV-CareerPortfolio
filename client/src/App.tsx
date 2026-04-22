@@ -8,6 +8,7 @@ import Home from "@/pages/home";
 
 const InsightsPage = lazy(() => import("@/pages/insights"));
 const AdminPage = lazy(() => import("@/pages/admin"));
+const PortfolioPage = lazy(() => import("@/pages/portfolio"));
 
 function LoadingFallback() {
   return (
@@ -26,6 +27,7 @@ function Router() {
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/insights" component={InsightsPage} />
+        <Route path="/portfolio" component={PortfolioPage} />
         <Route path="/admin" component={AdminPage} />
         <Route path="*" component={Home} />
       </Switch>

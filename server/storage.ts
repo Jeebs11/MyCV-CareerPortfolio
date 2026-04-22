@@ -1,6 +1,6 @@
 import { drizzle } from 'drizzle-orm/neon-http';
 import { neon } from '@neondatabase/serverless';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, asc, inArray, sql } from 'drizzle-orm';
 import { 
   blogPostsTable, 
   type InsertBlogPost, 
@@ -11,7 +11,11 @@ import {
   type CVContactRow,
   cvFileTable,
   type InsertCVFile,
-  type CVFileRow
+  type CVFileRow,
+  projectsTable,
+  type InsertProject,
+  type UpdateProject,
+  type ProjectRow
 } from '@shared/schema';
 
 // Initialize database connection using HTTP (better for serverless/Replit environments)
@@ -35,6 +39,14 @@ export interface IStorage {
   // CV File methods
   createCVFile(file: InsertCVFile): Promise<CVFileRow>;
   getLatestCVFile(): Promise<CVFileRow | undefined>;
+
+  // Project methods
+  getAllProjects(): Promise<ProjectRow[]>;
+  getProjectById(id: number): Promise<ProjectRow | undefined>;
+  createProject(project: InsertProject): Promise<ProjectRow>;
+  updateProject(id: number, project: UpdateProject): Promise<ProjectRow | undefined>;
+  deleteProject(id: number): Promise<boolean>;
+  reorderProjects(orders: { id: number; sortOrder: number }[]): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -91,6 +103,60 @@ export class DatabaseStorage implements IStorage {
   async getLatestCVFile(): Promise<CVFileRow | undefined> {
     const results = await db.select().from(cvFileTable).orderBy(desc(cvFileTable.uploadedAt)).limit(1);
     return results[0];
+  }
+
+  // Project CRUD operations
+  async getAllProjects(): Promise<ProjectRow[]> {
+    try {
+      const rows = await db.select().from(projectsTable).orderBy(asc(projectsTable.sortOrder), desc(projectsTable.createdAt));
+      return rows;
+    } catch (err: any) {
+      // Neon HTTP driver edge case on empty result sets
+      if (err?.message?.includes("Cannot read properties of null")) {
+        return [];
+      }
+      throw err;
+    }
+  }
+
+  async getProjectById(id: number): Promise<ProjectRow | undefined> {
+    const results = await db.select().from(projectsTable).where(eq(projectsTable.id, id));
+    return results[0];
+  }
+
+  async createProject(project: InsertProject): Promise<ProjectRow> {
+    const results = await db.insert(projectsTable).values(project).returning();
+    return results[0];
+  }
+
+  async updateProject(id: number, project: UpdateProject): Promise<ProjectRow | undefined> {
+    const results = await db
+      .update(projectsTable)
+      .set({ ...project, updatedAt: new Date() })
+      .where(eq(projectsTable.id, id))
+      .returning();
+    return results[0];
+  }
+
+  async deleteProject(id: number): Promise<boolean> {
+    const results = await db.delete(projectsTable).where(eq(projectsTable.id, id)).returning();
+    return results.length > 0;
+  }
+
+  async reorderProjects(orders: { id: number; sortOrder: number }[]): Promise<void> {
+    if (orders.length === 0) return;
+    // Atomic single-statement update using CASE so partial failures cannot
+    // leave inconsistent sortOrder values (Neon HTTP driver has no tx support).
+    const ids = orders.map(o => o.id);
+    const cases = orders
+      .map(o => sql`WHEN ${projectsTable.id} = ${o.id} THEN ${o.sortOrder}`);
+    await db
+      .update(projectsTable)
+      .set({
+        sortOrder: sql`CASE ${sql.join(cases, sql.raw(' '))} END`,
+        updatedAt: new Date(),
+      })
+      .where(inArray(projectsTable.id, ids));
   }
 }
 

@@ -2,8 +2,9 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { chatWithAssistantStream } from "./openai";
-import { insertBlogPostSchema, updateBlogPostSchema, insertCVContactSchema } from "@shared/schema";
+import { insertBlogPostSchema, updateBlogPostSchema, insertCVContactSchema, insertProjectSchema, updateProjectSchema } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
+import { z } from "zod";
 import path from "path";
 import fs from "fs/promises";
 import multer from "multer";
@@ -35,10 +36,40 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
 });
 
+// Configure multer for project image uploads
+const projectImageStorage = multer.diskStorage({
+  destination: async (req, file, cb) => {
+    const uploadDir = path.join(process.cwd(), 'uploads', 'projects');
+    await fs.mkdir(uploadDir, { recursive: true });
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = `project_${Date.now()}_${Math.round(Math.random() * 1e6)}${path.extname(file.originalname)}`;
+    cb(null, uniqueName);
+  },
+});
+
+const projectImageUpload = multer({
+  storage: projectImageStorage,
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['.jpg', '.jpeg', '.png', '.webp', '.svg', '.gif'];
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (allowedTypes.includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files (JPG, PNG, WEBP, SVG, GIF) are allowed'));
+    }
+  },
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+});
+
 // Simple admin authentication middleware
 const adminAuth = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
-  const adminPassword = process.env.ADMIN_PASSWORD || "admin123"; // Default for development
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  if (!adminPassword) {
+    return res.status(503).json({ error: "Admin auth not configured (ADMIN_PASSWORD missing)" });
+  }
 
   if (!authHeader || authHeader !== `Bearer ${adminPassword}`) {
     return res.status(401).json({ error: "Unauthorized" });
@@ -318,6 +349,108 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching latest CV:", error);
       res.status(500).json({ error: "Failed to fetch latest CV" });
+    }
+  });
+
+  // ============ PROJECT ROUTES (Portfolio) ============
+
+  // Get all projects (public)
+  app.get("/api/projects", async (req, res) => {
+    try {
+      const projects = await storage.getAllProjects();
+      res.json(projects);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+      res.status(500).json({ error: "Failed to fetch projects" });
+    }
+  });
+
+  // Get single project (public)
+  app.get("/api/projects/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+      const project = await storage.getProjectById(id);
+      if (!project) return res.status(404).json({ error: "Project not found" });
+      res.json(project);
+    } catch (error) {
+      console.error("Error fetching project:", error);
+      res.status(500).json({ error: "Failed to fetch project" });
+    }
+  });
+
+  // Create project (admin)
+  app.post("/api/projects", adminAuth, async (req, res) => {
+    try {
+      const validation = insertProjectSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ error: fromZodError(validation.error).toString() });
+      }
+      const project = await storage.createProject(validation.data);
+      res.status(201).json(project);
+    } catch (error) {
+      console.error("Error creating project:", error);
+      res.status(500).json({ error: "Failed to create project" });
+    }
+  });
+
+  // Update project (admin)
+  app.patch("/api/projects/:id", adminAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+      const validation = updateProjectSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ error: fromZodError(validation.error).toString() });
+      }
+      const project = await storage.updateProject(id, validation.data);
+      if (!project) return res.status(404).json({ error: "Project not found" });
+      res.json(project);
+    } catch (error) {
+      console.error("Error updating project:", error);
+      res.status(500).json({ error: "Failed to update project" });
+    }
+  });
+
+  // Delete project (admin)
+  app.delete("/api/projects/:id", adminAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+      const success = await storage.deleteProject(id);
+      if (!success) return res.status(404).json({ error: "Project not found" });
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting project:", error);
+      res.status(500).json({ error: "Failed to delete project" });
+    }
+  });
+
+  // Reorder projects (admin)
+  app.post("/api/projects/reorder", adminAuth, async (req, res) => {
+    try {
+      const schema = z.array(z.object({ id: z.number(), sortOrder: z.number() }));
+      const parsed = schema.safeParse(req.body?.orders);
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Invalid payload" });
+      }
+      await storage.reorderProjects(parsed.data);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error reordering projects:", error);
+      res.status(500).json({ error: "Failed to reorder projects" });
+    }
+  });
+
+  // Upload project image (admin)
+  app.post("/api/projects/upload-image", adminAuth, projectImageUpload.single('image'), async (req, res) => {
+    try {
+      if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+      const url = `/uploads/projects/${req.file.filename}`;
+      res.status(201).json({ url });
+    } catch (error) {
+      console.error("Error uploading project image:", error);
+      res.status(500).json({ error: "Failed to upload image" });
     }
   });
 

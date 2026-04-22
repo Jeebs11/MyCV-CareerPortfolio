@@ -44,8 +44,14 @@ import {
   Mail,
   Phone,
   Calendar as CalendarIcon,
-  FileText
+  FileText,
+  ArrowUp,
+  ArrowDown,
+  ImageIcon,
+  Building2,
+  ExternalLink as ExternalLinkIcon
 } from 'lucide-react';
+import type { ProjectRow } from '@shared/schema';
 import { Link } from 'wouter';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -77,6 +83,24 @@ const articleSchema = z.object({
 
 type ArticleFormData = z.infer<typeof articleSchema>;
 
+const projectSchema = z.object({
+  title: z.string().min(3, 'Title is required'),
+  client: z.string().min(1, 'Client is required'),
+  sector: z.string().min(1, 'Sector is required'),
+  year: z.string().min(1, 'Year is required'),
+  metric: z.string().min(1, 'Headline metric is required'),
+  challenge: z.string().min(10, 'Challenge must be at least 10 characters'),
+  impact: z.string().min(10, 'Impact must be at least 10 characters'),
+  role: z.string().optional(),
+  logo: z.string().optional(),
+  heroImage: z.string().optional(),
+  externalUrl: z.string().optional(),
+  featured: z.boolean().default(false),
+  sortOrder: z.coerce.number().int().default(0),
+});
+
+type ProjectFormData = z.infer<typeof projectSchema>;
+
 interface CVContact {
   id: number;
   name: string;
@@ -101,6 +125,10 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('blog');
   const [cvFile, setCVFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [editingProject, setEditingProject] = useState<ProjectRow | null>(null);
+  const [isProjectDialogOpen, setIsProjectDialogOpen] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingHero, setUploadingHero] = useState(false);
   const { toast } = useToast();
 
   // Fetch blog posts
@@ -134,6 +162,174 @@ export default function AdminPage() {
     },
     enabled: isAuthenticated && activeTab === 'cv',
   });
+
+  // Projects queries & mutations
+  const { data: projects = [], isLoading: isLoadingProjects } = useQuery<ProjectRow[]>({
+    queryKey: ['/api/projects'],
+    enabled: isAuthenticated && activeTab === 'projects',
+  });
+
+  const projectForm = useForm<ProjectFormData>({
+    resolver: zodResolver(projectSchema),
+    defaultValues: {
+      title: '',
+      client: '',
+      sector: '',
+      year: '',
+      metric: '',
+      challenge: '',
+      impact: '',
+      role: '',
+      logo: '',
+      heroImage: '',
+      externalUrl: '',
+      featured: false,
+      sortOrder: 0,
+    },
+  });
+
+  const createProjectMutation = useMutation({
+    mutationFn: async (data: ProjectFormData) => {
+      const payload = {
+        ...data,
+        role: data.role || null,
+        logo: data.logo || null,
+        heroImage: data.heroImage || null,
+        externalUrl: data.externalUrl || null,
+      };
+      const res = await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminPassword}` },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(await res.text() || 'Failed to create project');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
+      toast({ title: 'Success', description: 'Project created' });
+      setIsProjectDialogOpen(false);
+      projectForm.reset();
+    },
+    onError: (err: Error) => toast({ title: 'Error', description: err.message, variant: 'destructive' }),
+  });
+
+  const updateProjectMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: ProjectFormData }) => {
+      const payload = {
+        ...data,
+        role: data.role || null,
+        logo: data.logo || null,
+        heroImage: data.heroImage || null,
+        externalUrl: data.externalUrl || null,
+      };
+      const res = await fetch(`/api/projects/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminPassword}` },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(await res.text() || 'Failed to update project');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
+      toast({ title: 'Success', description: 'Project updated' });
+      setIsProjectDialogOpen(false);
+      setEditingProject(null);
+      projectForm.reset();
+    },
+    onError: (err: Error) => toast({ title: 'Error', description: err.message, variant: 'destructive' }),
+  });
+
+  const deleteProjectMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await fetch(`/api/projects/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${adminPassword}` },
+      });
+      if (!res.ok) throw new Error('Failed to delete project');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
+      toast({ title: 'Success', description: 'Project deleted' });
+    },
+    onError: () => toast({ title: 'Error', description: 'Failed to delete project', variant: 'destructive' }),
+  });
+
+  const reorderProjectsMutation = useMutation({
+    mutationFn: async (orders: { id: number; sortOrder: number }[]) => {
+      const res = await fetch('/api/projects/reorder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminPassword}` },
+        body: JSON.stringify({ orders }),
+      });
+      if (!res.ok) throw new Error('Failed to reorder');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
+    },
+  });
+
+  const handleProjectMove = (index: number, direction: 'up' | 'down') => {
+    const target = direction === 'up' ? index - 1 : index + 1;
+    if (target < 0 || target >= projects.length) return;
+    const next = [...projects];
+    [next[index], next[target]] = [next[target], next[index]];
+    const orders = next.map((p, i) => ({ id: p.id, sortOrder: i }));
+    reorderProjectsMutation.mutate(orders);
+  };
+
+  const uploadProjectImage = async (file: File, field: 'logo' | 'heroImage') => {
+    const setter = field === 'logo' ? setUploadingLogo : setUploadingHero;
+    setter(true);
+    try {
+      const fd = new FormData();
+      fd.append('image', file);
+      const res = await fetch('/api/projects/upload-image', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${adminPassword}` },
+        body: fd,
+      });
+      if (!res.ok) throw new Error('Upload failed');
+      const { url } = await res.json();
+      projectForm.setValue(field, url);
+      toast({ title: 'Uploaded', description: 'Image uploaded' });
+    } catch {
+      toast({ title: 'Error', description: 'Image upload failed', variant: 'destructive' });
+    } finally {
+      setter(false);
+    }
+  };
+
+  const handleEditProject = (project: ProjectRow) => {
+    setEditingProject(project);
+    projectForm.reset({
+      title: project.title,
+      client: project.client,
+      sector: project.sector,
+      year: project.year,
+      metric: project.metric,
+      challenge: project.challenge,
+      impact: project.impact,
+      role: project.role || '',
+      logo: project.logo || '',
+      heroImage: project.heroImage || '',
+      externalUrl: project.externalUrl || '',
+      featured: project.featured,
+      sortOrder: project.sortOrder,
+    });
+    setIsProjectDialogOpen(true);
+  };
+
+  const onProjectSubmit = (data: ProjectFormData) => {
+    if (editingProject) {
+      updateProjectMutation.mutate({ id: editingProject.id, data });
+    } else {
+      createProjectMutation.mutate(data);
+    }
+  };
 
   const form = useForm<ArticleFormData>({
     resolver: zodResolver(articleSchema),
@@ -526,6 +722,13 @@ export default function AdminPage() {
               Blog Management
             </TabsTrigger>
             <TabsTrigger 
+              value="projects" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(190,85%,55%)] data-[state=active]:to-[hsl(220,90%,60%)] data-[state=active]:text-white"
+              data-testid="tab-projects"
+            >
+              Portfolio Projects
+            </TabsTrigger>
+            <TabsTrigger 
               value="cv" 
               className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(190,85%,55%)] data-[state=active]:to-[hsl(220,90%,60%)] data-[state=active]:text-white"
               data-testid="tab-cv"
@@ -859,6 +1062,365 @@ export default function AdminPage() {
             </Form>
           </DialogContent>
         </Dialog>
+          </TabsContent>
+
+          {/* Portfolio Projects Tab */}
+          <TabsContent value="projects" className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-white">Portfolio Projects</h2>
+                <p className="text-sm text-white/60 mt-1">Manage case studies shown on the public Portfolio page</p>
+              </div>
+              <Button
+                onClick={() => {
+                  setEditingProject(null);
+                  projectForm.reset({
+                    title: '', client: '', sector: '', year: '', metric: '',
+                    challenge: '', impact: '', role: '', logo: '', heroImage: '',
+                    externalUrl: '', featured: false, sortOrder: projects.length,
+                  });
+                  setIsProjectDialogOpen(true);
+                }}
+                className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0"
+                data-testid="button-new-project"
+              >
+                <Plus className="w-4 h-4 mr-2" /> New Project
+              </Button>
+            </div>
+
+            {isLoadingProjects ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-6 h-6 text-cyan-400 animate-spin" />
+              </div>
+            ) : projects.length === 0 ? (
+              <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-12 text-center">
+                <Building2 className="w-10 h-10 text-white/40 mx-auto mb-3" />
+                <p className="text-white/70">No projects yet. Create your first one.</p>
+              </Card>
+            ) : (
+              <div className="space-y-3">
+                {projects.map((project, index) => (
+                  <Card
+                    key={project.id}
+                    className="bg-white/5 backdrop-blur-xl border-white/10 p-4"
+                    data-testid={`row-project-${project.id}`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="flex flex-col gap-1">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-7 w-7 text-white/60 hover:text-white"
+                          onClick={() => handleProjectMove(index, 'up')}
+                          disabled={index === 0 || reorderProjectsMutation.isPending}
+                          data-testid={`button-move-up-${project.id}`}
+                        >
+                          <ArrowUp className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-7 w-7 text-white/60 hover:text-white"
+                          onClick={() => handleProjectMove(index, 'down')}
+                          disabled={index === projects.length - 1 || reorderProjectsMutation.isPending}
+                          data-testid={`button-move-down-${project.id}`}
+                        >
+                          <ArrowDown className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      {project.logo ? (
+                        <div className="w-12 h-12 bg-white rounded-lg p-1.5 flex items-center justify-center flex-shrink-0">
+                          <img src={project.logo} alt={project.client} className="w-full h-full object-contain" />
+                        </div>
+                      ) : (
+                        <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Building2 className="w-5 h-5 text-white/60" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="font-semibold text-white truncate">{project.title}</h3>
+                          {project.featured && (
+                            <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/40">
+                              <Star className="w-3 h-3 mr-1" /> Featured
+                            </Badge>
+                          )}
+                          {project.externalUrl && (
+                            <Badge variant="outline" className="border-cyan-500/40 text-cyan-300">
+                              <ExternalLinkIcon className="w-3 h-3 mr-1" /> External
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-white/60 truncate">
+                          {project.client} · {project.sector} · {project.year}
+                        </p>
+                        <p className="text-xs text-cyan-400 mt-1 truncate">{project.metric}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="text-white/70 hover:text-white"
+                          onClick={() => handleEditProject(project)}
+                          data-testid={`button-edit-project-${project.id}`}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="text-red-400 hover:text-red-300"
+                          onClick={() => {
+                            if (confirm(`Delete "${project.title}"?`)) {
+                              deleteProjectMutation.mutate(project.id);
+                            }
+                          }}
+                          data-testid={`button-delete-project-${project.id}`}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+
+            <Dialog open={isProjectDialogOpen} onOpenChange={(open) => {
+              setIsProjectDialogOpen(open);
+              if (!open) { setEditingProject(null); projectForm.reset(); }
+            }}>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-[#0a0a0d] border-slate-800 text-white">
+                <DialogHeader>
+                  <DialogTitle>{editingProject ? 'Edit Project' : 'New Project'}</DialogTitle>
+                </DialogHeader>
+                <Form {...projectForm}>
+                  <form onSubmit={projectForm.handleSubmit(onProjectSubmit)} className="space-y-4">
+                    <FormField
+                      control={projectForm.control}
+                      name="title"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Title *</FormLabel>
+                          <FormControl><Input {...field} data-testid="input-project-title" /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={projectForm.control}
+                        name="client"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Client *</FormLabel>
+                            <FormControl><Input {...field} data-testid="input-project-client" /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={projectForm.control}
+                        name="sector"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Sector *</FormLabel>
+                            <FormControl><Input {...field} placeholder="e.g. Insurance" data-testid="input-project-sector" /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={projectForm.control}
+                        name="year"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Year / Period *</FormLabel>
+                            <FormControl><Input {...field} placeholder="e.g. 2023" data-testid="input-project-year" /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={projectForm.control}
+                        name="metric"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Headline Metric *</FormLabel>
+                            <FormControl><Input {...field} placeholder="e.g. £1.2M / 36% gain" data-testid="input-project-metric" /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <FormField
+                      control={projectForm.control}
+                      name="role"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Your Role</FormLabel>
+                          <FormControl><Input {...field} placeholder="e.g. Senior Project Manager" data-testid="input-project-role" /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={projectForm.control}
+                      name="challenge"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Challenge *</FormLabel>
+                          <FormControl><Textarea rows={3} {...field} data-testid="input-project-challenge" /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={projectForm.control}
+                      name="impact"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Impact *</FormLabel>
+                          <FormControl><Textarea rows={3} {...field} data-testid="input-project-impact" /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="grid grid-cols-1 gap-4">
+                      <FormField
+                        control={projectForm.control}
+                        name="logo"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Client Logo URL</FormLabel>
+                            <div className="flex gap-2">
+                              <FormControl>
+                                <Input {...field} placeholder="https://logo.clearbit.com/..." data-testid="input-project-logo" />
+                              </FormControl>
+                              <label className="cursor-pointer">
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={(e) => {
+                                    const f = e.target.files?.[0];
+                                    if (f) uploadProjectImage(f, 'logo');
+                                  }}
+                                />
+                                <span className="inline-flex items-center justify-center h-10 px-3 rounded-md bg-white/10 hover:bg-white/20 border border-white/10">
+                                  {uploadingLogo ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                                </span>
+                              </label>
+                            </div>
+                            {field.value && (
+                              <div className="mt-2 w-16 h-16 bg-white rounded p-1.5">
+                                <img src={field.value} alt="logo" className="w-full h-full object-contain" />
+                              </div>
+                            )}
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={projectForm.control}
+                        name="heroImage"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Hero Image URL</FormLabel>
+                            <div className="flex gap-2">
+                              <FormControl>
+                                <Input {...field} placeholder="https://..." data-testid="input-project-hero" />
+                              </FormControl>
+                              <label className="cursor-pointer">
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={(e) => {
+                                    const f = e.target.files?.[0];
+                                    if (f) uploadProjectImage(f, 'heroImage');
+                                  }}
+                                />
+                                <span className="inline-flex items-center justify-center h-10 px-3 rounded-md bg-white/10 hover:bg-white/20 border border-white/10">
+                                  {uploadingHero ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageIcon className="w-4 h-4" />}
+                                </span>
+                              </label>
+                            </div>
+                            {field.value && (
+                              <img src={field.value} alt="hero" className="mt-2 w-full h-32 object-cover rounded" />
+                            )}
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <FormField
+                      control={projectForm.control}
+                      name="externalUrl"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>External Case Study URL (optional)</FormLabel>
+                          <FormControl><Input {...field} placeholder="https://..." data-testid="input-project-external" /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={projectForm.control}
+                        name="sortOrder"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Sort Order</FormLabel>
+                            <FormControl><Input type="number" {...field} data-testid="input-project-sort" /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={projectForm.control}
+                        name="featured"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center gap-3 pt-7">
+                            <FormControl>
+                              <input
+                                type="checkbox"
+                                checked={field.value}
+                                onChange={field.onChange}
+                                className="w-5 h-5 accent-cyan-500"
+                                data-testid="checkbox-project-featured"
+                              />
+                            </FormControl>
+                            <FormLabel className="!mt-0">Featured (hero card)</FormLabel>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <DialogFooter>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => { setIsProjectDialogOpen(false); setEditingProject(null); projectForm.reset(); }}
+                        data-testid="button-cancel-project"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="submit"
+                        disabled={createProjectMutation.isPending || updateProjectMutation.isPending}
+                        className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0"
+                        data-testid="button-save-project"
+                      >
+                        {(createProjectMutation.isPending || updateProjectMutation.isPending) && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                        {editingProject ? 'Update' : 'Create'} Project
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
           </TabsContent>
 
           {/* CV Management Tab */}

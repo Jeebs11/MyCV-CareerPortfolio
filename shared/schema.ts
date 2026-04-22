@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, text, timestamp, boolean } from 'drizzle-orm/pg-core';
+import { pgTable, serial, varchar, text, timestamp, boolean, integer } from 'drizzle-orm/pg-core';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
@@ -64,6 +64,38 @@ export const insertCVFileSchema = createInsertSchema(cvFileTable).omit({
 
 export type CVFileRow = typeof cvFileTable.$inferSelect;
 export type InsertCVFile = z.infer<typeof insertCVFileSchema>;
+
+// Projects Table (Portfolio)
+export const projectsTable = pgTable('projects', {
+  id: serial('id').primaryKey(),
+  title: varchar('title', { length: 300 }).notNull(),
+  client: varchar('client', { length: 200 }).notNull(),
+  sector: varchar('sector', { length: 100 }).notNull(),
+  year: varchar('year', { length: 50 }).notNull(),
+  metric: varchar('metric', { length: 300 }).notNull(),
+  challenge: text('challenge').notNull(),
+  impact: text('impact').notNull(),
+  role: varchar('role', { length: 200 }),
+  logo: varchar('logo', { length: 500 }),
+  heroImage: varchar('hero_image', { length: 500 }),
+  externalUrl: varchar('external_url', { length: 500 }),
+  featured: boolean('featured').default(false).notNull(),
+  sortOrder: integer('sort_order').default(0).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const insertProjectSchema = createInsertSchema(projectsTable).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const updateProjectSchema = insertProjectSchema.partial();
+
+export type ProjectRow = typeof projectsTable.$inferSelect;
+export type InsertProject = z.infer<typeof insertProjectSchema>;
+export type UpdateProject = z.infer<typeof updateProjectSchema>;
 
 // ============ INTERFACES ============
 

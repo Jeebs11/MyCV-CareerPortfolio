@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import { Link } from 'wouter';
 import { experiences, skills, keyAchievements, detailedCertifications, timelineProjects, industryExperience, education } from '@shared/schema';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -43,7 +44,8 @@ import {
   GraduationCap,
   Menu,
   Phone,
-  MessageCircle
+  MessageCircle,
+  FolderKanban
 } from 'lucide-react';
 
 const iconMap: Record<string, any> = {
@@ -1145,6 +1147,17 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
               >
                 <Download className="mr-2 w-5 h-5" /> Download CV
               </Button>
+
+              <Link href="/portfolio">
+                <Button 
+                  size="lg"
+                  variant="outline"
+                  className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10 text-base md:text-lg px-8 md:px-10 py-6 md:py-7 w-full sm:w-auto"
+                  data-testid="button-view-portfolio"
+                >
+                  <FolderKanban className="mr-2 w-5 h-5" /> View Portfolio
+                </Button>
+              </Link>
               
               <Button 
                 size="lg"

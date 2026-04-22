@@ -43,6 +43,7 @@ The portfolio uses **PostgreSQL** database via **Neon Database serverless driver
 -   **blogPostsTable**: Stores blog articles with rich content, metadata, and featured status
 -   **cvContactsTable**: Captures contact information from CV downloads (name, email, phone, timestamp)
 -   **cvFileTable**: Manages uploaded CV files with metadata and timestamps
+-   **projectsTable**: Portfolio case studies (title, client, sector, year, metric, challenge, impact, role, logo, heroImage, externalUrl, featured, sortOrder)
 
 File uploads are handled using **Multer** middleware and stored in the `uploads/` directory. Static portfolio content (career history, certifications) uses in-memory constants for fast access.
 
