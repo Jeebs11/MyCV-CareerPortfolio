@@ -14,7 +14,7 @@ function LoadingFallback() {
   return (
     <div className="min-h-screen bg-[hsl(270,8%,12%)] flex items-center justify-center">
       <div className="flex flex-col items-center gap-4">
-        <div className="w-12 h-12 border-4 border-[hsl(190,85%,55%)]/30 border-t-[hsl(190,85%,55%)] rounded-full animate-spin" />
+        <div className="w-12 h-12 border-4 border-[hsl(var(--brand-primary))]/30 border-t-[hsl(var(--brand-primary))] rounded-full animate-spin" />
         <p className="text-white/60 text-sm">Loading...</p>
       </div>
     </div>

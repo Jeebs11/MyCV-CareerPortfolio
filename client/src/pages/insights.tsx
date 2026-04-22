@@ -41,7 +41,7 @@ export default function InsightsPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[hsl(262,50%,8%)] via-[hsl(245,30%,12%)] to-[hsl(220,40%,10%)] flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-[hsl(190,85%,55%)] animate-spin mx-auto mb-4" />
+          <Loader2 className="w-12 h-12 text-[hsl(var(--brand-primary))] animate-spin mx-auto mb-4" />
           <p className="text-white/60">Loading insights...</p>
         </div>
       </div>
@@ -52,8 +52,8 @@ export default function InsightsPage() {
     <div className="min-h-screen bg-gradient-to-br from-[hsl(262,50%,8%)] via-[hsl(245,30%,12%)] to-[hsl(220,40%,10%)]">
       {/* Hero Section */}
       <section className="relative py-20 px-6 overflow-hidden" data-testid="section-hero">
-        <div className="absolute inset-0 bg-gradient-to-b from-[hsl(190,85%,55%)]/10 via-transparent to-transparent" />
-        <div className="absolute top-20 right-10 w-72 h-72 bg-[hsl(220,90%,60%)]/20 rounded-full blur-3xl" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[hsl(var(--brand-primary))]/10 via-transparent to-transparent" />
+        <div className="absolute top-20 right-10 w-72 h-72 bg-[hsl(var(--brand-accent))]/20 rounded-full blur-3xl" />
         <div className="absolute bottom-10 left-10 w-96 h-96 bg-[hsl(262,50%,50%)]/20 rounded-full blur-3xl" />
         
         <div className="max-w-7xl mx-auto relative">
@@ -91,7 +91,7 @@ export default function InsightsPage() {
                 variant={selectedCategory === category ? "default" : "outline"}
                 className={`
                   ${selectedCategory === category 
-                    ? 'bg-[hsl(190,85%,55%)] text-white border-[hsl(190,85%,55%)]' 
+                    ? 'bg-[hsl(var(--brand-primary))] text-white border-[hsl(var(--brand-primary))]' 
                     : 'bg-white/5 backdrop-blur-md border-white/20 text-white/80 hover:bg-white/10'
                   }
                 `}
@@ -111,7 +111,7 @@ export default function InsightsPage() {
         <section className="relative py-12 px-6" data-testid="section-featured">
           <div className="max-w-7xl mx-auto">
             <div className="mb-6 flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-[hsl(190,85%,55%)]" />
+              <Sparkles className="w-5 h-5 text-[hsl(var(--brand-primary))]" />
               <h2 className="font-display text-2xl font-bold text-white">Featured Article</h2>
             </div>
 
@@ -123,10 +123,10 @@ export default function InsightsPage() {
               <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <Badge className="bg-[hsl(220,90%,60%)]/20 border-[hsl(220,90%,60%)]/30 text-[hsl(220,90%,70%)] backdrop-blur-md">
+                    <Badge className="bg-[hsl(var(--brand-accent))]/20 border-[hsl(var(--brand-accent))]/30 text-[hsl(220,90%,70%)] backdrop-blur-md">
                       {featuredPost.category}
                     </Badge>
-                    <Badge className="bg-[hsl(190,85%,55%)]/20 border-[hsl(190,85%,55%)]/30 text-[hsl(190,85%,70%)] backdrop-blur-md">
+                    <Badge className="bg-[hsl(var(--brand-primary))]/20 border-[hsl(var(--brand-primary))]/30 text-[hsl(190,85%,70%)] backdrop-blur-md">
                       <Sparkles className="w-3 h-3 mr-1" />
                       Featured
                     </Badge>
@@ -153,7 +153,7 @@ export default function InsightsPage() {
                   </div>
 
                   <Button 
-                    className="bg-[hsl(190,85%,55%)] text-white hover:bg-[hsl(190,85%,45%)] mt-4"
+                    className="bg-[hsl(var(--brand-primary))] text-white hover:bg-[hsl(190,85%,45%)] mt-4"
                     data-testid="button-read-featured"
                   >
                     Read Article
@@ -161,7 +161,7 @@ export default function InsightsPage() {
                   </Button>
                 </div>
 
-                <div className="relative h-64 md:h-full min-h-[300px] bg-gradient-to-br from-[hsl(190,85%,55%)]/20 to-[hsl(220,90%,60%)]/20 rounded-xl flex items-center justify-center border border-white/10 overflow-hidden">
+                <div className="relative h-64 md:h-full min-h-[300px] bg-gradient-to-br from-[hsl(var(--brand-primary))]/20 to-[hsl(var(--brand-accent))]/20 rounded-xl flex items-center justify-center border border-white/10 overflow-hidden">
                   {featuredPost.heroImage ? (
                     <img 
                       src={featuredPost.heroImage} 
@@ -213,13 +213,13 @@ export default function InsightsPage() {
                 <div className="p-6">
                   <div className="flex items-start gap-4 mb-4">
                     {!post.heroImage && (
-                      <div className="w-12 h-12 rounded-md bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center flex-shrink-0">
+                      <div className="w-12 h-12 rounded-md bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] flex items-center justify-center flex-shrink-0">
                         <BookOpen className="w-6 h-6 text-white" />
                       </div>
                     )}
                     
                     <div className="flex-1 min-w-0">
-                      <Badge className="bg-[hsl(220,90%,60%)]/20 border-[hsl(220,90%,60%)]/30 text-[hsl(220,90%,70%)] backdrop-blur-md text-xs mb-2">
+                      <Badge className="bg-[hsl(var(--brand-accent))]/20 border-[hsl(var(--brand-accent))]/30 text-[hsl(220,90%,70%)] backdrop-blur-md text-xs mb-2">
                         {post.category}
                       </Badge>
                       <h3 className="font-display text-xl font-bold text-white mb-2 line-clamp-2">
@@ -248,7 +248,7 @@ export default function InsightsPage() {
                     <Button
                       size="sm"
                       variant="ghost"
-                      className="text-[hsl(190,85%,55%)] hover:text-[hsl(190,85%,65%)]"
+                      className="text-[hsl(var(--brand-primary))] hover:text-[hsl(190,85%,65%)]"
                       data-testid={`button-read-more-${index}`}
                     >
                       Read More
@@ -284,11 +284,11 @@ export default function InsightsPage() {
         <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto bg-[hsl(245,30%,12%)] border-white/10">
           <DialogHeader>
             <div className="flex items-center gap-3 mb-4">
-              <Badge className="bg-[hsl(220,90%,60%)]/20 border-[hsl(220,90%,60%)]/30 text-[hsl(220,90%,70%)] backdrop-blur-md">
+              <Badge className="bg-[hsl(var(--brand-accent))]/20 border-[hsl(var(--brand-accent))]/30 text-[hsl(220,90%,70%)] backdrop-blur-md">
                 {selectedPost?.category}
               </Badge>
               {selectedPost?.featured && (
-                <Badge className="bg-[hsl(190,85%,55%)]/20 border-[hsl(190,85%,55%)]/30 text-[hsl(190,85%,70%)] backdrop-blur-md">
+                <Badge className="bg-[hsl(var(--brand-primary))]/20 border-[hsl(var(--brand-primary))]/30 text-[hsl(190,85%,70%)] backdrop-blur-md">
                   <Sparkles className="w-3 h-3 mr-1" />
                   Featured
                 </Badge>
@@ -329,11 +329,11 @@ export default function InsightsPage() {
             className="prose prose-invert prose-lg max-w-none
               prose-headings:text-white prose-headings:font-display
               prose-p:text-white/80 prose-p:leading-relaxed
-              prose-a:text-[hsl(190,85%,55%)] prose-a:no-underline hover:prose-a:underline
+              prose-a:text-[hsl(var(--brand-primary))] prose-a:no-underline hover:prose-a:underline
               prose-strong:text-white prose-strong:font-semibold
-              prose-code:text-[hsl(190,85%,55%)] prose-code:bg-white/10 prose-code:px-1 prose-code:rounded
+              prose-code:text-[hsl(var(--brand-primary))] prose-code:bg-white/10 prose-code:px-1 prose-code:rounded
               prose-pre:bg-white/5 prose-pre:border prose-pre:border-white/10
-              prose-blockquote:border-l-[hsl(190,85%,55%)] prose-blockquote:text-white/70
+              prose-blockquote:border-l-[hsl(var(--brand-primary))] prose-blockquote:text-white/70
               prose-ul:text-white/80 prose-ol:text-white/80
               prose-li:text-white/80
               prose-img:rounded-lg prose-img:border prose-img:border-white/10"

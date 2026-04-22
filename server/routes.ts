@@ -668,6 +668,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     catch (e) { console.error(e); res.status(500).json({ error: "Failed to reorder" }); }
   });
 
+  // ----- Theme CSS (no-FOUC delivery) -----
+  const DEFAULT_THEME = {
+    'theme.brandPrimary': '190 85% 55%',
+    'theme.brandAccent': '220 90% 60%',
+    'theme.brandPrimaryDark': '190 85% 55%',
+    'theme.brandAccentDark': '220 90% 60%',
+  };
+  const isValidHsl = (v: string): boolean => {
+    const m = v.trim().match(/^(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)%\s+(\d+(?:\.\d+)?)%$/);
+    if (!m) return false;
+    const h = parseFloat(m[1]), s = parseFloat(m[2]), l = parseFloat(m[3]);
+    return h >= 0 && h <= 360 && s >= 0 && s <= 100 && l >= 0 && l <= 100;
+  };
+  app.get("/api/theme.css", async (_req, res) => {
+    res.setHeader('Content-Type', 'text/css; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+    try {
+      const rows = await storage.getAllSiteSettings();
+      const map: Record<string, string> = { ...DEFAULT_THEME };
+      rows.forEach(r => {
+        if (r.key.startsWith('theme.') && isValidHsl(r.value)) map[r.key] = r.value;
+      });
+      const css = `:root{--brand-primary:${map['theme.brandPrimary']};--brand-accent:${map['theme.brandAccent']};}.dark{--brand-primary:${map['theme.brandPrimaryDark']};--brand-accent:${map['theme.brandAccentDark']};}`;
+      res.send(css);
+    } catch (e) {
+      console.error('theme.css error:', e);
+      const css = `:root{--brand-primary:${DEFAULT_THEME['theme.brandPrimary']};--brand-accent:${DEFAULT_THEME['theme.brandAccent']};}.dark{--brand-primary:${DEFAULT_THEME['theme.brandPrimaryDark']};--brand-accent:${DEFAULT_THEME['theme.brandAccentDark']};}`;
+      res.send(css);
+    }
+  });
+
   // ----- Site Settings (key/value) -----
   app.get("/api/site/settings", async (_req, res) => {
     try {
@@ -680,6 +711,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/site/settings", adminAuth, async (req, res) => {
     const v = z.array(upsertSiteSettingSchema).safeParse(req.body?.entries);
     if (!v.success) return res.status(400).json({ error: fromZodError(v.error).toString() });
+    const bad = v.data.find(e => e.key.startsWith('theme.') && !isValidHsl(e.value));
+    if (bad) {
+      return res.status(400).json({ error: `Invalid HSL value for ${bad.key}: expected "H S% L%" (H 0-360, S/L 0-100)` });
+    }
     try { await storage.upsertSiteSettings(v.data); res.json({ success: true }); }
     catch (e) { console.error(e); res.status(500).json({ error: "Failed to save" }); }
   });

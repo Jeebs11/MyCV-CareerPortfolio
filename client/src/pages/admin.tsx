@@ -55,6 +55,7 @@ import type { ProjectRow } from '@shared/schema';
 import { Link } from 'wouter';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CareerRolesAdmin, FlagshipWinsAdmin, SiteSkillsAdmin, SiteCertificationsAdmin, SiteEducationAdmin, SiteSettingsAdmin } from '@/components/admin/SiteContentTabs';
+import { AppearanceAdmin } from '@/components/admin/AppearanceAdmin';
 
 interface BlogPost {
   id: string;
@@ -668,7 +669,7 @@ export default function AdminPage() {
       <div className="min-h-screen bg-gradient-to-br from-[hsl(262,50%,8%)] via-[hsl(245,30%,12%)] to-[hsl(220,40%,10%)] flex items-center justify-center p-4">
         <Card className="w-full max-w-md bg-white/5 backdrop-blur-xl border-white/10 p-8">
           <div className="text-center mb-6">
-            <div className="w-16 h-16 bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] rounded-full flex items-center justify-center mx-auto mb-4">
               <Lock className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-2xl font-display font-bold text-white mb-2">
@@ -696,7 +697,7 @@ export default function AdminPage() {
 
             <Button 
               type="submit" 
-              className="w-full bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white"
+              className="w-full bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white"
               data-testid="button-admin-login"
             >
               Login
@@ -759,30 +760,31 @@ export default function AdminPage() {
           <TabsList className="bg-white/5 border border-white/10 mb-8">
             <TabsTrigger 
               value="blog" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(190,85%,55%)] data-[state=active]:to-[hsl(220,90%,60%)] data-[state=active]:text-white"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--brand-primary))] data-[state=active]:to-[hsl(var(--brand-accent))] data-[state=active]:text-white"
               data-testid="tab-blog"
             >
               Blog Management
             </TabsTrigger>
             <TabsTrigger 
               value="projects" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(190,85%,55%)] data-[state=active]:to-[hsl(220,90%,60%)] data-[state=active]:text-white"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--brand-primary))] data-[state=active]:to-[hsl(var(--brand-accent))] data-[state=active]:text-white"
               data-testid="tab-projects"
             >
               Portfolio Projects
             </TabsTrigger>
             <TabsTrigger 
               value="cv" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(190,85%,55%)] data-[state=active]:to-[hsl(220,90%,60%)] data-[state=active]:text-white"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--brand-primary))] data-[state=active]:to-[hsl(var(--brand-accent))] data-[state=active]:text-white"
               data-testid="tab-cv"
             >
               CV Management
             </TabsTrigger>
-            <TabsTrigger value="career" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(190,85%,55%)] data-[state=active]:to-[hsl(220,90%,60%)] data-[state=active]:text-white" data-testid="tab-career">Career Roles</TabsTrigger>
-            <TabsTrigger value="skills" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(190,85%,55%)] data-[state=active]:to-[hsl(220,90%,60%)] data-[state=active]:text-white" data-testid="tab-skills">Skills</TabsTrigger>
-            <TabsTrigger value="certifications" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(190,85%,55%)] data-[state=active]:to-[hsl(220,90%,60%)] data-[state=active]:text-white" data-testid="tab-certifications">Certifications</TabsTrigger>
-            <TabsTrigger value="education" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(190,85%,55%)] data-[state=active]:to-[hsl(220,90%,60%)] data-[state=active]:text-white" data-testid="tab-education">Education</TabsTrigger>
-            <TabsTrigger value="settings" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(190,85%,55%)] data-[state=active]:to-[hsl(220,90%,60%)] data-[state=active]:text-white" data-testid="tab-settings">Site Content</TabsTrigger>
+            <TabsTrigger value="career" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--brand-primary))] data-[state=active]:to-[hsl(var(--brand-accent))] data-[state=active]:text-white" data-testid="tab-career">Career Roles</TabsTrigger>
+            <TabsTrigger value="skills" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--brand-primary))] data-[state=active]:to-[hsl(var(--brand-accent))] data-[state=active]:text-white" data-testid="tab-skills">Skills</TabsTrigger>
+            <TabsTrigger value="certifications" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--brand-primary))] data-[state=active]:to-[hsl(var(--brand-accent))] data-[state=active]:text-white" data-testid="tab-certifications">Certifications</TabsTrigger>
+            <TabsTrigger value="education" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--brand-primary))] data-[state=active]:to-[hsl(var(--brand-accent))] data-[state=active]:text-white" data-testid="tab-education">Education</TabsTrigger>
+            <TabsTrigger value="settings" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--brand-primary))] data-[state=active]:to-[hsl(var(--brand-accent))] data-[state=active]:text-white" data-testid="tab-settings">Site Content</TabsTrigger>
+            <TabsTrigger value="appearance" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--brand-primary))] data-[state=active]:to-[hsl(var(--brand-accent))] data-[state=active]:text-white" data-testid="tab-appearance">Appearance</TabsTrigger>
           </TabsList>
 
           {/* Blog Management Tab */}
@@ -794,7 +796,7 @@ export default function AdminPage() {
                 form.reset();
                 setIsDialogOpen(true);
               }}
-              className="mb-6 bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white"
+              className="mb-6 bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white"
               data-testid="button-create-article"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -804,7 +806,7 @@ export default function AdminPage() {
             {/* Articles List */}
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-8 h-8 text-[hsl(190,85%,55%)] animate-spin" />
+                <Loader2 className="w-8 h-8 text-[hsl(var(--brand-primary))] animate-spin" />
               </div>
             ) : blogPosts.length === 0 ? (
               <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-12 text-center">
@@ -827,7 +829,7 @@ export default function AdminPage() {
                         {post.title}
                       </h3>
                       {post.featured && (
-                        <Badge className="bg-[hsl(220,90%,60%)]/20 border-[hsl(220,90%,60%)]/30 text-[hsl(220,90%,70%)]">
+                        <Badge className="bg-[hsl(var(--brand-accent))]/20 border-[hsl(var(--brand-accent))]/30 text-[hsl(220,90%,70%)]">
                           <Star className="w-3 h-3 mr-1" />
                           Featured
                         </Badge>
@@ -850,7 +852,7 @@ export default function AdminPage() {
                       size="sm"
                       variant="ghost"
                       onClick={() => handleEdit(post)}
-                      className="text-[hsl(190,85%,55%)] hover:text-[hsl(190,85%,65%)] hover:bg-[hsl(190,85%,55%)]/10"
+                      className="text-[hsl(var(--brand-primary))] hover:text-[hsl(190,85%,65%)] hover:bg-[hsl(var(--brand-primary))]/10"
                       data-testid={`button-edit-${post.id}`}
                     >
                       <Edit className="w-4 h-4" />
@@ -1072,12 +1074,12 @@ export default function AdminPage() {
                           type="checkbox"
                           checked={field.value}
                           onChange={field.onChange}
-                          className="w-4 h-4 rounded border-white/20 bg-white/5 text-[hsl(190,85%,55%)]"
+                          className="w-4 h-4 rounded border-white/20 bg-white/5 text-[hsl(var(--brand-primary))]"
                           data-testid="input-article-featured"
                         />
                       </FormControl>
                       <FormLabel className="text-white font-normal cursor-pointer">
-                        {field.value ? <Star className="w-4 h-4 inline mr-2 text-[hsl(220,90%,60%)]" /> : <StarOff className="w-4 h-4 inline mr-2" />}
+                        {field.value ? <Star className="w-4 h-4 inline mr-2 text-[hsl(var(--brand-accent))]" /> : <StarOff className="w-4 h-4 inline mr-2" />}
                         Mark as featured article
                       </FormLabel>
                     </FormItem>
@@ -1097,7 +1099,7 @@ export default function AdminPage() {
                   <Button
                     type="submit"
                     disabled={createMutation.isPending || updateMutation.isPending}
-                    className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white"
+                    className="bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white"
                     data-testid="button-save-article"
                   >
                     {(createMutation.isPending || updateMutation.isPending) && (
@@ -1129,7 +1131,7 @@ export default function AdminPage() {
                   });
                   setIsProjectDialogOpen(true);
                 }}
-                className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0"
+                className="bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0"
                 data-testid="button-new-project"
               >
                 <Plus className="w-4 h-4 mr-2" /> New Project
@@ -1597,7 +1599,7 @@ export default function AdminPage() {
                       <Button
                         type="submit"
                         disabled={createProjectMutation.isPending || updateProjectMutation.isPending}
-                        className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0"
+                        className="bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0"
                         data-testid="button-save-project"
                       >
                         {(createProjectMutation.isPending || updateProjectMutation.isPending) && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
@@ -1634,7 +1636,7 @@ export default function AdminPage() {
                     type="file"
                     accept=".pdf,.doc,.docx"
                     onChange={(e) => setCVFile(e.target.files?.[0] || null)}
-                    className="bg-white/5 border-white/10 text-white file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gradient-to-r file:from-[hsl(190,85%,55%)] file:to-[hsl(220,90%,60%)] file:text-white hover:file:opacity-90"
+                    className="bg-white/5 border-white/10 text-white file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gradient-to-r file:from-[hsl(var(--brand-primary))] file:to-[hsl(var(--brand-accent))] file:text-white hover:file:opacity-90"
                     data-testid="input-cv-file"
                   />
                   <p className="text-xs text-white/40 mt-2">
@@ -1644,7 +1646,7 @@ export default function AdminPage() {
                 <Button
                   type="submit"
                   disabled={!cvFile || isUploading}
-                  className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white"
+                  className="bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white"
                   data-testid="button-upload-cv"
                 >
                   {isUploading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
@@ -1675,7 +1677,7 @@ export default function AdminPage() {
 
               {isLoadingContacts ? (
                 <div className="flex items-center justify-center py-12">
-                  <Loader2 className="w-8 h-8 text-[hsl(190,85%,55%)] animate-spin" />
+                  <Loader2 className="w-8 h-8 text-[hsl(var(--brand-primary))] animate-spin" />
                 </div>
               ) : cvContacts.length === 0 ? (
                 <div className="text-center py-12 text-white/60">
@@ -1762,6 +1764,9 @@ export default function AdminPage() {
             <div className="border-t border-white/10 pt-6">
               <FlagshipWinsAdmin adminPassword={adminPassword} />
             </div>
+          </TabsContent>
+          <TabsContent value="appearance" className="space-y-6">
+            <AppearanceAdmin adminPassword={adminPassword} />
           </TabsContent>
         </Tabs>
       </div>

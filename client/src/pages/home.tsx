@@ -155,7 +155,7 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center font-display font-bold text-white text-sm">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] flex items-center justify-center font-display font-bold text-white text-sm">
               ML
             </div>
             <span className="font-display text-lg font-semibold text-white hidden sm:block">Mujeeb Lawal</span>
@@ -187,7 +187,7 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
             <Button 
               onClick={() => scrollToSection('contact')}
               size="sm"
-              className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0 px-6"
+              className="bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0 px-6"
               data-testid="button-cta-nav"
             >
               Get in Touch
@@ -264,7 +264,7 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
       {/* Scroll Progress Indicator */}
       <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/10">
         <div 
-          className="h-full bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] transition-all duration-300 ease-out"
+          className="h-full bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] transition-all duration-300 ease-out"
           style={{ width: `${scrollProgress}%` }}
           data-testid="scroll-progress-bar"
         />
@@ -393,7 +393,7 @@ function FlagshipAchievements() {
                         {project.title}
                       </h3>
                       <div className="flex items-center gap-2 text-sm text-white/60">
-                        <span className="text-[hsl(190,85%,55%)] font-medium">{project.company}</span>
+                        <span className="text-[hsl(var(--brand-primary))] font-medium">{project.company}</span>
                         <span>•</span>
                         <span>{project.period}</span>
                       </div>
@@ -677,7 +677,7 @@ function CollapsibleCareerJourney() {
                         {project.role}
                       </h3>
                       <div className="flex items-center gap-2 text-xs md:text-sm text-white/60 flex-wrap">
-                        <span className="text-[hsl(190,85%,55%)]">{project.company}</span>
+                        <span className="text-[hsl(var(--brand-primary))]">{project.company}</span>
                         <span>•</span>
                         <span>{project.period}</span>
                         <span className="hidden sm:inline">•</span>
@@ -725,7 +725,7 @@ function CollapsibleCareerJourney() {
                       <ul className="space-y-2">
                         {project.keyAchievements.map((achievement, idx) => (
                           <li key={idx} className="flex items-start gap-2">
-                            <CheckCircle2 className="w-4 h-4 text-[hsl(190,85%,55%)] mt-0.5 flex-shrink-0" />
+                            <CheckCircle2 className="w-4 h-4 text-[hsl(var(--brand-primary))] mt-0.5 flex-shrink-0" />
                             <span className="text-sm text-white/80">{achievement}</span>
                           </li>
                         ))}
@@ -743,7 +743,7 @@ function CollapsibleCareerJourney() {
                         </Badge>
                       )}
                       {project.budget && (
-                        <Badge className="text-xs bg-[hsl(190,85%,55%)]/20 border-[hsl(190,85%,55%)]/30 text-[hsl(190,85%,65%)]">
+                        <Badge className="text-xs bg-[hsl(var(--brand-primary))]/20 border-[hsl(var(--brand-primary))]/30 text-[hsl(190,85%,65%)]">
                           Budget: {project.budget}
                         </Badge>
                       )}
@@ -835,7 +835,7 @@ function VerticalCareerTimeline() {
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex flex-wrap gap-1.5">
                       <Badge 
-                        className="text-xs bg-gradient-to-r from-[hsl(190,85%,55%)]/20 to-[hsl(220,90%,60%)]/20 border-[hsl(190,85%,55%)]/30 text-white"
+                        className="text-xs bg-gradient-to-r from-[hsl(var(--brand-primary))]/20 to-[hsl(var(--brand-accent))]/20 border-[hsl(var(--brand-primary))]/30 text-white"
                         data-testid={`badge-career-period-${project.id}`}
                       >
                         {project.period}
@@ -862,7 +862,7 @@ function VerticalCareerTimeline() {
                     <h4 className="font-semibold text-white text-sm leading-tight mb-1" data-testid={`text-career-role-${project.id}`}>
                       {project.role}
                     </h4>
-                    <p className="text-[hsl(190,85%,55%)] text-sm font-medium" data-testid={`text-career-company-${project.id}`}>
+                    <p className="text-[hsl(var(--brand-primary))] text-sm font-medium" data-testid={`text-career-company-${project.id}`}>
                       {project.company}
                     </p>
                     <p className="text-xs text-white/60" data-testid={`text-career-location-${project.id}`}>
@@ -909,7 +909,7 @@ function VerticalCareerTimeline() {
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex flex-wrap gap-1.5">
                       <Badge 
-                        className="text-xs bg-gradient-to-r from-[hsl(190,85%,55%)]/20 to-[hsl(220,90%,60%)]/20 border-[hsl(190,85%,55%)]/30 text-white"
+                        className="text-xs bg-gradient-to-r from-[hsl(var(--brand-primary))]/20 to-[hsl(var(--brand-accent))]/20 border-[hsl(var(--brand-primary))]/30 text-white"
                         data-testid={`badge-career-mobile-period-${project.id}`}
                       >
                         {project.period}
@@ -936,7 +936,7 @@ function VerticalCareerTimeline() {
                     <h4 className="font-semibold text-white text-sm leading-tight mb-1" data-testid={`text-career-mobile-role-${project.id}`}>
                       {project.role}
                     </h4>
-                    <p className="text-[hsl(190,85%,55%)] text-sm font-medium" data-testid={`text-career-mobile-company-${project.id}`}>
+                    <p className="text-[hsl(var(--brand-primary))] text-sm font-medium" data-testid={`text-career-mobile-company-${project.id}`}>
                       {project.company}
                     </p>
                     <p className="text-xs text-white/60" data-testid={`text-career-mobile-location-${project.id}`}>
@@ -979,7 +979,7 @@ function VerticalCareerTimeline() {
                     <DialogTitle className="text-xl sm:text-2xl font-display mb-2 text-white pr-6" data-testid="text-dialog-role">
                       {selectedProject.role}
                     </DialogTitle>
-                    <DialogDescription className="text-base sm:text-lg text-[hsl(190,85%,55%)] font-medium" data-testid="text-dialog-company">
+                    <DialogDescription className="text-base sm:text-lg text-[hsl(var(--brand-primary))] font-medium" data-testid="text-dialog-company">
                       {selectedProject.company}
                     </DialogDescription>
                   </div>
@@ -1052,7 +1052,7 @@ function VerticalCareerTimeline() {
                 {/* Full Impact */}
                 <div>
                   <h3 className="font-semibold text-base sm:text-lg mb-3 flex items-center gap-2 text-white">
-                    <Award className="w-5 h-5 text-[hsl(190,85%,55%)]" />
+                    <Award className="w-5 h-5 text-[hsl(var(--brand-primary))]" />
                     Full Impact
                   </h3>
                   <ul className="space-y-2">
@@ -1133,8 +1133,8 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
   return (
     <section id="hero" className="relative min-h-[85vh] md:min-h-screen flex items-center justify-center overflow-hidden pt-20 md:pt-24" data-testid="section-hero">
       <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 md:w-96 md:h-96 bg-[hsl(190,85%,55%)]/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 md:w-96 md:h-96 bg-[hsl(220,90%,60%)]/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 md:w-96 md:h-96 bg-[hsl(var(--brand-primary))]/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 md:w-96 md:h-96 bg-[hsl(var(--brand-accent))]/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] md:w-[600px] md:h-[600px] bg-[hsl(270,65%,35%)]/10 rounded-full blur-3xl" />
       </div>
       
@@ -1157,7 +1157,7 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
                 <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white/70 mt-1">
                   {headlineSub2}
                 </span>
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] mt-2">
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] mt-2">
                   {headlineAccent}
                 </span>
               </h1>
@@ -1166,7 +1166,7 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-center justify-center">
               <Button 
                 size="lg"
-                className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0 hover-elevate active-elevate-2 text-base md:text-lg px-8 md:px-10 py-6 md:py-7 w-full sm:w-auto font-semibold"
+                className="bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0 hover-elevate active-elevate-2 text-base md:text-lg px-8 md:px-10 py-6 md:py-7 w-full sm:w-auto font-semibold"
                 onClick={() => setShowCVDialog(true)}
                 data-testid="button-primary-cta"
               >
@@ -1327,7 +1327,7 @@ function AnimatedMetricCard({ achievement, Icon, index }: { achievement: any; Ic
       style={{ animationDelay: `${index * 100}ms` }}
       data-testid={`card-metric-${index}`}
     >
-      <Icon className="w-6 h-6 md:w-8 md:h-8 text-[hsl(190,85%,55%)] mx-auto mb-2 md:mb-3" />
+      <Icon className="w-6 h-6 md:w-8 md:h-8 text-[hsl(var(--brand-primary))] mx-auto mb-2 md:mb-3" />
       <div className="font-mono text-2xl md:text-3xl font-bold text-white mb-2">
         {achievement.metric.includes('£') && '£'}
         {isVisible ? displayValue : hasDecimal ? '0.0' : '0'}
@@ -1383,7 +1383,7 @@ function TimelineCard({ experience, index, onHover, onLeave }: { experience: any
       >
         <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6">
           <div className="flex-shrink-0">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-md bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-md bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] flex items-center justify-center">
               <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
           </div>
@@ -1392,7 +1392,7 @@ function TimelineCard({ experience, index, onHover, onLeave }: { experience: any
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
               <div>
                 <h3 className="font-display text-lg sm:text-xl font-bold text-white mb-1 leading-tight">{experience.role}</h3>
-                <p className="text-[hsl(190,85%,55%)] font-medium text-sm sm:text-base">{experience.company}</p>
+                <p className="text-[hsl(var(--brand-primary))] font-medium text-sm sm:text-base">{experience.company}</p>
               </div>
               
               <div className="flex flex-col sm:items-end gap-2">
@@ -1431,7 +1431,7 @@ function TimelineCard({ experience, index, onHover, onLeave }: { experience: any
               <Button
                 size="sm"
                 variant="ghost"
-                className="text-xs text-[hsl(190,85%,55%)] hover:text-[hsl(190,85%,65%)] h-auto py-2 px-3 w-full sm:w-auto justify-center sm:justify-start"
+                className="text-xs text-[hsl(var(--brand-primary))] hover:text-[hsl(190,85%,65%)] h-auto py-2 px-3 w-full sm:w-auto justify-center sm:justify-start"
                 onClick={() => setShowImpactDialog(true)}
                 data-testid={`button-view-impact-exp-${index}`}
               >
@@ -1449,7 +1449,7 @@ function TimelineCard({ experience, index, onHover, onLeave }: { experience: any
             <DialogTitle className="font-display text-xl sm:text-2xl text-white pr-6">
               {experience.role}
             </DialogTitle>
-            <DialogDescription className="text-[hsl(190,85%,55%)] text-sm sm:text-base">
+            <DialogDescription className="text-[hsl(var(--brand-primary))] text-sm sm:text-base">
               {experience.company} • {experience.period}
             </DialogDescription>
           </DialogHeader>
@@ -1463,7 +1463,7 @@ function TimelineCard({ experience, index, onHover, onLeave }: { experience: any
               <ul className="space-y-2.5">
                 {experience.keyAchievements && experience.keyAchievements.map((achievement: string, idx: number) => (
                   <li key={idx} className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[hsl(190,85%,55%)] mt-0.5 flex-shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-[hsl(var(--brand-primary))] mt-0.5 flex-shrink-0" />
                     <span className="text-xs sm:text-sm text-white/80 leading-relaxed">{achievement}</span>
                   </li>
                 ))}
@@ -1510,9 +1510,9 @@ function GeographicMap({ activeRegion, setActiveRegion }: { activeRegion: string
           <div className="absolute inset-0 bg-gradient-to-br from-[hsl(270,8%,12%)]/50 to-[hsl(240,12%,18%)]/50" />
           
           <svg className="absolute inset-0 w-full h-full opacity-20" viewBox="0 0 1000 500">
-            <path d="M 400 150 Q 500 100 600 200" stroke="hsl(190,85%,55%)" strokeWidth="2" fill="none" className="animate-pulse" />
-            <path d="M 200 200 Q 400 150 450 180" stroke="hsl(190,85%,55%)" strokeWidth="2" fill="none" className="animate-pulse" style={{ animationDelay: '0.5s' }} />
-            <path d="M 450 180 Q 600 150 750 300" stroke="hsl(190,85%,55%)" strokeWidth="2" fill="none" className="animate-pulse" style={{ animationDelay: '1s' }} />
+            <path d="M 400 150 Q 500 100 600 200" stroke="hsl(var(--brand-primary))" strokeWidth="2" fill="none" className="animate-pulse" />
+            <path d="M 200 200 Q 400 150 450 180" stroke="hsl(var(--brand-primary))" strokeWidth="2" fill="none" className="animate-pulse" style={{ animationDelay: '0.5s' }} />
+            <path d="M 450 180 Q 600 150 750 300" stroke="hsl(var(--brand-primary))" strokeWidth="2" fill="none" className="animate-pulse" style={{ animationDelay: '1s' }} />
           </svg>
           
           {regions.map((region) => (
@@ -1530,7 +1530,7 @@ function GeographicMap({ activeRegion, setActiveRegion }: { activeRegion: string
               data-testid={`button-region-${region.id}`}
             >
               <div className="relative">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center shadow-lg shadow-[hsl(190,85%,55%)]/50 hover-elevate">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] flex items-center justify-center shadow-lg shadow-[hsl(var(--brand-primary))]/50 hover-elevate">
                   <MapPin className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                 </div>
                 
@@ -1570,7 +1570,7 @@ function CertificationsWall() {
         <div className="space-y-10 md:space-y-12">
           <div>
             <h3 className="font-display text-xl sm:text-2xl font-bold text-white mb-4 md:mb-6 flex items-center gap-2">
-              <Award className="w-5 h-5 sm:w-6 sm:h-6 text-[hsl(190,85%,55%)]" />
+              <Award className="w-5 h-5 sm:w-6 sm:h-6 text-[hsl(var(--brand-primary))]" />
               Professional Certifications
             </h3>
             <div className="grid md:grid-cols-2 gap-4 md:gap-6">
@@ -1582,13 +1582,13 @@ function CertificationsWall() {
                   data-testid={`card-cert-${index}`}
                 >
                   <div className="flex items-start gap-4">
-                    <div className="w-16 h-16 rounded-md bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center flex-shrink-0">
+                    <div className="w-16 h-16 rounded-md bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] flex items-center justify-center flex-shrink-0">
                       <Award className="w-8 h-8 text-white" />
                     </div>
                     
                     <div className="flex-1 min-w-0">
                       <h3 className="font-display text-xl font-bold text-white mb-1">{cert.name}</h3>
-                      <p className="text-[hsl(190,85%,55%)] text-sm mb-2">{cert.issuer}</p>
+                      <p className="text-[hsl(var(--brand-primary))] text-sm mb-2">{cert.issuer}</p>
                       
                       <div className="flex items-center gap-2 text-xs text-white/50 mb-3">
                         <Calendar className="w-3 h-3" />
@@ -1599,7 +1599,7 @@ function CertificationsWall() {
                             <a 
                               href={cert.verificationUrl}
                               onClick={(e) => e.stopPropagation()}
-                              className="flex items-center gap-1 text-[hsl(190,85%,55%)] hover:text-[hsl(190,85%,65%)]"
+                              className="flex items-center gap-1 text-[hsl(var(--brand-primary))] hover:text-[hsl(190,85%,65%)]"
                             >
                               <ExternalLink className="w-3 h-3" />
                               Verify
@@ -1636,7 +1636,7 @@ function CertificationsWall() {
 
           <div>
             <h3 className="font-display text-2xl font-bold text-white mb-6 flex items-center gap-2">
-              <GraduationCap className="w-6 h-6 text-[hsl(190,85%,55%)]" />
+              <GraduationCap className="w-6 h-6 text-[hsl(var(--brand-primary))]" />
               Education
             </h3>
             <div className="grid md:grid-cols-2 gap-6">
@@ -1648,13 +1648,13 @@ function CertificationsWall() {
                   data-testid={`card-edu-${index}`}
                 >
                   <div className="flex items-start gap-4">
-                    <div className="w-16 h-16 rounded-md bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center flex-shrink-0">
+                    <div className="w-16 h-16 rounded-md bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] flex items-center justify-center flex-shrink-0">
                       <GraduationCap className="w-8 h-8 text-white" />
                     </div>
                     
                     <div className="flex-1 min-w-0">
                       <h3 className="font-display text-xl font-bold text-white mb-1">{edu.degree}</h3>
-                      <p className="text-[hsl(190,85%,55%)] text-sm mb-2">{edu.institution}</p>
+                      <p className="text-[hsl(var(--brand-primary))] text-sm mb-2">{edu.institution}</p>
                       
                       <div className="flex flex-col gap-1 text-xs text-white/50 mb-3">
                         <div className="flex items-center gap-2">
@@ -1766,7 +1766,7 @@ function IndustryExperienceMap() {
                           <p className="text-xs text-white/60" data-testid={`text-project-role-${idx}`}>
                             {project.role} • {project.period}
                           </p>
-                          <p className="text-xs text-[hsl(190,85%,55%)] mt-2" data-testid={`text-project-achievement-${idx}`}>
+                          <p className="text-xs text-[hsl(var(--brand-primary))] mt-2" data-testid={`text-project-achievement-${idx}`}>
                             {project.keyAchievement}
                           </p>
                         </div>
@@ -1813,7 +1813,7 @@ function ContactSectionInner() {
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 pt-2 md:pt-4">
             <Button
               size="lg"
-              className="w-full sm:w-auto bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0 hover-elevate active-elevate-2 min-h-12"
+              className="w-full sm:w-auto bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0 hover-elevate active-elevate-2 min-h-12"
               onClick={() => window.location.href = `mailto:${email}`}
               data-testid="button-email-contact"
             >
@@ -1920,7 +1920,7 @@ function CVDownloadDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-md text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[hsl(190,85%,55%)] focus:border-transparent"
+              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-md text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[hsl(var(--brand-primary))] focus:border-transparent"
               placeholder="John Doe"
               data-testid="input-cv-name"
             />
@@ -1935,7 +1935,7 @@ function CVDownloadDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-md text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[hsl(190,85%,55%)] focus:border-transparent"
+              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-md text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[hsl(var(--brand-primary))] focus:border-transparent"
               placeholder="john@example.com"
               data-testid="input-cv-email"
             />
@@ -1949,7 +1949,7 @@ function CVDownloadDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-md text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[hsl(190,85%,55%)] focus:border-transparent"
+              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-md text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[hsl(var(--brand-primary))] focus:border-transparent"
               placeholder="+44 7900 000000"
               data-testid="input-cv-phone"
             />
@@ -1972,7 +1972,7 @@ function CVDownloadDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0 hover:opacity-90"
+              className="flex-1 bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0 hover:opacity-90"
               data-testid="button-cv-submit"
             >
               {isSubmitting ? (
@@ -2005,7 +2005,7 @@ function Footer() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-md bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center font-display font-bold text-white text-sm">
+            <div className="w-8 h-8 rounded-md bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] flex items-center justify-center font-display font-bold text-white text-sm">
               ML
             </div>
             <span className="text-white/60 text-sm" data-testid="text-footer-copyright">{copyright}</span>
@@ -2059,13 +2059,13 @@ function CertificationsSection() {
                   {cert.badgeImage ? (
                     <img src={cert.badgeImage} alt="" className="w-14 h-14 rounded object-contain bg-white/10 flex-shrink-0" />
                   ) : (
-                    <div className="w-14 h-14 rounded bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center flex-shrink-0">
+                    <div className="w-14 h-14 rounded bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] flex items-center justify-center flex-shrink-0">
                       <Award className="w-7 h-7 text-white" />
                     </div>
                   )}
                   <div className="min-w-0 flex-1">
                     <h3 className="font-display text-lg font-bold text-white leading-tight">{cert.name}</h3>
-                    <div className="text-sm text-[hsl(190,85%,55%)] font-medium mt-1">{cert.issuer}</div>
+                    <div className="text-sm text-[hsl(var(--brand-primary))] font-medium mt-1">{cert.issuer}</div>
                     <div className="text-xs text-white/50 mt-1">
                       {cert.dateObtained}{cert.validUntil ? ` – ${cert.validUntil}` : ''}
                     </div>
@@ -2087,7 +2087,7 @@ function CertificationsSection() {
                   </span>
                   {cert.verificationUrl && (
                     <a href={cert.verificationUrl} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-[hsl(190,85%,55%)] hover:underline"
+                      className="flex items-center gap-1 text-[hsl(var(--brand-primary))] hover:underline"
                       data-testid={`link-cert-verify-${cert.id}`}>
                       Verify <ExternalLink className="w-3 h-3" />
                     </a>
@@ -2122,12 +2122,12 @@ function EducationSection() {
             {items.map(edu => (
               <Card key={edu.id} className="bg-white/5 border-white/10 p-6" data-testid={`card-edu-${edu.id}`}>
                 <div className="flex items-start gap-3 mb-3">
-                  <div className="w-10 h-10 rounded bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] flex items-center justify-center flex-shrink-0">
                     <GraduationCap className="w-5 h-5 text-white" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <h3 className="font-display text-lg font-bold text-white leading-tight">{edu.degree}</h3>
-                    <div className="text-sm text-[hsl(190,85%,55%)] font-medium mt-1">{edu.institution}</div>
+                    <div className="text-sm text-[hsl(var(--brand-primary))] font-medium mt-1">{edu.institution}</div>
                     <div className="text-xs text-white/50 mt-1">
                       {edu.period}{edu.location ? ` · ${edu.location}` : ''}
                     </div>
@@ -2140,7 +2140,7 @@ function EducationSection() {
                   <ul className="space-y-1 mt-3">
                     {edu.achievements.map((a, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-white/70">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[hsl(190,85%,55%)] mt-0.5 flex-shrink-0" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[hsl(var(--brand-primary))] mt-0.5 flex-shrink-0" />
                         <span>{a}</span>
                       </li>
                     ))}

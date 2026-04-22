@@ -124,7 +124,7 @@ export function CareerRolesAdmin({ adminPassword }: AdminProps) {
           <p className="text-sm text-white/60">{roles.length} role{roles.length !== 1 ? 's' : ''} on home page</p>
         </div>
         <Button onClick={openCreate} data-testid="button-add-career-role"
-          className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0">
+          className="bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0">
           <Plus className="w-4 h-4 mr-2" /> Add Role
         </Button>
       </div>
@@ -188,7 +188,7 @@ export function CareerRolesAdmin({ adminPassword }: AdminProps) {
             <div className="flex justify-end gap-2 pt-2">
               <Button variant="outline" onClick={() => setCreating(false)}>Cancel</Button>
               <Button onClick={() => saveMutation.mutate(form)} disabled={saveMutation.isPending}
-                className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0" data-testid="button-save-role">
+                className="bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0" data-testid="button-save-role">
                 <Save className="w-4 h-4 mr-2" /> {saveMutation.isPending ? 'Saving...' : 'Save'}
               </Button>
             </div>
@@ -270,7 +270,7 @@ export function FlagshipWinsAdmin({ adminPassword }: AdminProps) {
           <p className="text-sm text-white/60">{wins.length} card{wins.length !== 1 ? 's' : ''} on home page</p>
         </div>
         <Button onClick={openCreate} data-testid="button-add-flagship"
-          className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0">
+          className="bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0">
           <Plus className="w-4 h-4 mr-2" /> Add Win
         </Button>
       </div>
@@ -317,7 +317,7 @@ export function FlagshipWinsAdmin({ adminPassword }: AdminProps) {
             <div className="flex justify-end gap-2 pt-2">
               <Button variant="outline" onClick={() => setCreating(false)}>Cancel</Button>
               <Button onClick={() => saveMutation.mutate(form)} disabled={saveMutation.isPending}
-                className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0" data-testid="button-save-flagship">
+                className="bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0" data-testid="button-save-flagship">
                 <Save className="w-4 h-4 mr-2" /> {saveMutation.isPending ? 'Saving...' : 'Save'}
               </Button>
             </div>
@@ -405,7 +405,7 @@ export function SiteSkillsAdmin({ adminPassword }: AdminProps) {
             </SelectContent>
           </Select>
           <Button onClick={openCreate} data-testid="button-add-skill"
-            className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0">
+            className="bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0">
             <Plus className="w-4 h-4 mr-2" /> Add Skill
           </Button>
         </div>
@@ -451,7 +451,7 @@ export function SiteSkillsAdmin({ adminPassword }: AdminProps) {
             <div className="flex justify-end gap-2 pt-2">
               <Button variant="outline" onClick={() => setCreating(false)}>Cancel</Button>
               <Button onClick={() => saveMutation.mutate(form)} disabled={saveMutation.isPending}
-                className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0" data-testid="button-save-skill">
+                className="bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0" data-testid="button-save-skill">
                 <Save className="w-4 h-4 mr-2" /> Save
               </Button>
             </div>
@@ -556,7 +556,7 @@ export function SiteSettingsAdmin({ adminPassword }: AdminProps) {
           <p className="text-sm text-white/60">Edit headlines, contact details, and section copy</p>
         </div>
         <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending}
-          className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0" data-testid="button-save-settings">
+          className="bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0" data-testid="button-save-settings">
           <Save className="w-4 h-4 mr-2" /> {saveMutation.isPending ? 'Saving...' : 'Save All'}
         </Button>
       </div>
@@ -704,7 +704,7 @@ export function SiteCertificationsAdmin({ adminPassword }: AdminProps) {
           <p className="text-sm text-white/60">{certs.length} certification{certs.length !== 1 ? 's' : ''} on home page</p>
         </div>
         <Button onClick={openCreate} data-testid="button-add-certification"
-          className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0">
+          className="bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0">
           <Plus className="w-4 h-4 mr-2" /> Add Certification
         </Button>
       </div>
@@ -748,7 +748,7 @@ export function SiteCertificationsAdmin({ adminPassword }: AdminProps) {
             <div className="flex justify-end gap-2 pt-2">
               <Button variant="outline" onClick={() => setCreating(false)}>Cancel</Button>
               <Button onClick={() => saveMutation.mutate(form)} disabled={saveMutation.isPending}
-                className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0" data-testid="button-save-cert">
+                className="bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0" data-testid="button-save-cert">
                 <Save className="w-4 h-4 mr-2" /> Save
               </Button>
             </div>
@@ -818,7 +818,7 @@ export function SiteEducationAdmin({ adminPassword }: AdminProps) {
           <p className="text-sm text-white/60">{items.length} entr{items.length !== 1 ? 'ies' : 'y'} on home page</p>
         </div>
         <Button onClick={openCreate} data-testid="button-add-education"
-          className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0">
+          className="bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0">
           <Plus className="w-4 h-4 mr-2" /> Add Education
         </Button>
       </div>
@@ -858,7 +858,7 @@ export function SiteEducationAdmin({ adminPassword }: AdminProps) {
             <div className="flex justify-end gap-2 pt-2">
               <Button variant="outline" onClick={() => setCreating(false)}>Cancel</Button>
               <Button onClick={() => saveMutation.mutate(form)} disabled={saveMutation.isPending}
-                className="bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0" data-testid="button-save-edu">
+                className="bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0" data-testid="button-save-edu">
                 <Save className="w-4 h-4 mr-2" /> Save
               </Button>
             </div>

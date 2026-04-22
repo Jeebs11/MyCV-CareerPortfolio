@@ -81,7 +81,7 @@ export default function SectionNavigation() {
               <div className="w-3 h-3 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 ring-2 ring-cyan-400/30" />
               <div className="absolute right-full mr-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
                 <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-lg px-3 py-2 flex items-center gap-2">
-                  <FolderKanban className="w-4 h-4 text-[hsl(190,85%,55%)]" />
+                  <FolderKanban className="w-4 h-4 text-[hsl(var(--brand-primary))]" />
                   <span className="text-sm font-medium text-white">Portfolio</span>
                 </div>
               </div>
@@ -104,7 +104,7 @@ export default function SectionNavigation() {
                 <div
                   className={`w-3 h-3 rounded-full transition-all duration-300 ${
                     isActive
-                      ? 'bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)]'
+                      ? 'bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))]'
                       : 'bg-white/30 group-hover:bg-white/50'
                   }`}
                 />
@@ -112,7 +112,7 @@ export default function SectionNavigation() {
                 {/* Tooltip */}
                 <div className="absolute right-full mr-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
                   <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-lg px-3 py-2 flex items-center gap-2">
-                    <Icon className="w-4 h-4 text-[hsl(190,85%,55%)]" />
+                    <Icon className="w-4 h-4 text-[hsl(var(--brand-primary))]" />
                     <span className="text-sm font-medium text-white">{section.label}</span>
                   </div>
                 </div>
@@ -126,7 +126,7 @@ export default function SectionNavigation() {
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetTrigger asChild>
           <button
-            className="md:hidden fixed bottom-4 left-4 w-14 h-14 rounded-full bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-2 border-white/30 shadow-2xl shadow-[hsl(190,85%,55%)]/50 hover:scale-110 active:scale-95 transition-all duration-200 flex items-center justify-center z-[9999]"
+            className="md:hidden fixed bottom-4 left-4 w-14 h-14 rounded-full bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-2 border-white/30 shadow-2xl shadow-[hsl(var(--brand-primary))]/50 hover:scale-110 active:scale-95 transition-all duration-200 flex items-center justify-center z-[9999]"
             data-testid="button-mobile-nav-fab"
           >
             <Compass className="w-6 h-6" />
@@ -139,7 +139,7 @@ export default function SectionNavigation() {
         >
           <SheetHeader className="mb-4">
             <SheetTitle className="text-white flex items-center gap-2">
-              <Compass className="w-5 h-5 text-[hsl(190,85%,55%)]" />
+              <Compass className="w-5 h-5 text-[hsl(var(--brand-primary))]" />
               Quick Navigation
             </SheetTitle>
             <SheetDescription className="text-white/60 text-sm">
@@ -170,7 +170,7 @@ export default function SectionNavigation() {
                   variant={isActive ? "default" : "ghost"}
                   className={`h-auto py-4 flex-col gap-2 ${
                     isActive
-                      ? 'bg-gradient-to-r from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white border-0'
+                      ? 'bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0'
                       : 'text-white/70 hover:text-white hover:bg-white/10'
                   }`}
                   data-testid={`mobile-nav-${section.id}`}

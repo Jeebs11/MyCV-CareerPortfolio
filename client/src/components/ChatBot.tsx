@@ -122,7 +122,7 @@ export default function ChatBot() {
       {/* Floating Chat Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 w-14 h-14 rounded-full shadow-2xl bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] border border-white/20 hover:scale-110 transition-all duration-300 flex items-center justify-center z-[9999]"
+        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 w-14 h-14 rounded-full shadow-2xl bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] border border-white/20 hover:scale-110 transition-all duration-300 flex items-center justify-center z-[9999]"
         data-testid="button-chat-toggle"
       >
         {isOpen ? (
@@ -139,10 +139,10 @@ export default function ChatBot() {
           data-testid="chat-window"
         >
           {/* Header */}
-          <div className="p-4 border-b border-white/10 bg-gradient-to-r from-[hsl(190,85%,55%)]/10 to-[hsl(220,90%,60%)]/10">
+          <div className="p-4 border-b border-white/10 bg-gradient-to-r from-[hsl(var(--brand-primary))]/10 to-[hsl(var(--brand-accent))]/10">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] flex items-center justify-center font-bold text-white">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] flex items-center justify-center font-bold text-white">
                   AI
                 </div>
                 <div>
@@ -166,7 +166,7 @@ export default function ChatBot() {
                 <div
                   className={`max-w-[80%] rounded-lg p-3 ${
                     msg.role === 'user'
-                      ? 'bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] text-white'
+                      ? 'bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white'
                       : 'bg-white/5 border border-white/10 text-white/90'
                   }`}
                 >
@@ -177,7 +177,7 @@ export default function ChatBot() {
             {isLoading && (
               <div className="flex justify-start">
                 <div className="bg-white/5 border border-white/10 rounded-lg p-3">
-                  <Loader2 className="h-5 w-5 animate-spin text-[hsl(190,85%,55%)]" />
+                  <Loader2 className="h-5 w-5 animate-spin text-[hsl(var(--brand-primary))]" />
                 </div>
               </div>
             )}
@@ -212,7 +212,7 @@ export default function ChatBot() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Ask a question..."
-                className="flex-1 px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[hsl(190,85%,55%)]/50"
+                className="flex-1 px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[hsl(var(--brand-primary))]/50"
                 disabled={isLoading}
                 data-testid="input-chat-message"
               />
@@ -220,7 +220,7 @@ export default function ChatBot() {
                 onClick={handleSendMessage}
                 disabled={!input.trim() || isLoading}
                 size="icon"
-                className="bg-gradient-to-br from-[hsl(190,85%,55%)] to-[hsl(220,90%,60%)] hover:scale-105 transition-transform"
+                className="bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] hover:scale-105 transition-transform"
                 data-testid="button-send-message"
               >
                 <Send className="h-4 w-4 text-white" />

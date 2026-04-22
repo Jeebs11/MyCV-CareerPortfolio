@@ -14,6 +14,10 @@
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
 
+  /* Brand gradient stops (overridable via /api/theme.css) */
+  --brand-primary: 190 85% 55%;
+  --brand-accent: 220 90% 60%;
+
   --background: 240 5% 96%;
 
   --foreground: 240 10% 15%;
@@ -132,6 +136,10 @@
   /* Backgrounds applied on top of other backgrounds when hovered/active */
   --elevate-1: rgba(255,255,255, .04);
   --elevate-2: rgba(255,255,255, .09);
+
+  /* Brand gradient stops (dark mode; overridable via /api/theme.css) */
+  --brand-primary: 190 85% 55%;
+  --brand-accent: 220 90% 60%;
 
   --background: 270 8% 12%;
 
