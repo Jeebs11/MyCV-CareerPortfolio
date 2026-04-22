@@ -78,7 +78,7 @@ export default function SectionNavigation() {
               data-testid="nav-dot-portfolio"
               aria-label="Open Portfolio"
             >
-              <div className="w-3 h-3 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 ring-2 ring-cyan-400/30" />
+              <div className="w-3 h-3 rounded-full bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] ring-2 ring-[hsl(var(--brand-primary))]/30" />
               <div className="absolute right-full mr-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
                 <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-lg px-3 py-2 flex items-center gap-2">
                   <FolderKanban className="w-4 h-4 text-[hsl(var(--brand-primary))]" />
@@ -152,7 +152,7 @@ export default function SectionNavigation() {
               <Button
                 onClick={() => setMobileMenuOpen(false)}
                 variant="default"
-                className="h-auto py-4 flex-col gap-2 w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white border-0"
+                className="h-auto py-4 flex-col gap-2 w-full bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0"
                 data-testid="mobile-nav-portfolio"
               >
                 <FolderKanban className="w-5 h-5" />
