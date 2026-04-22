@@ -743,7 +743,7 @@ function CollapsibleCareerJourney() {
                         </Badge>
                       )}
                       {project.budget && (
-                        <Badge className="text-xs bg-[hsl(var(--brand-primary))]/20 border-[hsl(var(--brand-primary))]/30 text-[hsl(190,85%,65%)]">
+                        <Badge className="text-xs bg-[hsl(var(--brand-primary))]/20 border-[hsl(var(--brand-primary))]/30 text-[hsl(var(--brand-primary-soft))]">
                           Budget: {project.budget}
                         </Badge>
                       )}
@@ -1431,7 +1431,7 @@ function TimelineCard({ experience, index, onHover, onLeave }: { experience: any
               <Button
                 size="sm"
                 variant="ghost"
-                className="text-xs text-[hsl(var(--brand-primary))] hover:text-[hsl(190,85%,65%)] h-auto py-2 px-3 w-full sm:w-auto justify-center sm:justify-start"
+                className="text-xs text-[hsl(var(--brand-primary))] hover:text-[hsl(var(--brand-primary-soft))] h-auto py-2 px-3 w-full sm:w-auto justify-center sm:justify-start"
                 onClick={() => setShowImpactDialog(true)}
                 data-testid={`button-view-impact-exp-${index}`}
               >
@@ -1599,7 +1599,7 @@ function CertificationsWall() {
                             <a 
                               href={cert.verificationUrl}
                               onClick={(e) => e.stopPropagation()}
-                              className="flex items-center gap-1 text-[hsl(var(--brand-primary))] hover:text-[hsl(190,85%,65%)]"
+                              className="flex items-center gap-1 text-[hsl(var(--brand-primary))] hover:text-[hsl(var(--brand-primary-soft))]"
                             >
                               <ExternalLink className="w-3 h-3" />
                               Verify

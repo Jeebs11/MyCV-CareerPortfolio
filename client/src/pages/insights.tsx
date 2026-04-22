@@ -123,10 +123,10 @@ export default function InsightsPage() {
               <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <Badge className="bg-[hsl(var(--brand-accent))]/20 border-[hsl(var(--brand-accent))]/30 text-[hsl(220,90%,70%)] backdrop-blur-md">
+                    <Badge className="bg-[hsl(var(--brand-accent))]/20 border-[hsl(var(--brand-accent))]/30 text-[hsl(var(--brand-accent-soft))] backdrop-blur-md">
                       {featuredPost.category}
                     </Badge>
-                    <Badge className="bg-[hsl(var(--brand-primary))]/20 border-[hsl(var(--brand-primary))]/30 text-[hsl(190,85%,70%)] backdrop-blur-md">
+                    <Badge className="bg-[hsl(var(--brand-primary))]/20 border-[hsl(var(--brand-primary))]/30 text-[hsl(var(--brand-primary-soft))] backdrop-blur-md">
                       <Sparkles className="w-3 h-3 mr-1" />
                       Featured
                     </Badge>
@@ -153,7 +153,7 @@ export default function InsightsPage() {
                   </div>
 
                   <Button 
-                    className="bg-[hsl(var(--brand-primary))] text-white hover:bg-[hsl(190,85%,45%)] mt-4"
+                    className="bg-[hsl(var(--brand-primary))] text-white hover:bg-[hsl(var(--brand-primary-strong))] mt-4"
                     data-testid="button-read-featured"
                   >
                     Read Article
@@ -219,7 +219,7 @@ export default function InsightsPage() {
                     )}
                     
                     <div className="flex-1 min-w-0">
-                      <Badge className="bg-[hsl(var(--brand-accent))]/20 border-[hsl(var(--brand-accent))]/30 text-[hsl(220,90%,70%)] backdrop-blur-md text-xs mb-2">
+                      <Badge className="bg-[hsl(var(--brand-accent))]/20 border-[hsl(var(--brand-accent))]/30 text-[hsl(var(--brand-accent-soft))] backdrop-blur-md text-xs mb-2">
                         {post.category}
                       </Badge>
                       <h3 className="font-display text-xl font-bold text-white mb-2 line-clamp-2">
@@ -248,7 +248,7 @@ export default function InsightsPage() {
                     <Button
                       size="sm"
                       variant="ghost"
-                      className="text-[hsl(var(--brand-primary))] hover:text-[hsl(190,85%,65%)]"
+                      className="text-[hsl(var(--brand-primary))] hover:text-[hsl(var(--brand-primary-soft))]"
                       data-testid={`button-read-more-${index}`}
                     >
                       Read More
@@ -284,11 +284,11 @@ export default function InsightsPage() {
         <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto bg-[hsl(245,30%,12%)] border-white/10">
           <DialogHeader>
             <div className="flex items-center gap-3 mb-4">
-              <Badge className="bg-[hsl(var(--brand-accent))]/20 border-[hsl(var(--brand-accent))]/30 text-[hsl(220,90%,70%)] backdrop-blur-md">
+              <Badge className="bg-[hsl(var(--brand-accent))]/20 border-[hsl(var(--brand-accent))]/30 text-[hsl(var(--brand-accent-soft))] backdrop-blur-md">
                 {selectedPost?.category}
               </Badge>
               {selectedPost?.featured && (
-                <Badge className="bg-[hsl(var(--brand-primary))]/20 border-[hsl(var(--brand-primary))]/30 text-[hsl(190,85%,70%)] backdrop-blur-md">
+                <Badge className="bg-[hsl(var(--brand-primary))]/20 border-[hsl(var(--brand-primary))]/30 text-[hsl(var(--brand-primary-soft))] backdrop-blur-md">
                   <Sparkles className="w-3 h-3 mr-1" />
                   Featured
                 </Badge>

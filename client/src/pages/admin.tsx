@@ -829,7 +829,7 @@ export default function AdminPage() {
                         {post.title}
                       </h3>
                       {post.featured && (
-                        <Badge className="bg-[hsl(var(--brand-accent))]/20 border-[hsl(var(--brand-accent))]/30 text-[hsl(220,90%,70%)]">
+                        <Badge className="bg-[hsl(var(--brand-accent))]/20 border-[hsl(var(--brand-accent))]/30 text-[hsl(var(--brand-accent-soft))]">
                           <Star className="w-3 h-3 mr-1" />
                           Featured
                         </Badge>
@@ -852,7 +852,7 @@ export default function AdminPage() {
                       size="sm"
                       variant="ghost"
                       onClick={() => handleEdit(post)}
-                      className="text-[hsl(var(--brand-primary))] hover:text-[hsl(190,85%,65%)] hover:bg-[hsl(var(--brand-primary))]/10"
+                      className="text-[hsl(var(--brand-primary))] hover:text-[hsl(var(--brand-primary-soft))] hover:bg-[hsl(var(--brand-primary))]/10"
                       data-testid={`button-edit-${post.id}`}
                     >
                       <Edit className="w-4 h-4" />

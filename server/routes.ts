@@ -674,28 +674,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     'theme.brandAccent': '220 90% 60%',
     'theme.brandPrimaryDark': '190 85% 55%',
     'theme.brandAccentDark': '220 90% 60%',
+    'theme.backgroundLight': '240 5% 96%',
+    'theme.backgroundDark': '270 8% 12%',
   };
+  const FONT_ALLOWLIST: Record<string, string> = {
+    'Inter': 'Inter:wght@400;500;600;700',
+    'Space Grotesk': 'Space+Grotesk:wght@400;500;600;700',
+    'Roboto': 'Roboto:wght@400;500;700',
+    'Open Sans': 'Open+Sans:wght@400;500;600;700',
+    'Lato': 'Lato:wght@400;700',
+    'Montserrat': 'Montserrat:wght@400;500;600;700',
+    'Poppins': 'Poppins:wght@400;500;600;700',
+    'Raleway': 'Raleway:wght@400;500;600;700',
+    'Playfair Display': 'Playfair+Display:wght@400;700',
+    'Merriweather': 'Merriweather:wght@400;700',
+    'Source Sans 3': 'Source+Sans+3:wght@400;600;700',
+    'IBM Plex Sans': 'IBM+Plex+Sans:wght@400;500;600;700',
+    'Work Sans': 'Work+Sans:wght@400;500;600;700',
+    'DM Sans': 'DM+Sans:wght@400;500;700',
+  };
+  const DEFAULT_FONTS = { 'theme.fontHeading': 'Space Grotesk', 'theme.fontBody': 'Inter' };
   const isValidHsl = (v: string): boolean => {
     const m = v.trim().match(/^(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)%\s+(\d+(?:\.\d+)?)%$/);
     if (!m) return false;
     const h = parseFloat(m[1]), s = parseFloat(m[2]), l = parseFloat(m[3]);
     return h >= 0 && h <= 360 && s >= 0 && s <= 100 && l >= 0 && l <= 100;
   };
+  const isValidFont = (v: string): boolean => Object.prototype.hasOwnProperty.call(FONT_ALLOWLIST, v);
   app.get("/api/theme.css", async (_req, res) => {
     res.setHeader('Content-Type', 'text/css; charset=utf-8');
-    res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    const buildCss = (m: Record<string, string>, fonts: Record<string, string>) => {
+      const families = Array.from(new Set([fonts['theme.fontHeading'], fonts['theme.fontBody']]))
+        .map(f => FONT_ALLOWLIST[f]).filter(Boolean).join('&family=');
+      const importLine = families
+        ? `@import url('https://fonts.googleapis.com/css2?family=${families}&display=swap');`
+        : '';
+      return `${importLine}
+:root{--brand-primary:${m['theme.brandPrimary']};--brand-accent:${m['theme.brandAccent']};--background:${m['theme.backgroundLight']};--font-sans:${fonts['theme.fontBody']},sans-serif;--font-display:${fonts['theme.fontHeading']},sans-serif;}
+.dark{--brand-primary:${m['theme.brandPrimaryDark']};--brand-accent:${m['theme.brandAccentDark']};--background:${m['theme.backgroundDark']};}`;
+    };
     try {
       const rows = await storage.getAllSiteSettings();
       const map: Record<string, string> = { ...DEFAULT_THEME };
+      const fonts: Record<string, string> = { ...DEFAULT_FONTS };
       rows.forEach(r => {
-        if (r.key.startsWith('theme.') && isValidHsl(r.value)) map[r.key] = r.value;
+        if (r.key in DEFAULT_THEME && isValidHsl(r.value)) map[r.key] = r.value;
+        else if (r.key in DEFAULT_FONTS && isValidFont(r.value)) fonts[r.key] = r.value;
       });
-      const css = `:root{--brand-primary:${map['theme.brandPrimary']};--brand-accent:${map['theme.brandAccent']};}.dark{--brand-primary:${map['theme.brandPrimaryDark']};--brand-accent:${map['theme.brandAccentDark']};}`;
-      res.send(css);
+      res.send(buildCss(map, fonts));
     } catch (e) {
       console.error('theme.css error:', e);
-      const css = `:root{--brand-primary:${DEFAULT_THEME['theme.brandPrimary']};--brand-accent:${DEFAULT_THEME['theme.brandAccent']};}.dark{--brand-primary:${DEFAULT_THEME['theme.brandPrimaryDark']};--brand-accent:${DEFAULT_THEME['theme.brandAccentDark']};}`;
-      res.send(css);
+      res.send(buildCss(DEFAULT_THEME, DEFAULT_FONTS));
     }
   });
 
@@ -711,9 +743,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/site/settings", adminAuth, async (req, res) => {
     const v = z.array(upsertSiteSettingSchema).safeParse(req.body?.entries);
     if (!v.success) return res.status(400).json({ error: fromZodError(v.error).toString() });
-    const bad = v.data.find(e => e.key.startsWith('theme.') && !isValidHsl(e.value));
-    if (bad) {
-      return res.status(400).json({ error: `Invalid HSL value for ${bad.key}: expected "H S% L%" (H 0-360, S/L 0-100)` });
+    for (const e of v.data) {
+      if (e.key in DEFAULT_THEME && !isValidHsl(e.value)) {
+        return res.status(400).json({ error: `Invalid HSL value for ${e.key}: expected "H S% L%" (H 0-360, S/L 0-100)` });
+      }
+      if (e.key in DEFAULT_FONTS && !isValidFont(e.value)) {
+        return res.status(400).json({ error: `Invalid font for ${e.key}: must be one of ${Object.keys(FONT_ALLOWLIST).join(', ')}` });
+      }
     }
     try { await storage.upsertSiteSettings(v.data); res.json({ success: true }); }
     catch (e) { console.error(e); res.status(500).json({ error: "Failed to save" }); }

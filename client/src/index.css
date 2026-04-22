@@ -17,6 +17,10 @@
   /* Brand gradient stops (overridable via /api/theme.css) */
   --brand-primary: 190 85% 55%;
   --brand-accent: 220 90% 60%;
+  /* Derived soft (lighter) and strong (darker) tints, auto-tracked from base */
+  --brand-primary-soft: hsl(from hsl(var(--brand-primary)) h s calc(l + 12%));
+  --brand-primary-strong: hsl(from hsl(var(--brand-primary)) h s calc(l - 12%));
+  --brand-accent-soft: hsl(from hsl(var(--brand-accent)) h s calc(l + 12%));
 
   --background: 240 5% 96%;
 
@@ -140,6 +144,9 @@
   /* Brand gradient stops (dark mode; overridable via /api/theme.css) */
   --brand-primary: 190 85% 55%;
   --brand-accent: 220 90% 60%;
+  --brand-primary-soft: hsl(from hsl(var(--brand-primary)) h s calc(l + 12%));
+  --brand-primary-strong: hsl(from hsl(var(--brand-primary)) h s calc(l - 12%));
+  --brand-accent-soft: hsl(from hsl(var(--brand-accent)) h s calc(l + 12%));
 
   --background: 270 8% 12%;
 

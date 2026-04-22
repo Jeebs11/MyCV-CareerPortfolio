@@ -4,19 +4,34 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, RotateCcw, Save } from 'lucide-react';
 
 interface Props { adminPassword: string }
 
-const DEFAULTS = {
+const HSL_DEFAULTS = {
   'theme.brandPrimary': '190 85% 55%',
   'theme.brandAccent': '220 90% 60%',
   'theme.brandPrimaryDark': '190 85% 55%',
   'theme.brandAccentDark': '220 90% 60%',
+  'theme.backgroundLight': '240 5% 96%',
+  'theme.backgroundDark': '270 8% 12%',
 };
-type ThemeKey = keyof typeof DEFAULTS;
+type HslKey = keyof typeof HSL_DEFAULTS;
+
+const FONT_DEFAULTS = {
+  'theme.fontHeading': 'Space Grotesk',
+  'theme.fontBody': 'Inter',
+};
+type FontKey = keyof typeof FONT_DEFAULTS;
+
+const FONT_OPTIONS = [
+  'Inter', 'Space Grotesk', 'Roboto', 'Open Sans', 'Lato',
+  'Montserrat', 'Poppins', 'Raleway', 'Playfair Display', 'Merriweather',
+  'Source Sans 3', 'IBM Plex Sans', 'Work Sans', 'DM Sans',
+];
 
 function hslToHex(hsl: string): string {
   const m = hsl.trim().match(/^(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)%\s+(\d+(?:\.\d+)?)%$/);
@@ -74,11 +89,13 @@ function reloadThemeCss() {
   });
 }
 
-const FIELDS: { key: ThemeKey; label: string }[] = [
-  { key: 'theme.brandPrimary', label: 'Brand Primary (Light)' },
-  { key: 'theme.brandAccent', label: 'Brand Accent (Light)' },
-  { key: 'theme.brandPrimaryDark', label: 'Brand Primary (Dark)' },
-  { key: 'theme.brandAccentDark', label: 'Brand Accent (Dark)' },
+const COLOR_FIELDS: { key: HslKey; label: string; section: 'brand' | 'background' }[] = [
+  { key: 'theme.brandPrimary', label: 'Brand Primary (Light)', section: 'brand' },
+  { key: 'theme.brandAccent', label: 'Brand Accent (Light)', section: 'brand' },
+  { key: 'theme.brandPrimaryDark', label: 'Brand Primary (Dark)', section: 'brand' },
+  { key: 'theme.brandAccentDark', label: 'Brand Accent (Dark)', section: 'brand' },
+  { key: 'theme.backgroundLight', label: 'Page Background (Light)', section: 'background' },
+  { key: 'theme.backgroundDark', label: 'Page Background (Dark)', section: 'background' },
 ];
 
 export function AppearanceAdmin({ adminPassword }: Props) {
@@ -87,15 +104,21 @@ export function AppearanceAdmin({ adminPassword }: Props) {
     queryKey: ['/api/site/settings'],
   });
 
-  const [values, setValues] = useState<Record<ThemeKey, string>>({ ...DEFAULTS });
+  const [hsl, setHsl] = useState<Record<HslKey, string>>({ ...HSL_DEFAULTS });
+  const [fonts, setFonts] = useState<Record<FontKey, string>>({ ...FONT_DEFAULTS });
 
   useEffect(() => {
     if (!settings) return;
-    const next = { ...DEFAULTS };
-    (Object.keys(DEFAULTS) as ThemeKey[]).forEach(k => {
-      if (settings[k]) next[k] = settings[k];
+    const nextHsl = { ...HSL_DEFAULTS };
+    (Object.keys(HSL_DEFAULTS) as HslKey[]).forEach(k => {
+      if (settings[k]) nextHsl[k] = settings[k];
     });
-    setValues(next);
+    setHsl(nextHsl);
+    const nextFonts = { ...FONT_DEFAULTS };
+    (Object.keys(FONT_DEFAULTS) as FontKey[]).forEach(k => {
+      if (settings[k] && FONT_OPTIONS.includes(settings[k])) nextFonts[k] = settings[k];
+    });
+    setFonts(nextFonts);
   }, [settings]);
 
   const saveMutation = useMutation({
@@ -105,7 +128,11 @@ export function AppearanceAdmin({ adminPassword }: Props) {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${adminPassword}` },
         body: JSON.stringify({ entries }),
       });
-      if (!res.ok) throw new Error(await res.text() || 'Save failed');
+      if (!res.ok) {
+        const txt = await res.text();
+        try { throw new Error(JSON.parse(txt).error || txt); }
+        catch { throw new Error(txt || 'Save failed'); }
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/site/settings'] });
@@ -115,7 +142,12 @@ export function AppearanceAdmin({ adminPassword }: Props) {
     onError: (e: Error) => toast({ title: 'Error', description: e.message, variant: 'destructive' }),
   });
 
-  const invalidKeys = (Object.keys(values) as ThemeKey[]).filter(k => !isValidHsl(values[k]));
+  const invalidKeys = (Object.keys(hsl) as HslKey[]).filter(k => !isValidHsl(hsl[k]));
+
+  const buildEntries = () => [
+    ...(Object.keys(hsl) as HslKey[]).map(k => ({ key: k, value: hsl[k].trim() })),
+    ...(Object.keys(fonts) as FontKey[]).map(k => ({ key: k, value: fonts[k] })),
+  ];
 
   const handleSave = () => {
     if (invalidKeys.length > 0) {
@@ -126,13 +158,16 @@ export function AppearanceAdmin({ adminPassword }: Props) {
       });
       return;
     }
-    const entries = (Object.keys(values) as ThemeKey[]).map(k => ({ key: k, value: values[k].trim() }));
-    saveMutation.mutate(entries);
+    saveMutation.mutate(buildEntries());
   };
 
   const handleReset = () => {
-    setValues({ ...DEFAULTS });
-    const entries = (Object.keys(DEFAULTS) as ThemeKey[]).map(k => ({ key: k, value: DEFAULTS[k] }));
+    setHsl({ ...HSL_DEFAULTS });
+    setFonts({ ...FONT_DEFAULTS });
+    const entries = [
+      ...(Object.keys(HSL_DEFAULTS) as HslKey[]).map(k => ({ key: k, value: HSL_DEFAULTS[k] })),
+      ...(Object.keys(FONT_DEFAULTS) as FontKey[]).map(k => ({ key: k, value: FONT_DEFAULTS[k] })),
+    ];
     saveMutation.mutate(entries);
   };
 
@@ -144,54 +179,107 @@ export function AppearanceAdmin({ adminPassword }: Props) {
     );
   }
 
+  const brandFields = COLOR_FIELDS.filter(f => f.section === 'brand');
+  const bgFields = COLOR_FIELDS.filter(f => f.section === 'background');
+
+  const renderColorField = (f: { key: HslKey; label: string }) => {
+    const hex = hslToHex(hsl[f.key]);
+    const valid = isValidHsl(hsl[f.key]);
+    return (
+      <div key={f.key} className="space-y-2">
+        <Label htmlFor={`color-${f.key}`}>{f.label}</Label>
+        <div className="flex items-center gap-3">
+          <input
+            id={`color-${f.key}`}
+            type="color"
+            value={hex}
+            onChange={e => setHsl(v => ({ ...v, [f.key]: hexToHsl(e.target.value) }))}
+            className="h-10 w-14 rounded-md border border-border bg-transparent cursor-pointer"
+            data-testid={`input-color-${f.key.split('.')[1]}`}
+          />
+          <Input
+            value={hsl[f.key]}
+            onChange={e => setHsl(v => ({ ...v, [f.key]: e.target.value }))}
+            placeholder="H S% L%"
+            className={`font-mono text-sm ${!valid ? 'border-destructive' : ''}`}
+            data-testid={`input-hsl-${f.key.split('.')[1]}`}
+          />
+        </div>
+        {!valid && <div className="text-xs text-destructive">Invalid HSL — use <code>H S% L%</code></div>}
+      </div>
+    );
+  };
+
   return (
     <Card className="p-6 space-y-6" data-testid="card-appearance">
       <div>
         <h2 className="text-xl font-semibold mb-1">Appearance</h2>
         <p className="text-sm text-muted-foreground">
-          Customize the brand colors used in gradients, accents and highlights across the site.
+          Customize brand colors, page backgrounds, and typography across the site.
           Changes apply immediately on save.
         </p>
       </div>
 
-      <div className="grid sm:grid-cols-2 gap-4">
-        {FIELDS.map(f => {
-          const hex = hslToHex(values[f.key]);
-          return (
-            <div key={f.key} className="space-y-2">
-              <Label htmlFor={`color-${f.key}`}>{f.label}</Label>
-              <div className="flex items-center gap-3">
-                <input
-                  id={`color-${f.key}`}
-                  type="color"
-                  value={hex}
-                  onChange={e => setValues(v => ({ ...v, [f.key]: hexToHsl(e.target.value) }))}
-                  className="h-10 w-14 rounded-md border border-border bg-transparent cursor-pointer"
-                  data-testid={`input-color-${f.key.split('.')[1]}`}
-                />
-                <Input
-                  value={values[f.key]}
-                  onChange={e => setValues(v => ({ ...v, [f.key]: e.target.value }))}
-                  placeholder="H S% L%"
-                  className="font-mono text-sm"
-                  data-testid={`input-hsl-${f.key.split('.')[1]}`}
-                />
-              </div>
-              <div className="text-xs text-muted-foreground">Format: <code>H S% L%</code> (e.g. 190 85% 55%)</div>
-            </div>
-          );
-        })}
+      <div className="space-y-3">
+        <h3 className="text-sm font-medium">Brand Colors</h3>
+        <div className="grid sm:grid-cols-2 gap-4">{brandFields.map(renderColorField)}</div>
       </div>
 
-      <div className="rounded-md border border-border p-4">
-        <div className="text-sm font-medium mb-2">Live Preview</div>
+      <div className="space-y-3">
+        <h3 className="text-sm font-medium">Page Backgrounds</h3>
+        <div className="grid sm:grid-cols-2 gap-4">{bgFields.map(renderColorField)}</div>
+      </div>
+
+      <div className="space-y-3">
+        <h3 className="text-sm font-medium">Typography</h3>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="font-heading">Heading Font</Label>
+            <Select value={fonts['theme.fontHeading']} onValueChange={v => setFonts(f => ({ ...f, 'theme.fontHeading': v }))}>
+              <SelectTrigger id="font-heading" data-testid="select-font-heading"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {FONT_OPTIONS.map(o => <SelectItem key={o} value={o} style={{ fontFamily: `${o}, sans-serif` }}>{o}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="font-body">Body Font</Label>
+            <Select value={fonts['theme.fontBody']} onValueChange={v => setFonts(f => ({ ...f, 'theme.fontBody': v }))}>
+              <SelectTrigger id="font-body" data-testid="select-font-body"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {FONT_OPTIONS.map(o => <SelectItem key={o} value={o} style={{ fontFamily: `${o}, sans-serif` }}>{o}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-md border border-border p-4 space-y-3">
+        <div className="text-sm font-medium">Live Preview</div>
         <div
           className="h-16 rounded-md"
           style={{
-            background: `linear-gradient(to right, hsl(${values['theme.brandPrimary']}), hsl(${values['theme.brandAccent']}))`,
+            background: `linear-gradient(to right, hsl(${hsl['theme.brandPrimary']}), hsl(${hsl['theme.brandAccent']}))`,
           }}
+          data-testid="preview-gradient-light"
         />
-        <div className="mt-2 text-xs text-muted-foreground">Light-mode gradient. Dark mode uses the dark pair.</div>
+        <div
+          className="h-16 rounded-md"
+          style={{
+            background: `linear-gradient(to right, hsl(${hsl['theme.brandPrimaryDark']}), hsl(${hsl['theme.brandAccentDark']}))`,
+          }}
+          data-testid="preview-gradient-dark"
+        />
+        <div className="grid sm:grid-cols-2 gap-3">
+          <div className="rounded-md p-3 border border-border" style={{ background: `hsl(${hsl['theme.backgroundLight']})`, color: '#111' }}>
+            <div style={{ fontFamily: `${fonts['theme.fontHeading']}, sans-serif` }} className="text-lg font-bold">Heading sample</div>
+            <div style={{ fontFamily: `${fonts['theme.fontBody']}, sans-serif` }} className="text-sm">Light background body text</div>
+          </div>
+          <div className="rounded-md p-3 border border-border" style={{ background: `hsl(${hsl['theme.backgroundDark']})`, color: '#eee' }}>
+            <div style={{ fontFamily: `${fonts['theme.fontHeading']}, sans-serif` }} className="text-lg font-bold">Heading sample</div>
+            <div style={{ fontFamily: `${fonts['theme.fontBody']}, sans-serif` }} className="text-sm">Dark background body text</div>
+          </div>
+        </div>
       </div>
 
       <div className="flex gap-3">
