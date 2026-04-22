@@ -779,7 +779,6 @@ export default function AdminPage() {
               CV Management
             </TabsTrigger>
             <TabsTrigger value="career" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(190,85%,55%)] data-[state=active]:to-[hsl(220,90%,60%)] data-[state=active]:text-white" data-testid="tab-career">Career Roles</TabsTrigger>
-            <TabsTrigger value="flagship" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(190,85%,55%)] data-[state=active]:to-[hsl(220,90%,60%)] data-[state=active]:text-white" data-testid="tab-flagship">Flagship Wins</TabsTrigger>
             <TabsTrigger value="skills" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(190,85%,55%)] data-[state=active]:to-[hsl(220,90%,60%)] data-[state=active]:text-white" data-testid="tab-skills">Skills</TabsTrigger>
             <TabsTrigger value="certifications" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(190,85%,55%)] data-[state=active]:to-[hsl(220,90%,60%)] data-[state=active]:text-white" data-testid="tab-certifications">Certifications</TabsTrigger>
             <TabsTrigger value="education" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(190,85%,55%)] data-[state=active]:to-[hsl(220,90%,60%)] data-[state=active]:text-white" data-testid="tab-education">Education</TabsTrigger>
@@ -1749,9 +1748,6 @@ export default function AdminPage() {
           <TabsContent value="career" className="space-y-6">
             <CareerRolesAdmin adminPassword={adminPassword} />
           </TabsContent>
-          <TabsContent value="flagship" className="space-y-6">
-            <FlagshipWinsAdmin adminPassword={adminPassword} />
-          </TabsContent>
           <TabsContent value="skills" className="space-y-6">
             <SiteSkillsAdmin adminPassword={adminPassword} />
           </TabsContent>
@@ -1763,6 +1759,9 @@ export default function AdminPage() {
           </TabsContent>
           <TabsContent value="settings" className="space-y-6">
             <SiteSettingsAdmin adminPassword={adminPassword} />
+            <div className="border-t border-white/10 pt-6">
+              <FlagshipWinsAdmin adminPassword={adminPassword} />
+            </div>
           </TabsContent>
         </Tabs>
       </div>

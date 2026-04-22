@@ -424,7 +424,7 @@ function FlagshipAchievements() {
 
 function SkillsAndCertificationsGrid() {
   const { data: settings = {} } = useQuery<Record<string, string>>({ queryKey: ['/api/site/settings'] });
-  const { data: skillsList = [] } = useQuery<SiteSkillRow[]>({ queryKey: ['/api/site/skills'] });
+  const { data: skillsList = [], isLoading: skillsLoading } = useQuery<SiteSkillRow[]>({ queryKey: ['/api/site/skills'] });
 
   const skillsData = {
     methodologies: skillsList.filter(s => s.category === 'methodology').map(s => s.name),
@@ -451,6 +451,11 @@ function SkillsAndCertificationsGrid() {
           </p>
         </div>
 
+        {skillsLoading ? (
+          <div className="grid lg:grid-cols-2 gap-6 md:gap-8">
+            {[0, 1, 2, 3].map(i => <Card key={i} className="bg-white/5 border-white/10 p-8 h-48 animate-pulse" />)}
+          </div>
+        ) : (
         <div className="grid lg:grid-cols-2 gap-6 md:gap-8">
           {/* Methodologies & Frameworks */}
           <Card className="bg-white/5 backdrop-blur-sm border-white/10 p-6 md:p-8">
@@ -558,6 +563,7 @@ function SkillsAndCertificationsGrid() {
             </div>
           </Card>
         </div>
+        )}
       </div>
     </section>
   );
