@@ -34,17 +34,83 @@ export default function PortfolioPage() {
   const [selectedProject, setSelectedProject] = useState<ProjectRow | null>(null);
 
   useEffect(() => {
-    document.title = 'Portfolio — Mujeeb Lawal | Senior Project Manager';
-    const meta = document.querySelector('meta[name="description"]');
+    const title = 'Portfolio — Mujeeb Lawal | Senior Project Manager';
     const desc = 'Selected delivery portfolio from Mujeeb Lawal — 17+ years, £50M+ delivered across 7 sectors. Signature transformation programmes in financial services, insurance, sustainability and more.';
-    if (meta) meta.setAttribute('content', desc);
-    else {
-      const m = document.createElement('meta');
-      m.name = 'description';
-      m.content = desc;
-      document.head.appendChild(m);
-    }
+    const url = typeof window !== 'undefined' ? window.location.href : '';
+
+    document.title = title;
+
+    const setMeta = (selector: string, attr: string, key: string, value: string) => {
+      let el = document.head.querySelector<HTMLMetaElement>(selector);
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute(attr, key);
+        document.head.appendChild(el);
+      }
+      el.setAttribute('content', value);
+    };
+
+    setMeta('meta[name="description"]', 'name', 'description', desc);
+    // OpenGraph
+    setMeta('meta[property="og:title"]', 'property', 'og:title', title);
+    setMeta('meta[property="og:description"]', 'property', 'og:description', desc);
+    setMeta('meta[property="og:type"]', 'property', 'og:type', 'website');
+    if (url) setMeta('meta[property="og:url"]', 'property', 'og:url', url);
+    // Twitter
+    setMeta('meta[name="twitter:card"]', 'name', 'twitter:card', 'summary_large_image');
+    setMeta('meta[name="twitter:title"]', 'name', 'twitter:title', title);
+    setMeta('meta[name="twitter:description"]', 'name', 'twitter:description', desc);
   }, []);
+
+  // Per-project metadata (OG) when a detail dialog is open
+  useEffect(() => {
+    if (!selectedProject) return;
+    const t = `${selectedProject.title} — ${selectedProject.client} | Mujeeb Lawal`;
+    const d = selectedProject.summary || selectedProject.impact;
+    document.title = t;
+    const setMeta = (selector: string, attr: string, key: string, value: string) => {
+      let el = document.head.querySelector<HTMLMetaElement>(selector);
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute(attr, key);
+        document.head.appendChild(el);
+      }
+      el.setAttribute('content', value);
+    };
+    setMeta('meta[property="og:title"]', 'property', 'og:title', t);
+    setMeta('meta[property="og:description"]', 'property', 'og:description', d);
+    if (selectedProject.heroImage) {
+      setMeta('meta[property="og:image"]', 'property', 'og:image', selectedProject.heroImage);
+      setMeta('meta[name="twitter:image"]', 'name', 'twitter:image', selectedProject.heroImage);
+    }
+
+    // Per-project JSON-LD (CreativeWork / CaseStudy)
+    const json = {
+      '@context': 'https://schema.org',
+      '@type': 'CreativeWork',
+      name: selectedProject.title,
+      headline: selectedProject.title,
+      about: selectedProject.sector,
+      description: selectedProject.description || selectedProject.summary || selectedProject.impact,
+      datePublished: selectedProject.year,
+      creator: { '@type': 'Person', name: 'Mujeeb Lawal' },
+      sourceOrganization: { '@type': 'Organization', name: selectedProject.client },
+      image: selectedProject.heroImage || undefined,
+      url: typeof window !== 'undefined' ? window.location.origin + '/portfolio#' + selectedProject.slug : undefined,
+    };
+    let s = document.getElementById('project-jsonld') as HTMLScriptElement | null;
+    if (!s) {
+      s = document.createElement('script');
+      s.type = 'application/ld+json';
+      s.id = 'project-jsonld';
+      document.head.appendChild(s);
+    }
+    s.textContent = JSON.stringify(json);
+    return () => {
+      const el = document.getElementById('project-jsonld');
+      if (el) el.remove();
+    };
+  }, [selectedProject]);
 
   const { data: projects = [], isLoading, isError } = useQuery<ProjectRow[]>({
     queryKey: ['/api/projects'],
@@ -104,11 +170,7 @@ export default function PortfolioPage() {
   }, [projects]);
 
   const handleProjectClick = (project: ProjectRow) => {
-    if (project.externalUrl) {
-      window.open(project.externalUrl, '_blank', 'noopener,noreferrer');
-    } else {
-      setSelectedProject(project);
-    }
+    setSelectedProject(project);
   };
 
   return (
@@ -490,6 +552,11 @@ export default function PortfolioPage() {
               </div>
 
               <div className="space-y-6 pt-2">
+                {selectedProject.summary && (
+                  <p className="text-base text-slate-200 leading-relaxed font-light italic border-l-2 border-cyan-500/40 pl-4">
+                    {selectedProject.summary}
+                  </p>
+                )}
                 <div>
                   <h3 className="text-sm font-mono text-slate-500 uppercase tracking-wider mb-2">The Challenge</h3>
                   <p className="text-slate-300 leading-relaxed font-light">
@@ -503,15 +570,88 @@ export default function PortfolioPage() {
                     {selectedProject.impact}
                   </p>
                 </div>
-                {selectedProject.role && (
+                {selectedProject.description && (
+                  <>
+                    <Separator className="bg-slate-800/50" />
+                    <div>
+                      <h3 className="text-sm font-mono text-slate-500 uppercase tracking-wider mb-2">Project Detail</h3>
+                      <div className="text-slate-300 leading-relaxed font-light whitespace-pre-line">
+                        {selectedProject.description}
+                      </div>
+                    </div>
+                  </>
+                )}
+                {selectedProject.outcomes && selectedProject.outcomes.length > 0 && (
                   <div>
-                    <h3 className="text-sm font-mono text-slate-500 uppercase tracking-wider mb-2">Role</h3>
-                    <p className="text-slate-300 font-light">{selectedProject.role}</p>
+                    <h3 className="text-sm font-mono text-slate-500 uppercase tracking-wider mb-2">Outcomes</h3>
+                    <ul className="space-y-1.5">
+                      {selectedProject.outcomes.map((o, i) => (
+                        <li key={i} className="flex gap-2 text-slate-300 font-light" data-testid={`text-outcome-${i}`}>
+                          <span className="text-cyan-400 mt-1">▸</span><span>{o}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {selectedProject.galleryImages && selectedProject.galleryImages.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-mono text-slate-500 uppercase tracking-wider mb-2">Gallery</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {selectedProject.galleryImages.map((src, i) => (
+                        <a key={i} href={src} target="_blank" rel="noopener noreferrer" className="block">
+                          <img
+                            src={src}
+                            alt={`${selectedProject.title} gallery ${i + 1}`}
+                            className="w-full h-28 object-cover rounded-md border border-slate-800 hover-elevate"
+                            data-testid={`img-gallery-${i}`}
+                          />
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {selectedProject.role && (
+                    <div>
+                      <h3 className="text-sm font-mono text-slate-500 uppercase tracking-wider mb-2">Role</h3>
+                      <p className="text-slate-300 font-light">{selectedProject.role}</p>
+                    </div>
+                  )}
+                  {selectedProject.duration && (
+                    <div>
+                      <h3 className="text-sm font-mono text-slate-500 uppercase tracking-wider mb-2">Duration</h3>
+                      <p className="text-slate-300 font-light" data-testid="text-detail-duration">{selectedProject.duration}</p>
+                    </div>
+                  )}
+                </div>
+                {selectedProject.techStack && selectedProject.techStack.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-mono text-slate-500 uppercase tracking-wider mb-2">Tools & Methods</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedProject.techStack.map((t, i) => (
+                        <span key={i} className="text-xs font-mono px-2 py-1 rounded bg-slate-800/70 border border-slate-700 text-slate-300" data-testid={`badge-tech-${i}`}>
+                          {t}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-slate-800">
+                {selectedProject.externalUrl && (
+                  <a
+                    href={selectedProject.externalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1"
+                    data-testid="link-detail-external"
+                  >
+                    <Button variant="outline" className="w-full border-cyan-500/40 text-cyan-300 hover:text-white hover:bg-cyan-500/10">
+                      <ExternalLink className="w-4 h-4 mr-2" /> Visit Project
+                    </Button>
+                  </a>
+                )}
                 <a href="mailto:odmlawal@gmail.com" className="flex-1">
                   <Button className="w-full bg-cyan-600 hover:bg-cyan-500 text-white border-0" data-testid="button-detail-contact">
                     <Mail className="w-4 h-4 mr-2" /> Discuss This Project

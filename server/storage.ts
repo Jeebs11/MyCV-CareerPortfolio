@@ -19,8 +19,8 @@ import {
 } from '@shared/schema';
 
 // Initialize database connection using HTTP (better for serverless/Replit environments)
-const sql = neon(process.env.DATABASE_URL!);
-export const db = drizzle(sql);
+const neonSql = neon(process.env.DATABASE_URL!);
+export const db = drizzle(neonSql);
 
 // Storage interface for blog posts and CV management
 export interface IStorage {
@@ -43,6 +43,7 @@ export interface IStorage {
   // Project methods
   getAllProjects(): Promise<ProjectRow[]>;
   getProjectById(id: number): Promise<ProjectRow | undefined>;
+  getProjectBySlug(slug: string): Promise<ProjectRow | undefined>;
   createProject(project: InsertProject): Promise<ProjectRow>;
   updateProject(id: number, project: UpdateProject): Promise<ProjectRow | undefined>;
   deleteProject(id: number): Promise<boolean>;
@@ -124,6 +125,17 @@ export class DatabaseStorage implements IStorage {
     return results[0];
   }
 
+  async getProjectBySlug(slug: string): Promise<ProjectRow | undefined> {
+    try {
+      const results = await db.select().from(projectsTable).where(eq(projectsTable.slug, slug));
+      return results[0];
+    } catch (err: any) {
+      // Neon HTTP driver can throw on empty result sets in some versions
+      if (err?.message?.includes("Cannot read properties of null")) return undefined;
+      throw err;
+    }
+  }
+
   async createProject(project: InsertProject): Promise<ProjectRow> {
     const results = await db.insert(projectsTable).values(project).returning();
     return results[0];
@@ -150,10 +162,11 @@ export class DatabaseStorage implements IStorage {
     const ids = orders.map(o => o.id);
     const cases = orders
       .map(o => sql`WHEN ${projectsTable.id} = ${o.id} THEN ${o.sortOrder}`);
+    const joined = (sql as any).join(cases, sql.raw(' '));
     await db
       .update(projectsTable)
       .set({
-        sortOrder: sql`CASE ${sql.join(cases, sql.raw(' '))} END`,
+        sortOrder: sql`CASE ${joined} END` as any,
         updatedAt: new Date(),
       })
       .where(inArray(projectsTable.id, ids));

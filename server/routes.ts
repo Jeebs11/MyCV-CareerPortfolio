@@ -365,7 +365,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get single project (public)
+  // Get single project by slug (public)
+  app.get("/api/projects/by-slug/:slug", async (req, res) => {
+    try {
+      const project = await storage.getProjectBySlug(req.params.slug);
+      if (!project) return res.status(404).json({ error: "Project not found" });
+      res.json(project);
+    } catch (error) {
+      console.error("Error fetching project by slug:", error);
+      res.status(500).json({ error: "Failed to fetch project" });
+    }
+  });
+
+  // Get single project by id (public)
   app.get("/api/projects/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);

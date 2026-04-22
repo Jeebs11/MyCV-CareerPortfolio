@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -83,17 +83,27 @@ const articleSchema = z.object({
 
 type ArticleFormData = z.infer<typeof articleSchema>;
 
+const slugify = (s: string) =>
+  s.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+
 const projectSchema = z.object({
   title: z.string().min(3, 'Title is required'),
+  slug: z.string().min(2, 'Slug is required').regex(/^[a-z0-9-]+$/, 'Lowercase letters, numbers and hyphens only'),
   client: z.string().min(1, 'Client is required'),
   sector: z.string().min(1, 'Sector is required'),
   year: z.string().min(1, 'Year is required'),
+  duration: z.string().optional(),
   metric: z.string().min(1, 'Headline metric is required'),
+  summary: z.string().optional(),
   challenge: z.string().min(10, 'Challenge must be at least 10 characters'),
   impact: z.string().min(10, 'Impact must be at least 10 characters'),
+  description: z.string().optional(),
+  outcomes: z.string().optional(),
+  techStack: z.string().optional(),
   role: z.string().optional(),
   logo: z.string().optional(),
   heroImage: z.string().optional(),
+  galleryImages: z.array(z.string()).default([]),
   externalUrl: z.string().optional(),
   featured: z.boolean().default(false),
   sortOrder: z.coerce.number().int().default(0),
@@ -173,30 +183,61 @@ export default function AdminPage() {
     resolver: zodResolver(projectSchema),
     defaultValues: {
       title: '',
+      slug: '',
       client: '',
       sector: '',
       year: '',
+      duration: '',
       metric: '',
+      summary: '',
       challenge: '',
       impact: '',
+      description: '',
+      outcomes: '',
+      techStack: '',
       role: '',
       logo: '',
       heroImage: '',
+      galleryImages: [],
       externalUrl: '',
       featured: false,
       sortOrder: 0,
     },
   });
 
+  // Auto-fill slug from title when slug is empty
+  const watchedTitle = projectForm.watch('title');
+  const watchedSlug = projectForm.watch('slug');
+  useEffect(() => {
+    if (!editingProject && watchedTitle && !watchedSlug) {
+      projectForm.setValue('slug', slugify(watchedTitle), { shouldValidate: false });
+    }
+  }, [watchedTitle, watchedSlug, editingProject]);
+
+  const buildProjectPayload = (data: ProjectFormData) => {
+    const toArr = (s?: string) =>
+      (s || '')
+        .split('\n')
+        .map(x => x.trim())
+        .filter(Boolean);
+    return {
+      ...data,
+      duration: data.duration || null,
+      summary: data.summary || null,
+      description: data.description || null,
+      role: data.role || null,
+      logo: data.logo || null,
+      heroImage: data.heroImage || null,
+      externalUrl: data.externalUrl || null,
+      outcomes: toArr(data.outcomes),
+      techStack: toArr(data.techStack),
+      galleryImages: data.galleryImages || [],
+    };
+  };
+
   const createProjectMutation = useMutation({
     mutationFn: async (data: ProjectFormData) => {
-      const payload = {
-        ...data,
-        role: data.role || null,
-        logo: data.logo || null,
-        heroImage: data.heroImage || null,
-        externalUrl: data.externalUrl || null,
-      };
+      const payload = buildProjectPayload(data);
       const res = await fetch('/api/projects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminPassword}` },
@@ -216,13 +257,7 @@ export default function AdminPage() {
 
   const updateProjectMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: ProjectFormData }) => {
-      const payload = {
-        ...data,
-        role: data.role || null,
-        logo: data.logo || null,
-        heroImage: data.heroImage || null,
-        externalUrl: data.externalUrl || null,
-      };
+      const payload = buildProjectPayload(data);
       const res = await fetch(`/api/projects/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminPassword}` },
@@ -307,15 +342,22 @@ export default function AdminPage() {
     setEditingProject(project);
     projectForm.reset({
       title: project.title,
+      slug: project.slug,
       client: project.client,
       sector: project.sector,
       year: project.year,
+      duration: project.duration || '',
       metric: project.metric,
+      summary: project.summary || '',
       challenge: project.challenge,
       impact: project.impact,
+      description: project.description || '',
+      outcomes: (project.outcomes || []).join('\n'),
+      techStack: (project.techStack || []).join('\n'),
       role: project.role || '',
       logo: project.logo || '',
       heroImage: project.heroImage || '',
+      galleryImages: project.galleryImages || [],
       externalUrl: project.externalUrl || '',
       featured: project.featured,
       sortOrder: project.sortOrder,
@@ -1207,6 +1249,17 @@ export default function AdminPage() {
                         </FormItem>
                       )}
                     />
+                    <FormField
+                      control={projectForm.control}
+                      name="slug"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Slug * <span className="text-xs text-muted-foreground">(used in shareable URL)</span></FormLabel>
+                          <FormControl><Input {...field} placeholder="auto-generated from title" data-testid="input-project-slug" /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                     <div className="grid grid-cols-2 gap-4">
                       <FormField
                         control={projectForm.control}
@@ -1257,6 +1310,28 @@ export default function AdminPage() {
                     </div>
                     <FormField
                       control={projectForm.control}
+                      name="duration"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Duration</FormLabel>
+                          <FormControl><Input {...field} placeholder="e.g. 18 months" data-testid="input-project-duration" /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={projectForm.control}
+                      name="summary"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Summary <span className="text-xs text-muted-foreground">(1-2 sentences shown above the fold)</span></FormLabel>
+                          <FormControl><Textarea rows={2} {...field} data-testid="input-project-summary" /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={projectForm.control}
                       name="role"
                       render={({ field }) => (
                         <FormItem>
@@ -1284,6 +1359,39 @@ export default function AdminPage() {
                         <FormItem>
                           <FormLabel>Impact *</FormLabel>
                           <FormControl><Textarea rows={3} {...field} data-testid="input-project-impact" /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={projectForm.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Project Detail <span className="text-xs text-muted-foreground">(longer narrative)</span></FormLabel>
+                          <FormControl><Textarea rows={5} {...field} data-testid="input-project-description" /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={projectForm.control}
+                      name="outcomes"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Outcomes <span className="text-xs text-muted-foreground">(one per line)</span></FormLabel>
+                          <FormControl><Textarea rows={4} {...field} placeholder={`Delivered £1.2M programme on time\nReduced cycle time by 36%\nGrew team to 34 people`} data-testid="input-project-outcomes" /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={projectForm.control}
+                      name="techStack"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Tools & Methods <span className="text-xs text-muted-foreground">(one per line)</span></FormLabel>
+                          <FormControl><Textarea rows={3} {...field} placeholder={`Jira\nConfluence\nSAFe`} data-testid="input-project-techstack" /></FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -1350,6 +1458,79 @@ export default function AdminPage() {
                             </div>
                             {field.value && (
                               <img src={field.value} alt="hero" className="mt-2 w-full h-32 object-cover rounded" />
+                            )}
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={projectForm.control}
+                        name="galleryImages"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Gallery Images</FormLabel>
+                            <div className="flex items-center gap-2">
+                              <label className="cursor-pointer" data-testid="label-gallery-upload">
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  multiple
+                                  className="hidden"
+                                  onChange={async (e) => {
+                                    const files = Array.from(e.target.files || []);
+                                    if (!files.length) return;
+                                    const uploaded: string[] = [];
+                                    for (const f of files) {
+                                      try {
+                                        const fd = new FormData();
+                                        fd.append('image', f);
+                                        const res = await fetch('/api/projects/upload-image', {
+                                          method: 'POST',
+                                          headers: { 'Authorization': `Bearer ${adminPassword}` },
+                                          body: fd,
+                                        });
+                                        if (res.ok) {
+                                          const { url } = await res.json();
+                                          uploaded.push(url);
+                                        }
+                                      } catch {}
+                                    }
+                                    if (uploaded.length) {
+                                      const next = [...(field.value || []), ...uploaded];
+                                      field.onChange(next);
+                                      toast({ title: 'Uploaded', description: `${uploaded.length} image(s) added` });
+                                    } else {
+                                      toast({ title: 'Error', description: 'Gallery upload failed', variant: 'destructive' });
+                                    }
+                                    e.target.value = '';
+                                  }}
+                                />
+                                <span className="inline-flex items-center justify-center h-10 px-3 rounded-md bg-white/10 hover:bg-white/20 border border-white/10 gap-2 text-sm">
+                                  <Upload className="w-4 h-4" /> Add gallery images
+                                </span>
+                              </label>
+                              <span className="text-xs text-muted-foreground" data-testid="text-gallery-count">{(field.value || []).length} image(s)</span>
+                            </div>
+                            {(field.value || []).length > 0 && (
+                              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mt-2">
+                                {(field.value || []).map((src, i) => (
+                                  <div key={i} className="relative group" data-testid={`gallery-item-${i}`}>
+                                    <img src={src} alt={`gallery ${i + 1}`} className="w-full h-20 object-cover rounded border border-white/10" />
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const next = (field.value || []).filter((_, idx) => idx !== i);
+                                        field.onChange(next);
+                                      }}
+                                      className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/70 text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                      data-testid={`button-remove-gallery-${i}`}
+                                      aria-label="Remove image"
+                                    >
+                                      ×
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
                             )}
                             <FormMessage />
                           </FormItem>
