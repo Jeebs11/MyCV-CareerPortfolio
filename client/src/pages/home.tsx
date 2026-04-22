@@ -2037,14 +2037,15 @@ function Footer() {
 
 function CertificationsSection() {
   const { data: certs = [], isLoading } = useQuery<SiteCertificationRow[]>({ queryKey: ['/api/site/certifications'] });
+  const { data: settings = {} } = useQuery<Record<string, string>>({ queryKey: ['/api/site/settings'] });
   if (!isLoading && certs.length === 0) return null;
   return (
     <section id="certifications" className="relative py-16 md:py-24 bg-white/[0.015]" data-testid="section-certifications">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12">
-          <Badge className="bg-white/10 backdrop-blur-md border border-white/20 text-white mb-4">Credentials</Badge>
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">Certifications</h2>
-          <p className="text-lg text-white/60 max-w-2xl mx-auto">Verified credentials backing my delivery and leadership work.</p>
+          <Badge className="bg-white/10 backdrop-blur-md border border-white/20 text-white mb-4">{settings['certifications.eyebrow'] || 'Credentials'}</Badge>
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">{settings['certifications.heading'] || 'Certifications'}</h2>
+          <p className="text-lg text-white/60 max-w-2xl mx-auto">{settings['certifications.subheading'] || 'Verified credentials backing my delivery and leadership work.'}</p>
         </div>
         {isLoading ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -2103,13 +2104,14 @@ function CertificationsSection() {
 
 function EducationSection() {
   const { data: items = [], isLoading } = useQuery<SiteEducationRow[]>({ queryKey: ['/api/site/education'] });
+  const { data: settings = {} } = useQuery<Record<string, string>>({ queryKey: ['/api/site/settings'] });
   if (!isLoading && items.length === 0) return null;
   return (
     <section id="education" className="relative py-16 md:py-24" data-testid="section-education">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12">
-          <Badge className="bg-white/10 backdrop-blur-md border border-white/20 text-white mb-4">Education</Badge>
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">Academic Background</h2>
+          <Badge className="bg-white/10 backdrop-blur-md border border-white/20 text-white mb-4">{settings['education.eyebrow'] || 'Education'}</Badge>
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">{settings['education.heading'] || 'Academic Background'}</h2>
         </div>
         {isLoading ? (
           <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">

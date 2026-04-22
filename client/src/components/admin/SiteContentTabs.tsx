@@ -489,6 +489,21 @@ const SETTING_GROUPS: { label: string; keys: { key: string; label: string; multi
     ],
   },
   {
+    label: 'Certifications Section',
+    keys: [
+      { key: 'certifications.eyebrow', label: 'Eyebrow' },
+      { key: 'certifications.heading', label: 'Section heading' },
+      { key: 'certifications.subheading', label: 'Section subheading', multi: true },
+    ],
+  },
+  {
+    label: 'Education Section',
+    keys: [
+      { key: 'education.eyebrow', label: 'Eyebrow' },
+      { key: 'education.heading', label: 'Section heading' },
+    ],
+  },
+  {
     label: 'Career Section',
     keys: [
       { key: 'career.heading', label: 'Section heading' },
