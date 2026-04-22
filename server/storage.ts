@@ -107,15 +107,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Project CRUD operations
+  private isNeonEmptyResultError(err: unknown): boolean {
+    return err instanceof Error && err.message.includes("Cannot read properties of null");
+  }
+
   async getAllProjects(): Promise<ProjectRow[]> {
     try {
       const rows = await db.select().from(projectsTable).orderBy(asc(projectsTable.sortOrder), desc(projectsTable.createdAt));
       return rows;
-    } catch (err: any) {
-      // Neon HTTP driver edge case on empty result sets
-      if (err?.message?.includes("Cannot read properties of null")) {
-        return [];
-      }
+    } catch (err) {
+      if (this.isNeonEmptyResultError(err)) return [];
       throw err;
     }
   }
@@ -129,9 +130,8 @@ export class DatabaseStorage implements IStorage {
     try {
       const results = await db.select().from(projectsTable).where(eq(projectsTable.slug, slug));
       return results[0];
-    } catch (err: any) {
-      // Neon HTTP driver can throw on empty result sets in some versions
-      if (err?.message?.includes("Cannot read properties of null")) return undefined;
+    } catch (err) {
+      if (this.isNeonEmptyResultError(err)) return undefined;
       throw err;
     }
   }
@@ -160,13 +160,14 @@ export class DatabaseStorage implements IStorage {
     // Atomic single-statement update using CASE so partial failures cannot
     // leave inconsistent sortOrder values (Neon HTTP driver has no tx support).
     const ids = orders.map(o => o.id);
-    const cases = orders
-      .map(o => sql`WHEN ${projectsTable.id} = ${o.id} THEN ${o.sortOrder}`);
-    const joined = (sql as any).join(cases, sql.raw(' '));
+    const cases = orders.map(
+      o => sql`WHEN ${projectsTable.id} = ${o.id} THEN ${o.sortOrder}`
+    );
+    const joined = sql.join(cases, sql.raw(' '));
     await db
       .update(projectsTable)
       .set({
-        sortOrder: sql`CASE ${joined} END` as any,
+        sortOrder: sql<number>`CASE ${joined} END`,
         updatedAt: new Date(),
       })
       .where(inArray(projectsTable.id, ids));

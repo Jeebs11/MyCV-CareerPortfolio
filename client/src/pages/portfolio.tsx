@@ -388,8 +388,26 @@ export default function PortfolioPage() {
                   className="group relative portfolio-glass-panel rounded-xl flex flex-col h-full hover:bg-white/[0.02] transition-colors duration-500 border border-slate-800/60 hover:border-slate-700 cursor-pointer overflow-hidden"
                   data-testid={`card-project-${project.id}`}
                 >
+                  {project.heroImage ? (
+                    <div className="relative w-full aspect-[16/9] overflow-hidden bg-slate-900">
+                      <img
+                        src={project.heroImage}
+                        alt={project.title}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        loading="lazy"
+                        data-testid={`img-card-hero-${project.id}`}
+                        onError={(e) => (e.currentTarget.style.display = 'none')}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
+                    </div>
+                  ) : (
+                    <div className="w-full aspect-[16/9] bg-gradient-to-br from-slate-900 to-slate-800/40 flex items-center justify-center">
+                      <Briefcase className="w-10 h-10 text-slate-700" />
+                    </div>
+                  )}
+
                   <div className="p-6 border-b border-slate-800/50 flex-grow">
-                    <div className="flex items-start justify-between mb-6 gap-3">
+                    <div className="flex items-start justify-between mb-5 gap-3">
                       <div className="flex items-center gap-3 min-w-0">
                         {project.logo ? (
                           <div className="w-10 h-10 bg-white rounded-lg p-1.5 flex items-center justify-center flex-shrink-0">
@@ -412,20 +430,33 @@ export default function PortfolioPage() {
                           <p className="text-slate-200 font-medium truncate">{project.client}</p>
                         </div>
                       </div>
-                      {project.externalUrl ? (
-                        <ExternalLink className="w-4 h-4 text-slate-500 group-hover:text-cyan-400 transition-colors flex-shrink-0" />
-                      ) : (
-                        <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-white transition-colors flex-shrink-0" />
-                      )}
+                      <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-white transition-colors flex-shrink-0" />
                     </div>
 
-                    <h3 className="font-display text-2xl font-light text-white mb-4 group-hover:text-cyan-100 transition-colors">
+                    <h3 className="font-display text-2xl font-light text-white mb-3 group-hover:text-cyan-100 transition-colors">
                       {project.title}
                     </h3>
 
-                    <p className="text-slate-400 text-sm font-light leading-relaxed mb-6 line-clamp-4">
-                      {project.challenge}
+                    <p
+                      className="text-slate-300 text-sm font-light leading-relaxed mb-4 line-clamp-3"
+                      data-testid={`text-card-summary-${project.id}`}
+                    >
+                      {project.summary || project.challenge}
                     </p>
+
+                    {project.outcomes && project.outcomes.length > 0 && (
+                      <ul
+                        className="space-y-1.5 mt-4 pt-4 border-t border-slate-800/50"
+                        data-testid={`list-card-outcomes-${project.id}`}
+                      >
+                        {project.outcomes.slice(0, 3).map((o, i) => (
+                          <li key={i} className="flex gap-2 text-xs text-slate-400 leading-snug">
+                            <span className="text-cyan-400/80 mt-[3px]">▸</span>
+                            <span className="line-clamp-1">{o}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
 
                   <div className="p-6 bg-black/20 mt-auto">
@@ -438,7 +469,7 @@ export default function PortfolioPage() {
                     <div className="flex items-center justify-between text-xs font-mono text-slate-500">
                       <span>{project.year}</span>
                       <span className="uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        {project.externalUrl ? 'View Live ↗' : 'Read Case Study'}
+                        Read Case Study
                       </span>
                     </div>
                   </div>

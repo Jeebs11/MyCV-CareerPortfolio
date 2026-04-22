@@ -164,6 +164,13 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
             >
               Journey
             </button>
+            <a
+              href="/portfolio"
+              className="text-sm font-medium text-white/70 hover:text-white transition-colors"
+              data-testid="link-portfolio-nav"
+            >
+              Portfolio
+            </a>
             <a 
               href="/insights"
               className="text-sm font-medium text-white/70 hover:text-white transition-colors"
@@ -212,6 +219,14 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
                     <div className="font-medium">Journey</div>
                     <div className="text-sm text-white/60">17 Years of Experience</div>
                   </button>
+                  <a
+                    href="/portfolio"
+                    className="text-left text-white/90 hover:text-white transition-colors py-3 px-4 rounded-md hover-elevate"
+                    data-testid="mobile-link-portfolio"
+                  >
+                    <div className="font-medium">Portfolio</div>
+                    <div className="text-sm text-white/60">Selected case studies</div>
+                  </a>
                   <a 
                     href="/insights"
                     className="text-left text-white/90 hover:text-white transition-colors py-3 px-4 rounded-md hover-elevate"
