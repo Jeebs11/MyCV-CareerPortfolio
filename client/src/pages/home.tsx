@@ -26,8 +26,7 @@ interface CVForm { name: string; email: string; phone: string }
 function SectionRule({ label }: { label: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', padding: '0 64px', marginBottom: 40 }}>
-      <div style={{ flex: 1, height: 1, background: BRASS, opacity: 0.35 }} />
-      <div style={{ padding: '0 22px', fontSize: 8.5, fontWeight: 600, letterSpacing: '0.28em', textTransform: 'uppercase', color: BRASS, flexShrink: 0 }}>{label}</div>
+      <div style={{ fontSize: 8.5, fontWeight: 600, letterSpacing: '0.28em', textTransform: 'uppercase', color: BRASS, flexShrink: 0, paddingRight: 20 }}>{label}</div>
       <div style={{ flex: 1, height: 1, background: BRASS, opacity: 0.35 }} />
     </div>
   );
