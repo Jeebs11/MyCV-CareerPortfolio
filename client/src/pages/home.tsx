@@ -1191,11 +1191,11 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
                 <Download className="mr-2 w-4 h-4 md:w-5 md:h-5" /> Download CV
               </Button>
 
-              <Link href="/portfolio">
+              <Link href="/portfolio" className="w-full sm:w-auto">
                 <Button 
                   size="lg"
                   variant="outline"
-                  className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10 text-sm md:text-lg px-6 md:px-10 py-5 md:py-7 w-full sm:w-auto"
+                  className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10 text-sm md:text-lg px-6 md:px-10 py-5 md:py-7 w-full"
                   data-testid="button-view-portfolio"
                 >
                   <FolderKanban className="mr-2 w-4 h-4 md:w-5 md:h-5" /> View Portfolio
@@ -1213,7 +1213,7 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
               </Button>
             </div>
             
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 pt-2 text-sm text-white/70 justify-center">
+            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 pt-2 text-sm text-white/70 justify-center">
               <a 
                 href={`mailto:${email}`}
                 className="hover:text-white transition-colors flex items-center gap-2"
