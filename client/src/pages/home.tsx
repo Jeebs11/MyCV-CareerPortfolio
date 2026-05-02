@@ -121,9 +121,7 @@ export default function Home() {
         a { text-decoration: none; }
         ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: hsl(220,20%,30%); }
       `}</style>
-
       <FloatingNav />
-
       {/* ── LEFT PANEL ── */}
       <aside style={{ width: 340, background: INK, color: PAPER, height: '100vh', display: 'flex', flexDirection: 'column', padding: '52px 44px', flexShrink: 0, overflowY: 'auto' }}>
         {/* Logo */}
@@ -193,7 +191,6 @@ export default function Home() {
           </div>
         </div>
       </aside>
-
       {/* ── RIGHT PANEL ── */}
       <main ref={mainRef} style={{ flex: 1, background: PAPER, overflowY: 'auto', height: '100vh' }}>
 
@@ -217,7 +214,7 @@ export default function Home() {
 
         {/* MANDATES */}
         <section id="mandates" ref={el => s('mandates', el)} style={{ padding: '64px', borderBottom: `1px solid ${HAIRLINE}` }}>
-          <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: BRASS, marginBottom: 40 }}>Selected Mandates</div>
+          <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: BRASS, marginBottom: 40 }}>Top key achievements</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
             {flagshipWins.length > 0
               ? flagshipWins.slice(0, 3).map((win, i) => (
@@ -349,7 +346,6 @@ export default function Home() {
           <div style={{ marginTop: 64, paddingTop: 24, borderTop: `1px solid ${HAIRLINE}`, fontSize: 11, color: 'hsl(220,15%,65%)' }}>{copyright}</div>
         </section>
       </main>
-
       {/* ── CV DOWNLOAD MODAL ── */}
       {cvModalOpen && (
         <div
