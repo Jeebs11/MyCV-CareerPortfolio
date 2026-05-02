@@ -24,8 +24,11 @@ interface BlogPost {
   heroImage?: string;
 }
 
+const PAGE_SIZE = 10;
+
 export default function InsightsPage() {
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [page, setPage] = useState(1);
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
 
   const { data: blogPosts = [], isLoading } = useQuery<BlogPost[]>({ queryKey: ['/api/blog-posts'] });
@@ -36,6 +39,13 @@ export default function InsightsPage() {
 
   const categories = ['All', ...Array.from(new Set(blogPosts.map(p => p.category)))];
   const filtered = selectedCategory === 'All' ? blogPosts : blogPosts.filter(p => p.category === selectedCategory);
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  function changeCategory(cat: string) {
+    setSelectedCategory(cat);
+    setPage(1);
+  }
 
   return (
     <div style={{ fontFamily: 'Inter, sans-serif', display: 'flex', minHeight: '100vh' }}>
@@ -67,7 +77,7 @@ export default function InsightsPage() {
         <div style={{ marginBottom: 36 }}>
           <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'hsl(220,15%,40%)', marginBottom: 16 }}>Filter by topic</div>
           {categories.map((cat, i) => (
-            <button key={i} onClick={() => setSelectedCategory(cat)} style={{
+            <button key={i} onClick={() => changeCategory(cat)} style={{
               display: 'block', width: '100%', textAlign: 'left',
               padding: '9px 0 9px 12px', background: 'none', border: 'none', cursor: 'pointer',
               fontSize: 12, fontWeight: selectedCategory === cat ? 600 : 400,
@@ -104,7 +114,7 @@ export default function InsightsPage() {
           </div>
         ) : (
           <div>
-            {filtered.map((post, i) => (
+            {paginated.map((post, i) => (
               <article
                 key={post.id}
                 className="article-hover"
@@ -129,6 +139,37 @@ export default function InsightsPage() {
                 <div style={{ marginTop: 20, fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: BRASS }}>Read →</div>
               </article>
             ))}
+
+            {/* PAGINATION */}
+            {totalPages > 1 && (
+              <div style={{ padding: '32px 64px 48px', borderTop: `1px solid ${HAIRLINE}`, display: 'flex', alignItems: 'center', gap: 24 }}>
+                <button
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: page === 1 ? 'hsl(220,15%,75%)' : INK, background: 'none', border: 'none', cursor: page === 1 ? 'default' : 'pointer', padding: 0 }}
+                >← Prev</button>
+
+                <div style={{ display: 'flex', gap: 6 }}>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
+                    <button
+                      key={n}
+                      onClick={() => setPage(n)}
+                      style={{ width: 32, height: 32, fontSize: 12, fontWeight: n === page ? 600 : 400, color: n === page ? PAPER : MUTED, background: n === page ? INK : 'transparent', border: `1px solid ${n === page ? 'transparent' : HAIRLINE}`, cursor: 'pointer' }}
+                    >{n}</button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                  style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: page === totalPages ? 'hsl(220,15%,75%)' : INK, background: 'none', border: 'none', cursor: page === totalPages ? 'default' : 'pointer', padding: 0 }}
+                >Next →</button>
+
+                <span style={{ marginLeft: 'auto', fontSize: 11, color: MUTED }}>
+                  {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}
+                </span>
+              </div>
+            )}
           </div>
         )}
 
