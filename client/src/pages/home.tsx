@@ -124,14 +124,6 @@ export default function Home() {
       <FloatingNav />
       {/* ── LEFT PANEL ── */}
       <aside style={{ width: 340, background: INK, color: PAPER, height: '100vh', display: 'flex', flexDirection: 'column', padding: '52px 44px', flexShrink: 0, overflowY: 'auto' }}>
-        {/* Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 52 }}>
-          <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
-            <rect width="40" height="40" rx="2" fill={BRASS} />
-            <text x="20" y="28" textAnchor="middle" fontFamily="Cormorant Garamond,serif" fontWeight="600" fontSize="22" fill={PAPER}>M</text>
-          </svg>
-        </div>
-
         {/* Name + title */}
         <div style={{ marginBottom: 40 }}>
           <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 44, fontWeight: 400, lineHeight: 1.05, color: PAPER, marginBottom: 10 }}>Mujeeb<br />Lawal</div>
