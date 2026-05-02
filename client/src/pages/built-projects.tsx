@@ -59,7 +59,7 @@ export default function BuiltProjectsPage() {
   const { data: dbProjects = [] } = useQuery<BuiltProjectRow[]>({ queryKey: ['/api/built-projects'] });
 
   useEffect(() => {
-    document.title = 'Projects — Mujeeb Lawal | Built on Replit';
+    document.title = 'Portfolio — Mujeeb Lawal | Built on Replit';
   }, []);
 
   const all: BuiltProjectRow[] = dbProjects.length > 0 ? dbProjects : FALLBACK;
@@ -87,7 +87,7 @@ export default function BuiltProjectsPage() {
         </Link>
 
         <div style={{ marginBottom: 36 }}>
-          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 32, fontWeight: 400, lineHeight: 1.1, color: PAPER, marginBottom: 8 }}>Projects</div>
+          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 32, fontWeight: 400, lineHeight: 1.1, color: PAPER, marginBottom: 8 }}>Portfolio</div>
           <div style={{ fontSize: 13, color: 'hsl(220,15%,50%)', lineHeight: 1.65 }}>Things I've built — web apps, tools, automations, and dashboards. All live on Replit.</div>
         </div>
 
@@ -116,7 +116,6 @@ export default function BuiltProjectsPage() {
 
         <div style={{ borderTop: '1px solid hsl(220,20%,22%)', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 10 }}>
           <Link href="/" style={{ fontSize: 12, color: 'hsl(220,15%,50%)' }}>← Back to Profile</Link>
-          <Link href="/case-studies" style={{ fontSize: 12, color: 'hsl(220,15%,50%)' }}>Case Studies</Link>
           <Link href="/insights" style={{ fontSize: 12, color: 'hsl(220,15%,50%)' }}>Insights</Link>
         </div>
       </aside>
@@ -125,7 +124,7 @@ export default function BuiltProjectsPage() {
       <main style={{ flex: 1, background: PAPER, overflowY: 'auto', height: '100vh' }}>
         <div style={{ padding: '52px 64px 40px', borderBottom: `1px solid ${HAIRLINE}` }}>
           <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.24em', textTransform: 'uppercase', color: BRASS, marginBottom: 12 }}>Built on Replit</div>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 48, fontWeight: 400, color: INK, lineHeight: 1.1, marginBottom: 12 }}>Technical Projects</h1>
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 48, fontWeight: 400, color: INK, lineHeight: 1.1, marginBottom: 12 }}>Portfolio</h1>
           <p style={{ fontSize: 14, color: MUTED, maxWidth: 560 }}>I don't just manage delivery — I build. These are working tools and applications, each solving a real problem I encountered in programme work.</p>
         </div>
 

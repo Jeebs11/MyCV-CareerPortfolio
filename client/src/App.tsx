@@ -6,7 +6,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "@/pages/home";
 import InsightsPage from "@/pages/insights";
-import CaseStudiesPage from "@/pages/case-studies";
 import BuiltProjectsPage from "@/pages/built-projects";
 
 const AdminPage = lazy(() => import("@/pages/admin"));
@@ -26,9 +25,8 @@ function Router() {
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/insights" component={InsightsPage} />
-        <Route path="/case-studies" component={CaseStudiesPage} />
+        <Route path="/portfolio" component={BuiltProjectsPage} />
         <Route path="/projects" component={BuiltProjectsPage} />
-        <Route path="/portfolio" component={CaseStudiesPage} />
         <Route path="/admin" component={AdminPage} />
         <Route path="*" component={Home} />
       </Switch>

@@ -7,8 +7,7 @@ const BRASS_LIGHT = 'hsl(35,55%,62%)';
 
 const PAGES = [
   { href: '/', label: 'Profile' },
-  { href: '/case-studies', label: 'Case Studies' },
-  { href: '/projects', label: 'Built Projects' },
+  { href: '/portfolio', label: 'Portfolio' },
   { href: '/insights', label: 'Insights' },
 ];
 
@@ -16,7 +15,7 @@ export default function FloatingNav() {
   const [location] = useLocation();
 
   const isActive = (href: string) =>
-    href === '/' ? location === '/' : location.startsWith(href);
+    href === '/' ? location === '/' : location === href || location === '/projects' && href === '/portfolio';
 
   return (
     <nav
