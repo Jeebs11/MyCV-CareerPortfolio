@@ -6,17 +6,16 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "@/pages/home";
 import InsightsPage from "@/pages/insights";
-import PortfolioPage from "@/pages/portfolio";
+import CaseStudiesPage from "@/pages/case-studies";
+import BuiltProjectsPage from "@/pages/built-projects";
 
 const AdminPage = lazy(() => import("@/pages/admin"));
 
 function LoadingFallback() {
   return (
-    <div className="min-h-screen bg-[hsl(270,8%,12%)] flex items-center justify-center">
-      <div className="flex flex-col items-center gap-4">
-        <div className="w-12 h-12 border-4 border-[hsl(var(--brand-primary))]/30 border-t-[hsl(var(--brand-primary))] rounded-full animate-spin" />
-        <p className="text-white/60 text-sm">Loading...</p>
-      </div>
+    <div style={{ minHeight: '100vh', background: 'hsl(220,25%,14%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ width: 40, height: 40, border: '3px solid hsl(35,45%,45%)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
@@ -27,7 +26,9 @@ function Router() {
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/insights" component={InsightsPage} />
-        <Route path="/portfolio" component={PortfolioPage} />
+        <Route path="/case-studies" component={CaseStudiesPage} />
+        <Route path="/projects" component={BuiltProjectsPage} />
+        <Route path="/portfolio" component={CaseStudiesPage} />
         <Route path="/admin" component={AdminPage} />
         <Route path="*" component={Home} />
       </Switch>
@@ -40,6 +41,7 @@ function PrefetchOnIdle() {
     const prefetch = () => {
       queryClient.prefetchQuery({ queryKey: ['/api/projects'] });
       queryClient.prefetchQuery({ queryKey: ['/api/blog-posts'] });
+      queryClient.prefetchQuery({ queryKey: ['/api/built-projects'] });
     };
     const w = window as Window & { requestIdleCallback?: (cb: () => void) => number };
     if (typeof w.requestIdleCallback === 'function') {

@@ -251,6 +251,34 @@ export const upsertSiteSettingSchema = createInsertSchema(siteSettingsTable).omi
 export type SiteSettingRow = typeof siteSettingsTable.$inferSelect;
 export type UpsertSiteSetting = z.infer<typeof upsertSiteSettingSchema>;
 
+// Built Projects Table (Replit-built tools & apps)
+export const builtProjectsTable = pgTable('built_projects', {
+  id: serial('id').primaryKey(),
+  title: varchar('title', { length: 300 }).notNull(),
+  description: text('description').notNull(),
+  type: varchar('type', { length: 50 }).notNull(), // 'Web App' | 'Automation' | 'Dashboard' | 'Tool'
+  stack: jsonb('stack').$type<string[]>().notNull(),
+  lines: jsonb('lines').$type<string[]>().notNull(), // feature bullet points
+  status: varchar('status', { length: 20 }).default('Live').notNull(),
+  url: varchar('url', { length: 500 }),
+  image: varchar('image', { length: 500 }),
+  highlight: boolean('highlight').default(false).notNull(),
+  sortOrder: integer('sort_order').default(0).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const insertBuiltProjectSchema = createInsertSchema(builtProjectsTable, {
+  stack: z.array(z.string()),
+  lines: z.array(z.string()),
+}).omit({ id: true, createdAt: true, updatedAt: true });
+
+export const updateBuiltProjectSchema = insertBuiltProjectSchema.partial();
+
+export type BuiltProjectRow = typeof builtProjectsTable.$inferSelect;
+export type InsertBuiltProject = z.infer<typeof insertBuiltProjectSchema>;
+export type UpdateBuiltProject = z.infer<typeof updateBuiltProjectSchema>;
+
 // ============ INTERFACES ============
 
 export interface Experience {

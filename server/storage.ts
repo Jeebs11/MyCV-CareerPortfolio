@@ -16,6 +16,10 @@ import {
   type InsertProject,
   type UpdateProject,
   type ProjectRow,
+  builtProjectsTable,
+  type InsertBuiltProject,
+  type UpdateBuiltProject,
+  type BuiltProjectRow,
   careerRolesTable,
   type InsertCareerRole,
   type UpdateCareerRole,
@@ -117,6 +121,13 @@ export interface IStorage {
   // Site Settings
   getAllSiteSettings(): Promise<SiteSettingRow[]>;
   upsertSiteSettings(entries: UpsertSiteSetting[]): Promise<void>;
+
+  // Built Projects
+  getAllBuiltProjects(): Promise<BuiltProjectRow[]>;
+  createBuiltProject(data: InsertBuiltProject): Promise<BuiltProjectRow>;
+  updateBuiltProject(id: number, data: UpdateBuiltProject): Promise<BuiltProjectRow | undefined>;
+  deleteBuiltProject(id: number): Promise<boolean>;
+  reorderBuiltProjects(orders: { id: number; sortOrder: number }[]): Promise<void>;
 
   // Seed
   seedSiteContentIfEmpty(): Promise<void>;
@@ -243,6 +254,36 @@ export class DatabaseStorage implements IStorage {
         updatedAt: new Date(),
       })
       .where(inArray(projectsTable.id, ids));
+  }
+
+  // Built Projects
+  async getAllBuiltProjects(): Promise<BuiltProjectRow[]> {
+    try {
+      return await db.select().from(builtProjectsTable).orderBy(asc(builtProjectsTable.sortOrder), asc(builtProjectsTable.id));
+    } catch (err) {
+      if (isNeonEmptyResultError(err)) return [];
+      throw err;
+    }
+  }
+  async createBuiltProject(data: InsertBuiltProject): Promise<BuiltProjectRow> {
+    const r = await db.insert(builtProjectsTable).values(data).returning();
+    return r[0];
+  }
+  async updateBuiltProject(id: number, data: UpdateBuiltProject): Promise<BuiltProjectRow | undefined> {
+    const r = await db.update(builtProjectsTable).set({ ...data, updatedAt: new Date() }).where(eq(builtProjectsTable.id, id)).returning();
+    return r[0];
+  }
+  async deleteBuiltProject(id: number): Promise<boolean> {
+    const r = await db.delete(builtProjectsTable).where(eq(builtProjectsTable.id, id)).returning();
+    return r.length > 0;
+  }
+  async reorderBuiltProjects(orders: { id: number; sortOrder: number }[]): Promise<void> {
+    if (orders.length === 0) return;
+    const { ids, joined } = reorderCaseUpdate(builtProjectsTable, orders);
+    await db.update(builtProjectsTable).set({
+      sortOrder: sql<number>`CASE ${joined} END`,
+      updatedAt: new Date(),
+    }).where(inArray(builtProjectsTable.id, ids));
   }
 
   // Career Roles

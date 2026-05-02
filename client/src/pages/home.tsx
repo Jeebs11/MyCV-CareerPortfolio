@@ -1,2183 +1,399 @@
-import { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
-import { experiences, skills, keyAchievements, detailedCertifications, timelineProjects, industryExperience, education } from '@shared/schema';
-import type { CareerRoleRow, FlagshipWinRow, SiteSkillRow, SiteCertificationRow, SiteEducationRow } from '@shared/schema';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from '@/components/ui/sheet';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import type { CareerRoleRow, FlagshipWinRow, SiteSkillRow, SiteEducationRow } from '@shared/schema';
 
-const ChatBot = lazy(() => import('@/components/ChatBot'));
-const SectionNavigation = lazy(() => import('@/components/SectionNavigation'));
-import {
-  TrendingUp,
-  Award,
-  Zap,
-  Globe,
-  MapPin,
-  Leaf,
-  Mail,
-  Linkedin,
-  Download,
-  ArrowRight,
-  Briefcase,
-  Code,
-  Users,
-  Target,
-  ChevronDown,
-  CheckCircle2,
-  Clock,
-  DollarSign,
-  BarChart3,
-  ShieldCheck,
-  Smile,
-  AlertCircle,
-  ExternalLink,
-  Calendar,
-  BookOpen,
-  Lightbulb,
-  ChevronLeft,
-  ChevronRight,
-  ChevronUp,
-  GraduationCap,
-  Menu,
-  Phone,
-  MessageCircle,
-  FolderKanban
-} from 'lucide-react';
+const INK = 'hsl(220,25%,14%)';
+const PAPER = 'hsl(40,20%,97%)';
+const BRASS = 'hsl(35,45%,45%)';
+const BRASS_LIGHT = 'hsl(35,55%,62%)';
+const HAIRLINE = 'hsl(40,15%,87%)';
+const MUTED = 'hsl(220,12%,52%)';
 
-const iconMap: Record<string, any> = {
-  TrendingUp,
-  Award,
-  Zap,
-  Globe,
-  MapPin,
-  Leaf,
-  Calendar,
-  Briefcase,
-  Target,
-  DollarSign,
-  Users
-};
+const NAV_ITEMS = [
+  { id: 'profile', label: 'Profile' },
+  { id: 'mandates', label: 'Selected Mandates' },
+  { id: 'capability', label: 'Capability' },
+  { id: 'career', label: 'Career' },
+  { id: 'education', label: 'Education' },
+  { id: 'contact', label: 'Contact' },
+];
+
+interface SiteSettings { [key: string]: string }
+
+interface CVForm { name: string; email: string; phone: string }
 
 export default function Home() {
-  const [isVisible, setIsVisible] = useState(false);
+  const [activeSection, setActiveSection] = useState('profile');
+  const [cvModalOpen, setCvModalOpen] = useState(false);
+  const [cvForm, setCvForm] = useState<CVForm>({ name: '', email: '', phone: '' });
+  const [cvSubmitting, setCvSubmitting] = useState(false);
+  const [cvError, setCvError] = useState('');
+  const mainRef = useRef<HTMLDivElement>(null);
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
+  // API data
+  const { data: settings = {} } = useQuery<SiteSettings>({ queryKey: ['/api/site/settings'] });
+  const { data: flagshipWins = [] } = useQuery<FlagshipWinRow[]>({ queryKey: ['/api/site/flagship-wins'] });
+  const { data: skills = [] } = useQuery<SiteSkillRow[]>({ queryKey: ['/api/site/skills'] });
+  const { data: careerRoles = [] } = useQuery<CareerRoleRow[]>({ queryKey: ['/api/site/career-roles'] });
+  const { data: education = [] } = useQuery<SiteEducationRow[]>({ queryKey: ['/api/site/education'] });
+
+  // SEO
   useEffect(() => {
-    setIsVisible(true);
+    document.title = 'Mujeeb Lawal — Senior Programme Director | £50M+ Delivery';
   }, []);
 
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      const offset = 80; // Account for fixed navigation bar
-      const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
-      const offsetPosition = elementPosition - offset;
-      
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-[hsl(270,8%,12%)] via-[hsl(260,10%,15%)] to-[hsl(240,12%,18%)]">
-      <Navigation scrollToSection={scrollToSection} />
-      <StickyContactBar />
-      
-      <HeroSection scrollToSection={scrollToSection} />
-      
-      <FlagshipAchievements />
-      
-      <SkillsAndCertificationsGrid />
-      
-      <CollapsibleCareerJourney />
-
-      <CertificationsSection />
-
-      <EducationSection />
-
-      <ContactSection />
-      
-      <Footer />
-      
-      <Suspense fallback={null}>
-        <SectionNavigation />
-        <ChatBot />
-      </Suspense>
-    </div>
-  );
-}
-
-function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void }) {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [showCVDialog, setShowCVDialog] = useState(false);
-
+  // Scrollspy
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-      
-      // Calculate scroll progress
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-      const scrollTop = window.scrollY;
-      const scrollable = documentHeight - windowHeight;
-      const progress = (scrollTop / scrollable) * 100;
-      setScrollProgress(Math.min(progress, 100));
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const handleNavClick = (section: string) => {
-    setMobileMenuOpen(false);
-    // Wait for menu to close before scrolling
-    setTimeout(() => {
-      scrollToSection(section);
-    }, 300);
-  };
-
-  return (
-    <nav 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? 'bg-[hsl(270,8%,12%)]/80 backdrop-blur-xl border-b border-white/10' : ''
-      }`}
-      data-testid="navigation"
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-16 md:h-24">
-          {/* Logo */}
-          <a href="/" className="flex items-center" aria-label="Mujeeb Lawal — Home">
-            <img
-              src="/logo-light.png"
-              alt="Mujeeb Lawal"
-              className="h-11 w-11 md:h-20 md:w-20 object-contain block dark:hidden"
-              data-testid="img-logo-nav-light"
-            />
-            <img
-              src="/logo-dark.png"
-              alt="Mujeeb Lawal"
-              className="h-11 w-11 md:h-20 md:w-20 object-contain hidden dark:block"
-              data-testid="img-logo-nav-dark"
-            />
-          </a>
-          
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
-            <button 
-              onClick={() => scrollToSection('career-journey')}
-              className="text-sm font-medium text-white/70 hover:text-white transition-colors"
-              data-testid="link-journey"
-            >
-              Journey
-            </button>
-            <Link
-              href="/portfolio"
-              className="text-sm font-medium text-white/70 hover:text-white transition-colors"
-              data-testid="link-portfolio-nav"
-            >
-              Portfolio
-            </Link>
-            <Link
-              href="/insights"
-              className="text-sm font-medium text-white/70 hover:text-white transition-colors"
-              data-testid="link-insights"
-            >
-              Thought Leadership
-            </Link>
-            <Button 
-              onClick={() => scrollToSection('contact')}
-              size="sm"
-              className="bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0 px-6"
-              data-testid="button-cta-nav"
-            >
-              Get in Touch
-            </Button>
-          </div>
-          
-          {/* Mobile Menu Button */}
-          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden text-white hover:bg-white/10"
-                data-testid="button-mobile-menu"
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-              <SheetContent 
-                side="right" 
-                className="bg-[hsl(270,8%,12%)]/95 backdrop-blur-xl border-white/10 w-[280px] sm:w-[320px]"
-              >
-                <SheetHeader>
-                  <SheetTitle className="text-white font-display">Navigation</SheetTitle>
-                  <SheetDescription className="text-white/60 text-sm">
-                    Explore different sections of the portfolio
-                  </SheetDescription>
-                </SheetHeader>
-                <div className="flex flex-col gap-4 mt-8">
-                  <button 
-                    onClick={() => handleNavClick('journey')}
-                    className="text-left text-white/90 hover:text-white transition-colors py-3 px-4 rounded-md hover-elevate"
-                    data-testid="mobile-link-journey"
-                  >
-                    <div className="font-medium">Journey</div>
-                    <div className="text-sm text-white/60">17 Years of Experience</div>
-                  </button>
-                  <Link
-                    href="/portfolio"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="text-left text-white/90 hover:text-white transition-colors py-3 px-4 rounded-md hover-elevate"
-                    data-testid="mobile-link-portfolio"
-                  >
-                    <div className="font-medium">Portfolio</div>
-                    <div className="text-sm text-white/60">Selected case studies</div>
-                  </Link>
-                  <Link
-                    href="/insights"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="text-left text-white/90 hover:text-white transition-colors py-3 px-4 rounded-md hover-elevate"
-                    data-testid="mobile-link-insights"
-                  >
-                    <div className="font-medium">Thought Leadership</div>
-                    <div className="text-sm text-white/60">Articles & Insights</div>
-                  </Link>
-                  <button 
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      setTimeout(() => setShowCVDialog(true), 300);
-                    }}
-                    className="text-left text-white/90 hover:text-white transition-colors py-3 px-4 rounded-md hover-elevate flex items-center gap-2"
-                    data-testid="mobile-button-download-cv"
-                  >
-                    <Download className="w-4 h-4" />
-                    <div>
-                      <div className="font-medium">Download CV</div>
-                      <div className="text-sm text-white/60">Get my resume</div>
-                    </div>
-                  </button>
-                </div>
-              </SheetContent>
-            </Sheet>
-        </div>
-      </div>
-      
-      {/* Scroll Progress Indicator */}
-      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/10">
-        <div 
-          className="h-full bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] transition-all duration-300 ease-out"
-          style={{ width: `${scrollProgress}%` }}
-          data-testid="scroll-progress-bar"
-        />
-      </div>
-      
-      {/* CV Download Dialog */}
-      <CVDownloadDialog open={showCVDialog} onOpenChange={setShowCVDialog} />
-    </nav>
-  );
-}
-
-function StickyContactBar() {
-  const [isVisible, setIsVisible] = useState(false);
-  const [showCVDialog, setShowCVDialog] = useState(false);
-  const { data: settings = {} } = useQuery<Record<string, string>>({ queryKey: ['/api/site/settings'] });
-
-  const email = settings['contact.email'] || 'odmlawal@gmail.com';
-  const whatsapp = settings['contact.whatsapp'] || '971509082234';
-  const linkedinUrl = settings['contact.linkedin_url'] || 'https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/';
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsVisible(window.scrollY > 600); // Show after scrolling past hero
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  if (!isVisible) return null;
-
-  return (
-    <>
-      <div className="fixed top-20 right-4 z-40 flex flex-col gap-2 sm:flex-row sm:gap-3" data-testid="sticky-contact-bar">
-        <Button
-          size="sm"
-          variant="outline"
-          className="bg-white/10 backdrop-blur-xl border-white/20 text-white hover:bg-white/20 shadow-lg"
-          onClick={() => setShowCVDialog(true)}
-          data-testid="button-sticky-cv"
-        >
-          <Download className="w-4 h-4 sm:mr-2" />
-          <span className="hidden sm:inline">CV</span>
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          className="bg-white/10 backdrop-blur-xl border-white/20 text-white hover:bg-white/20 shadow-lg"
-          onClick={() => window.location.href = `mailto:${email}`}
-          data-testid="button-sticky-email"
-        >
-          <Mail className="w-4 h-4 sm:mr-2" />
-          <span className="hidden sm:inline">Email</span>
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          className="bg-white/10 backdrop-blur-xl border-white/20 text-white hover:bg-white/20 shadow-lg"
-          onClick={() => window.open(`https://wa.me/${whatsapp}`, '_blank')}
-          data-testid="button-sticky-whatsapp"
-        >
-          <MessageCircle className="w-4 h-4 sm:mr-2" />
-          <span className="hidden sm:inline">WhatsApp</span>
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          className="bg-white/10 backdrop-blur-xl border-white/20 text-white hover:bg-white/20 shadow-lg"
-          onClick={() => window.open(linkedinUrl, '_blank')}
-          data-testid="button-sticky-linkedin"
-        >
-          <Linkedin className="w-4 h-4 sm:mr-2" />
-          <span className="hidden sm:inline">LinkedIn</span>
-        </Button>
-      </div>
-      
-      <CVDownloadDialog open={showCVDialog} onOpenChange={setShowCVDialog} />
-    </>
-  );
-}
-
-function FlagshipAchievements() {
-  const { data: settings = {} } = useQuery<Record<string, string>>({ queryKey: ['/api/site/settings'] });
-  const { data: wins = [], isLoading } = useQuery<FlagshipWinRow[]>({ queryKey: ['/api/site/flagship-wins'] });
-
-  const heading = settings['flagship.heading'] || 'Three Flagship Achievements';
-  const subheading = settings['flagship.subheading'] || 'Tangible business impact across regulated delivery, PMO leadership, and sustainability initiatives';
-
-  return (
-    <section id="flagship-wins" className="relative py-16 md:py-24" data-testid="section-flagship">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-12 md:mb-16">
-          <Badge className="bg-white/10 backdrop-blur-md border border-white/20 text-white mb-4">
-            Signature Wins
-          </Badge>
-          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
-            {heading}
-          </h2>
-          <p className="text-lg md:text-xl text-white/60 max-w-3xl mx-auto">
-            {subheading}
-          </p>
-        </div>
-
-        {isLoading ? (
-          <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
-            {[0, 1, 2].map(i => <Card key={i} className="bg-white/5 border-white/10 p-8 h-64 animate-pulse" />)}
-          </div>
-        ) : (
-        <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
-          {wins.slice(0, 3).map((project, index) => {
-            const Icon = (iconMap[project.icon] as React.ComponentType<{ className?: string }>) || Target;
-            return (
-              <Card
-                key={project.id}
-                className="bg-white/5 backdrop-blur-sm border-white/10 p-6 md:p-8 hover-elevate transition-all group"
-                data-testid={`card-flagship-${index + 1}`}
-                style={{ animationDelay: `${index * 150}ms` }}
-              >
-                <div className="space-y-4">
-                  {/* Icon & Title */}
-                  <div className="space-y-3">
-                    <div className={`w-14 h-14 rounded-lg bg-gradient-to-br ${project.colorGradient} p-3 flex items-center justify-center`}>
-                      <Icon className="w-full h-full text-white" />
-                    </div>
-                    <div>
-                      <h3 className="font-display text-xl md:text-2xl font-bold text-white mb-2 leading-tight">
-                        {project.title}
-                      </h3>
-                      <div className="flex items-center gap-2 text-sm text-white/60">
-                        <span className="text-[hsl(var(--brand-primary))] font-medium">{project.company}</span>
-                        <span>•</span>
-                        <span>{project.period}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Metrics */}
-                  <div className="flex flex-wrap gap-2 pt-2">
-                    {project.metrics.map((metric, idx) => (
-                      <Badge 
-                        key={idx}
-                        className="text-xs bg-white/5 border-white/10 text-white/70"
-                      >
-                        {metric}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
-        </div>
-        )}
-      </div>
-    </section>
-  );
-}
-
-function SkillsAndCertificationsGrid() {
-  const { data: settings = {} } = useQuery<Record<string, string>>({ queryKey: ['/api/site/settings'] });
-  const { data: skillsList = [], isLoading: skillsLoading } = useQuery<SiteSkillRow[]>({ queryKey: ['/api/site/skills'] });
-
-  const skillsData = {
-    methodologies: skillsList.filter(s => s.category === 'methodology').map(s => s.name),
-    tools: skillsList.filter(s => s.category === 'tool').map(s => s.name),
-    certifications: skillsList.filter(s => s.category === 'certification').map(s => ({ name: s.name, status: s.status || 'certified' })),
-    industries: skillsList.filter(s => s.category === 'industry').map(s => s.name),
-  };
-
-  const heading = settings['skills.heading'] || 'Skills & Certifications';
-  const subheading = settings['skills.subheading'] || 'Proven methodologies, tools, and credentials for enterprise-level programme delivery';
-
-  return (
-    <section id="skills" className="relative py-16 md:py-24" data-testid="section-skills">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-12 md:mb-16">
-          <Badge className="bg-white/10 backdrop-blur-md border border-white/20 text-white mb-4">
-            Expertise Overview
-          </Badge>
-          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
-            {heading}
-          </h2>
-          <p className="text-lg md:text-xl text-white/60 max-w-3xl mx-auto">
-            {subheading}
-          </p>
-        </div>
-
-        {skillsLoading ? (
-          <div className="grid lg:grid-cols-2 gap-6 md:gap-8">
-            {[0, 1, 2, 3].map(i => <Card key={i} className="bg-white/5 border-white/10 p-8 h-48 animate-pulse" />)}
-          </div>
-        ) : (
-        <div className="grid lg:grid-cols-2 gap-6 md:gap-8">
-          {/* Methodologies & Frameworks */}
-          <Card className="bg-white/5 backdrop-blur-sm border-white/10 p-6 md:p-8">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 p-2.5 flex items-center justify-center">
-                  <Target className="w-full h-full text-white" />
-                </div>
-                <h3 className="font-display text-xl md:text-2xl font-bold text-white">
-                  Methodologies & Frameworks
-                </h3>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {skillsData.methodologies.map((method, idx) => (
-                  <Badge 
-                    key={idx}
-                    className="text-sm bg-blue-500/10 border-blue-500/20 text-blue-300"
-                  >
-                    {method}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          </Card>
-
-          {/* Tools & Technologies */}
-          <Card className="bg-white/5 backdrop-blur-sm border-white/10 p-6 md:p-8">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 p-2.5 flex items-center justify-center">
-                  <Code className="w-full h-full text-white" />
-                </div>
-                <h3 className="font-display text-xl md:text-2xl font-bold text-white">
-                  Tools & Platforms
-                </h3>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {skillsData.tools.map((tool, idx) => (
-                  <Badge 
-                    key={idx}
-                    className="text-sm bg-purple-500/10 border-purple-500/20 text-purple-300"
-                  >
-                    {tool}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          </Card>
-
-          {/* Certifications */}
-          <Card className="bg-white/5 backdrop-blur-sm border-white/10 p-6 md:p-8">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 p-2.5 flex items-center justify-center">
-                  <Award className="w-full h-full text-white" />
-                </div>
-                <h3 className="font-display text-xl md:text-2xl font-bold text-white">
-                  Certifications
-                </h3>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {skillsData.certifications.map((cert, idx) => (
-                  <Badge 
-                    key={idx}
-                    className={`text-sm ${
-                      cert.status === 'pursuing' 
-                        ? 'bg-green-500/5 border-green-500/30 border-dashed text-green-300' 
-                        : 'bg-green-500/10 border-green-500/20 text-green-300'
-                    }`}
-                  >
-                    {cert.name}
-                    {cert.status === 'pursuing' && (
-                      <span className="ml-1 text-xs opacity-70">(Pursuing)</span>
-                    )}
-                    {cert.status === 'certified' && (
-                      <span className="ml-1 text-xs opacity-70">✓</span>
-                    )}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          </Card>
-
-          {/* Industry Experience */}
-          <Card className="bg-white/5 backdrop-blur-sm border-white/10 p-6 md:p-8">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 p-2.5 flex items-center justify-center">
-                  <Briefcase className="w-full h-full text-white" />
-                </div>
-                <h3 className="font-display text-xl md:text-2xl font-bold text-white">
-                  Industry Experience (7 Sectors)
-                </h3>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {skillsData.industries.map((industry, idx) => (
-                  <Badge 
-                    key={idx}
-                    className="text-sm bg-orange-500/10 border-orange-500/20 text-orange-300"
-                  >
-                    {industry}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          </Card>
-        </div>
-        )}
-      </div>
-    </section>
-  );
-}
-
-function CompanyLogo({ companyName, logoUrl }: { companyName: string; logoUrl: string | null }) {
-  const [imageError, setImageError] = useState(false);
-
-  if (!logoUrl || imageError) {
-    return (
-      <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-lg bg-white p-2 flex items-center justify-center">
-        <span className="text-sm font-bold text-gray-800">
-          {companyName.substring(0, 2).toUpperCase()}
-        </span>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-lg bg-white p-2 flex items-center justify-center">
-      <img 
-        src={logoUrl} 
-        alt={`${companyName} logo`}
-        className="w-full h-full object-contain"
-        onError={() => setImageError(true)}
-      />
-    </div>
-  );
-}
-
-function CollapsibleCareerJourney() {
-  const { data: settings = {} } = useQuery<Record<string, string>>({ queryKey: ['/api/site/settings'] });
-  const { data: careerRoles = [], isLoading } = useQuery<CareerRoleRow[]>({ queryKey: ['/api/site/career-roles'] });
-
-  const heading = settings['career.heading'] || '17-Year Career Journey';
-  const subheading = settings['career.subheading'] || '12 companies • 7 industries • £50M+ delivered across regulated and complex programmes';
-
-  // Custom company logos (prioritized over Clearbit)
-  const customLogos: Record<string, string> = {
-    'Dictate.IT': new URL('@assets/image_1762336983383.png', import.meta.url).href,
-    'Alfa Laval': new URL('@assets/image_1762334520974.png', import.meta.url).href,
-    'BSS Industrial': new URL('@assets/image_1762336971805.png', import.meta.url).href,
-    'Finimize': new URL('@assets/image_1762334568530.png', import.meta.url).href,
-    'Novocycle Technology': new URL('@assets/image_1762334605591.png', import.meta.url).href,
-    'Caravan and Motorhome Club': new URL('@assets/image_1762334620134.png', import.meta.url).href,
-    'Jardine Lloyd Thompson': new URL('@assets/image_1762337194949.png', import.meta.url).href,
-  };
-
-  // Company domain mapping for logo fetching via Clearbit (fallback)
-  const companyDomains: Record<string, string> = {
-    'Simply Business': 'simplybusiness.com',
-    'Mercer': 'mercer.com',
-    'GSMA': 'gsma.com',
-    '6Connex': '6connex.com',
-    'Best Future Education Centre': 'bestfuture.edu.ng',
-    'People Planet Projects': 'peopleplanetprojects.com',
-    'CorProfit': 'deloitte.com',
-    'Nigerian Prison Service': 'prisons.gov.ng',
-  };
-
-  const getCompanyLogo = (companyName: string) => {
-    // Prioritize custom logos
-    if (customLogos[companyName]) {
-      return customLogos[companyName];
-    }
-    
-    // Fallback to Clearbit
-    const domain = companyDomains[companyName];
-    return domain ? `https://logo.clearbit.com/${domain}` : null;
-  };
-
-  return (
-    <section id="career-journey" className="relative py-16 md:py-24" data-testid="section-career-journey">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-12 md:mb-16">
-          <Badge className="bg-white/10 backdrop-blur-md border border-white/20 text-white mb-4">
-            Full Career History
-          </Badge>
-          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
-            {heading}
-          </h2>
-          <p className="text-lg md:text-xl text-white/60 max-w-3xl mx-auto">
-            {subheading}
-          </p>
-        </div>
-
-        {isLoading ? (
-          <div className="space-y-3">
-            {[0, 1, 2, 3].map(i => <Card key={i} className="bg-white/5 border-white/10 h-20 animate-pulse" />)}
-          </div>
-        ) : (
-        <Accordion type="single" collapsible className="space-y-3">
-          {careerRoles.map((project, index) => {
-            const logoUrl = project.logoUrl || getCompanyLogo(project.company);
-            
-            return (
-              <AccordionItem 
-                key={project.id} 
-                value={String(project.id)}
-                className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden"
-                data-testid={`accordion-career-${index}`}
-              >
-                <AccordionTrigger className="px-4 md:px-6 py-4 hover:no-underline hover-elevate">
-                  <div className="flex items-center gap-3 md:gap-4 w-full text-left">
-                    {/* Company Logo */}
-                    <CompanyLogo companyName={project.company} logoUrl={logoUrl} />
-
-                    {/* Role & Company Info */}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-white text-sm md:text-base mb-1">
-                        {project.role}
-                      </h3>
-                      <div className="flex items-center gap-2 text-xs md:text-sm text-white/60 flex-wrap">
-                        <span className="text-[hsl(var(--brand-primary))]">{project.company}</span>
-                        <span>•</span>
-                        <span>{project.period}</span>
-                        <span className="hidden sm:inline">•</span>
-                        <span className="hidden sm:inline">{project.location}</span>
-                      </div>
-                    </div>
-
-                    {/* Status Badges - Far Right */}
-                    <div className="flex flex-col gap-1.5 flex-shrink-0 items-end ml-auto">
-                      <Badge 
-                        className={`text-xs ${
-                          project.employmentType === 'Contract' 
-                            ? 'bg-orange-500/20 border-orange-500/30 text-orange-300' 
-                            : 'bg-blue-500/20 border-blue-500/30 text-blue-300'
-                        }`}
-                      >
-                        {project.employmentType}
-                      </Badge>
-                      {project.current && (
-                        <Badge className="text-xs bg-green-500/20 border-green-500/30 text-green-300">
-                          Current
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                </AccordionTrigger>
-                
-                <AccordionContent className="px-4 md:px-6 pb-4">
-                  <div className="space-y-4 pt-2">
-                    {/* Role Description */}
-                    {project.description && (
-                      <div>
-                        <p className="text-white/80 text-sm md:text-base leading-relaxed">
-                          {project.description}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Key Achievements */}
-                    <div>
-                      <h4 className="text-sm font-semibold text-white/70 mb-3 flex items-center gap-2">
-                        <Target className="w-4 h-4" />
-                        Key Impact
-                      </h4>
-                      <ul className="space-y-2">
-                        {project.keyAchievements.map((achievement, idx) => (
-                          <li key={idx} className="flex items-start gap-2">
-                            <CheckCircle2 className="w-4 h-4 text-[hsl(var(--brand-primary))] mt-0.5 flex-shrink-0" />
-                            <span className="text-sm text-white/80">{achievement}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {/* Metrics & Details */}
-                    <div className="flex flex-wrap gap-2 pt-2 border-t border-white/10">
-                      <Badge className="text-xs bg-white/5 border-white/10 text-white/70">
-                        {project.industry}
-                      </Badge>
-                      {project.projectType && (
-                        <Badge className="text-xs bg-white/5 border-white/10 text-white/70">
-                          {project.projectType}
-                        </Badge>
-                      )}
-                      {project.budget && (
-                        <Badge className="text-xs bg-[hsl(var(--brand-primary))]/20 border-[hsl(var(--brand-primary))]/30 text-[hsl(var(--brand-primary-soft))]">
-                          Budget: {project.budget}
-                        </Badge>
-                      )}
-                      {project.teamSize && (
-                        <Badge className="text-xs bg-white/5 border-white/10 text-white/70">
-                          Team: {project.teamSize} people
-                        </Badge>
-                      )}
-                    </div>
-
-                    {/* Technologies */}
-                    {project.technologies && project.technologies.length > 0 && (
-                      <div>
-                        <h4 className="text-sm font-semibold text-white/70 mb-2">Technologies & Tools</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {project.technologies.map((tech, idx) => (
-                            <Badge key={idx} className="text-xs bg-white/5 border-white/10 text-white/70">
-                              {tech}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            );
-          })}
-        </Accordion>
-        )}
-      </div>
-    </section>
-  );
-}
-
-function VerticalCareerTimeline() {
-  const [selectedProject, setSelectedProject] = useState<typeof timelineProjects[0] | null>(null);
-  const desktopScrollRef = useRef<HTMLDivElement>(null);
-  const [showTopFade, setShowTopFade] = useState(false);
-  const [showBottomFade, setShowBottomFade] = useState(true);
-
-  const handleDesktopScroll = () => {
-    if (!desktopScrollRef.current) return;
-    const { scrollTop, scrollHeight, clientHeight } = desktopScrollRef.current;
-    setShowTopFade(scrollTop > 20);
-    setShowBottomFade(scrollTop < scrollHeight - clientHeight - 20);
-  };
-
-  return (
-    <div className="w-full">
-      <div className="mb-4 text-center lg:text-left">
-        <Badge 
-          className="bg-white/10 backdrop-blur-md border border-white/20 text-white"
-          data-testid="badge-career-timeline"
-        >
-          Career Journey
-        </Badge>
-        <h3 className="font-display text-2xl font-bold text-white mt-2" data-testid="text-career-timeline-title">
-          17 Years • 12 Companies
-        </h3>
-      </div>
-
-      <div className="relative">
-        {/* Desktop: Vertical scrollable carousel */}
-        <div className="hidden lg:block relative">
-          {/* Top fade overlay */}
-          {showTopFade && (
-            <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-[hsl(270,8%,12%)] to-transparent pointer-events-none z-10" />
-          )}
-          
-          <div 
-            ref={desktopScrollRef}
-            onScroll={handleDesktopScroll}
-            className="max-h-[500px] overflow-y-auto space-y-3 py-2 scrollbar-hide"
-            style={{ 
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none'
-            }}
-            data-testid="carousel-desktop"
-          >
-            {timelineProjects.map((project) => (
-              <Card
-                key={project.id}
-                className="bg-white/5 backdrop-blur-xl border-white/10 p-4 hover-elevate cursor-pointer transition-all"
-                onClick={() => setSelectedProject(project)}
-                data-testid={`card-career-${project.id}`}
-              >
-                <div className="space-y-2">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex flex-wrap gap-1.5">
-                      <Badge 
-                        className="text-xs bg-gradient-to-r from-[hsl(var(--brand-primary))]/20 to-[hsl(var(--brand-accent))]/20 border-[hsl(var(--brand-primary))]/30 text-white"
-                        data-testid={`badge-career-period-${project.id}`}
-                      >
-                        {project.period}
-                      </Badge>
-                      <Badge 
-                        className={`text-xs ${
-                          project.employmentType === 'Contract' 
-                            ? 'bg-orange-500/20 border-orange-500/30 text-orange-300' 
-                            : 'bg-blue-500/20 border-blue-500/30 text-blue-300'
-                        }`}
-                        data-testid={`badge-career-employment-${project.id}`}
-                      >
-                        {project.employmentType}
-                      </Badge>
-                    </div>
-                    {project.current && (
-                      <Badge className="text-xs bg-green-500/20 border-green-500/30 text-green-300" data-testid={`badge-career-current-${project.id}`}>
-                        Current
-                      </Badge>
-                    )}
-                  </div>
-
-                  <div>
-                    <h4 className="font-semibold text-white text-sm leading-tight mb-1" data-testid={`text-career-role-${project.id}`}>
-                      {project.role}
-                    </h4>
-                    <p className="text-[hsl(var(--brand-primary))] text-sm font-medium" data-testid={`text-career-company-${project.id}`}>
-                      {project.company}
-                    </p>
-                    <p className="text-xs text-white/60" data-testid={`text-career-location-${project.id}`}>
-                      {project.location}
-                    </p>
-                  </div>
-
-                  {project.description && (
-                    <p className="text-sm text-white/70 leading-relaxed" data-testid={`text-career-description-${project.id}`}>
-                      {project.description}
-                    </p>
-                  )}
-
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <Badge variant="outline" className="text-xs border-white/20 text-white/70" data-testid={`badge-career-industry-${project.id}`}>
-                      {project.industry}
-                    </Badge>
-                    <Badge variant="outline" className="text-xs border-white/20 text-white/70" data-testid={`badge-career-type-${project.id}`}>
-                      {project.projectType}
-                    </Badge>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-
-          {/* Bottom fade overlay */}
-          {showBottomFade && (
-            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[hsl(270,8%,12%)] to-transparent pointer-events-none z-10" />
-          )}
-        </div>
-
-        {/* Mobile: Vertical single-column stack */}
-        <div className="lg:hidden relative">
-          <div className="space-y-3" data-testid="carousel-mobile">
-            {timelineProjects.map((project) => (
-              <Card
-                key={project.id}
-                className="bg-white/5 backdrop-blur-xl border-white/10 p-4 hover-elevate cursor-pointer w-full"
-                onClick={() => setSelectedProject(project)}
-                data-testid={`card-career-mobile-${project.id}`}
-              >
-                <div className="space-y-2">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex flex-wrap gap-1.5">
-                      <Badge 
-                        className="text-xs bg-gradient-to-r from-[hsl(var(--brand-primary))]/20 to-[hsl(var(--brand-accent))]/20 border-[hsl(var(--brand-primary))]/30 text-white"
-                        data-testid={`badge-career-mobile-period-${project.id}`}
-                      >
-                        {project.period}
-                      </Badge>
-                      <Badge 
-                        className={`text-xs ${
-                          project.employmentType === 'Contract' 
-                            ? 'bg-orange-500/20 border-orange-500/30 text-orange-300' 
-                            : 'bg-blue-500/20 border-blue-500/30 text-blue-300'
-                        }`}
-                        data-testid={`badge-career-mobile-employment-${project.id}`}
-                      >
-                        {project.employmentType}
-                      </Badge>
-                    </div>
-                    {project.current && (
-                      <Badge className="text-xs bg-green-500/20 border-green-500/30 text-green-300" data-testid={`badge-career-mobile-current-${project.id}`}>
-                        Current
-                      </Badge>
-                    )}
-                  </div>
-
-                  <div>
-                    <h4 className="font-semibold text-white text-sm leading-tight mb-1" data-testid={`text-career-mobile-role-${project.id}`}>
-                      {project.role}
-                    </h4>
-                    <p className="text-[hsl(var(--brand-primary))] text-sm font-medium" data-testid={`text-career-mobile-company-${project.id}`}>
-                      {project.company}
-                    </p>
-                    <p className="text-xs text-white/60" data-testid={`text-career-mobile-location-${project.id}`}>
-                      {project.location}
-                    </p>
-                  </div>
-
-                  {project.description && (
-                    <p className="text-sm text-white/70 leading-relaxed" data-testid={`text-career-mobile-description-${project.id}`}>
-                      {project.description}
-                    </p>
-                  )}
-
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <Badge variant="outline" className="text-xs border-white/20 text-white/70" data-testid={`badge-career-mobile-industry-${project.id}`}>
-                      {project.industry}
-                    </Badge>
-                    <Badge variant="outline" className="text-xs border-white/20 text-white/70" data-testid={`badge-career-mobile-type-${project.id}`}>
-                      {project.projectType}
-                    </Badge>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Position Detail Dialog */}
-      <Dialog open={!!selectedProject} onOpenChange={(open) => !open && setSelectedProject(null)}>
-        <DialogContent 
-          className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto bg-black/90 backdrop-blur-xl border border-white/10" 
-          data-testid="dialog-career-detail"
-        >
-          {selectedProject && (
-            <>
-              <DialogHeader>
-                <div className="flex flex-col sm:flex-row items-start justify-between gap-3 sm:gap-4 mb-4">
-                  <div className="flex-1">
-                    <DialogTitle className="text-xl sm:text-2xl font-display mb-2 text-white pr-6" data-testid="text-dialog-role">
-                      {selectedProject.role}
-                    </DialogTitle>
-                    <DialogDescription className="text-base sm:text-lg text-[hsl(var(--brand-primary))] font-medium" data-testid="text-dialog-company">
-                      {selectedProject.company}
-                    </DialogDescription>
-                  </div>
-                  {selectedProject.current && (
-                    <Badge className="bg-green-500/20 border-green-500/30 text-green-300" data-testid="badge-dialog-current">
-                      Current Position
-                    </Badge>
-                  )}
-                </div>
-              </DialogHeader>
-
-              <div className="space-y-5 sm:space-y-6">
-                {/* Overview Section */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-white/60" />
-                    <div>
-                      <p className="text-xs text-white/60">Period</p>
-                      <p className="text-sm font-medium text-white" data-testid="text-dialog-period">{selectedProject.period}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-white/60" />
-                    <div>
-                      <p className="text-xs text-white/60">Location</p>
-                      <p className="text-sm font-medium text-white" data-testid="text-dialog-location">{selectedProject.location}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Briefcase className="w-4 h-4 text-white/60" />
-                    <div>
-                      <p className="text-xs text-white/60">Industry</p>
-                      <p className="text-sm font-medium text-white" data-testid="text-dialog-industry">{selectedProject.industry}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Target className="w-4 h-4 text-white/60" />
-                    <div>
-                      <p className="text-xs text-white/60">Project Type</p>
-                      <p className="text-sm font-medium text-white" data-testid="text-dialog-type">{selectedProject.projectType}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Briefcase className="w-4 h-4 text-white/60" />
-                    <div>
-                      <p className="text-xs text-white/60">Employment Type</p>
-                      <Badge 
-                        className={`text-xs ${
-                          selectedProject.employmentType === 'Contract' 
-                            ? 'bg-orange-500/20 border-orange-500/30 text-orange-300' 
-                            : 'bg-blue-500/20 border-blue-500/30 text-blue-300'
-                        }`}
-                        data-testid="text-dialog-employment"
-                      >
-                        {selectedProject.employmentType}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Description */}
-                {selectedProject.description && (
-                  <div>
-                    <p className="text-base text-white/80 leading-relaxed" data-testid="text-dialog-description">
-                      {selectedProject.description}
-                    </p>
-                  </div>
-                )}
-
-                {/* Full Impact */}
-                <div>
-                  <h3 className="font-semibold text-base sm:text-lg mb-3 flex items-center gap-2 text-white">
-                    <Award className="w-5 h-5 text-[hsl(var(--brand-primary))]" />
-                    Full Impact
-                  </h3>
-                  <ul className="space-y-2">
-                    {selectedProject.keyAchievements.map((achievement, idx) => (
-                      <li key={idx} className="flex items-start gap-2" data-testid={`text-dialog-achievement-${idx}`}>
-                        <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm text-white/80">{achievement}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Additional Details */}
-                {(selectedProject.budget || selectedProject.teamSize || selectedProject.technologies) && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-4 border-t border-white/10">
-                    {selectedProject.budget && (
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4 text-white/60" />
-                        <div>
-                          <p className="text-xs text-white/60">Budget</p>
-                          <p className="text-sm font-medium text-white" data-testid="text-dialog-budget">{selectedProject.budget}</p>
-                        </div>
-                      </div>
-                    )}
-                    {selectedProject.teamSize && (
-                      <div className="flex items-center gap-2">
-                        <Users className="w-4 h-4 text-white/60" />
-                        <div>
-                          <p className="text-xs text-white/60">Team Size</p>
-                          <p className="text-sm font-medium text-white" data-testid="text-dialog-team">{selectedProject.teamSize} members</p>
-                        </div>
-                      </div>
-                    )}
-                    {selectedProject.technologies && selectedProject.technologies.length > 0 && (
-                      <div className="col-span-full">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Code className="w-4 h-4 text-white/60" />
-                          <p className="text-xs text-white/60">Technologies</p>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          {selectedProject.technologies.map((tech, idx) => (
-                            <Badge 
-                              key={`${selectedProject.id}-${tech}-${idx}`} 
-                              variant="outline" 
-                              className="text-xs border-white/20 text-white/70 bg-white/5" 
-                              data-testid={`badge-dialog-tech-${selectedProject.id}-${tech.toLowerCase().replace(/\s+/g, '-')}-${idx}`}
-                            >
-                              {tech}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-}
-
-function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => void }) {
-  const [showCVDialog, setShowCVDialog] = useState(false);
-  const { data: settings = {} } = useQuery<Record<string, string>>({ queryKey: ['/api/site/settings'] });
-
-  const statusBadge = settings['hero.status_badge'] || 'Open to new opportunities';
-  const headlineMain = settings['hero.headline_main'] || 'Senior Project Manager';
-  const headlineSub1 = settings['hero.headline_sub1'] || 'Senior Program Manager';
-  const headlineSub2 = settings['hero.headline_sub2'] || 'PMO Lead';
-  const headlineAccent = settings['hero.headline_accent'] || '£50M+ Delivery | 17+ Years';
-  const email = settings['contact.email'] || 'odmlawal@gmail.com';
-  const linkedinUrl = settings['contact.linkedin_url'] || 'https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/';
-  const whatsapp = settings['contact.whatsapp'] || '971509082234';
-
-  return (
-    <section id="hero" className="relative min-h-[85vh] md:min-h-screen flex items-center justify-center overflow-hidden pt-16 md:pt-24" data-testid="section-hero">
-      <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 md:w-96 md:h-96 bg-[hsl(var(--brand-primary))]/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 md:w-96 md:h-96 bg-[hsl(var(--brand-accent))]/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] md:w-[600px] md:h-[600px] bg-[hsl(270,65%,35%)]/10 rounded-full blur-3xl" />
-      </div>
-      
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-20">
-        <div className="flex flex-col items-center text-center">
-          <div className="space-y-5 md:space-y-8 max-w-5xl">
-            <div className="space-y-3 md:space-y-6">
-              <div className="flex items-center justify-center gap-2 md:gap-4" data-testid="wordmark-name">
-                <span className="h-px w-6 md:w-12 bg-[hsl(var(--brand-primary))]/50" />
-                <span className="font-display text-[0.65rem] md:text-sm font-semibold tracking-[0.25em] md:tracking-[0.4em] text-[hsl(var(--brand-primary))] uppercase">
-                  Mujeeb Lawal
-                </span>
-                <span className="h-px w-6 md:w-12 bg-[hsl(var(--brand-primary))]/50" />
-              </div>
-
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-green-500/20 border border-green-500/30">
-                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                <span className="text-xs md:text-sm font-medium text-green-300" data-testid="badge-status">
-                  {statusBadge}
-                </span>
-              </div>
-              
-              <h1 className="font-display text-[2rem] leading-[1.05] sm:text-5xl sm:leading-[1.1] md:text-6xl lg:text-7xl font-bold text-white" data-testid="text-hero-title">
-                {headlineMain}
-                <span className="block text-xl sm:text-3xl md:text-5xl lg:text-6xl font-semibold text-white/70 mt-1.5 md:mt-1">
-                  {headlineSub1}
-                </span>
-                <span className="block text-xl sm:text-3xl md:text-5xl lg:text-6xl font-semibold text-white/70 mt-0.5 md:mt-1">
-                  {headlineSub2}
-                </span>
-                <span className="block text-2xl sm:text-3xl md:text-5xl lg:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] mt-3 md:mt-2">
-                  {headlineAccent}
-                </span>
-              </h1>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row flex-wrap gap-2.5 md:gap-3 items-center justify-center">
-              <Button 
-                size="lg"
-                className="bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0 hover-elevate active-elevate-2 text-sm md:text-lg px-6 md:px-10 py-5 md:py-7 w-full sm:w-auto font-semibold"
-                onClick={() => setShowCVDialog(true)}
-                data-testid="button-primary-cta"
-              >
-                <Download className="mr-2 w-4 h-4 md:w-5 md:h-5" /> Download CV
-              </Button>
-
-              <Link href="/portfolio" className="w-full sm:w-auto">
-                <Button 
-                  size="lg"
-                  variant="outline"
-                  className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10 text-sm md:text-lg px-6 md:px-10 py-5 md:py-7 w-full"
-                  data-testid="button-view-portfolio"
-                >
-                  <FolderKanban className="mr-2 w-4 h-4 md:w-5 md:h-5" /> View Portfolio
-                </Button>
-              </Link>
-              
-              <Button 
-                size="lg"
-                variant="outline"
-                className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10 text-sm md:text-lg px-6 md:px-10 py-5 md:py-7 w-full sm:w-auto"
-                onClick={() => scrollToSection('contact')}
-                data-testid="button-secondary-cta"
-              >
-                <Mail className="mr-2 w-4 h-4 md:w-5 md:h-5" /> Get in Touch
-              </Button>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 pt-2 text-sm text-white/70 justify-center">
-              <a 
-                href={`mailto:${email}`}
-                className="hover:text-white transition-colors flex items-center gap-2"
-                data-testid="link-email"
-              >
-                <Mail className="w-4 h-4" />
-                <span>{email}</span>
-              </a>
-              <span className="text-white/30 hidden sm:block">|</span>
-              <a 
-                href={linkedinUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-white transition-colors flex items-center gap-2"
-                data-testid="link-linkedin"
-              >
-                <Linkedin className="w-4 h-4" />
-                <span>LinkedIn Profile</span>
-              </a>
-              <span className="text-white/30 hidden sm:block">|</span>
-              <a 
-                href={`https://wa.me/${whatsapp}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-white transition-colors flex items-center gap-2"
-                data-testid="link-whatsapp"
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span>WhatsApp</span>
-              </a>
-            </div>
-          </div>
-        </div>
-        
-        <button 
-          onClick={() => scrollToSection('flagship-wins')}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/40 hover:text-white/60 transition-colors animate-bounce"
-          data-testid="button-scroll-indicator"
-        >
-          <ChevronDown className="w-8 h-8" />
-        </button>
-      </div>
-      
-      <CVDownloadDialog open={showCVDialog} onOpenChange={setShowCVDialog} />
-    </section>
-  );
-}
-
-function MetricsDashboard() {
-  return (
-    <section id="metrics" className="relative py-12 md:py-20" data-testid="section-metrics">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-8 md:mb-12">
-          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4" data-testid="text-metrics-title">
-            Impact by Numbers
-          </h2>
-          <p className="text-base md:text-lg text-white/60 max-w-2xl mx-auto px-4">
-            Quantifiable results from 17+ years of international project delivery
-          </p>
-        </div>
-        
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
-          {keyAchievements.map((achievement, index) => {
-            const Icon = iconMap[achievement.icon];
-            return (
-              <AnimatedMetricCard key={index} achievement={achievement} Icon={Icon} index={index} />
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function AnimatedMetricCard({ achievement, Icon, index }: { achievement: any; Icon: any; index: number }) {
-  const [count, setCount] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
+    const root = mainRef.current;
+    if (!root) return;
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) setActiveSection(entry.target.id);
+        });
       },
-      { threshold: 0.1 }
+      { root, threshold: 0.35 }
     );
-
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-
+    Object.values(sectionRefs.current).forEach(el => { if (el) observer.observe(el); });
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    if (!isVisible) return;
+  const scrollTo = (id: string) => {
+    const el = sectionRefs.current[id];
+    const root = mainRef.current;
+    if (el && root) root.scrollTo({ top: el.offsetTop, behavior: 'smooth' });
+  };
 
-    const numericString = achievement.metric.replace(/[£+%M]/g, '').trim();
-    const target = parseFloat(numericString);
-    if (isNaN(target)) return;
-
-    const duration = 2000;
-    const steps = 60;
-    const increment = target / steps;
-    let current = 0;
-
-    const timer = setInterval(() => {
-      current += increment;
-      if (current >= target) {
-        setCount(target);
-        clearInterval(timer);
-      } else {
-        setCount(current);
-      }
-    }, duration / steps);
-
-    return () => clearInterval(timer);
-  }, [isVisible, achievement.metric]);
-
-  const hasDecimal = achievement.metric.includes('.');
-  const displayValue = hasDecimal ? count.toFixed(1) : Math.floor(count);
-
-  return (
-    <Card
-      ref={ref}
-      className="bg-white/5 backdrop-blur-xl border-white/10 p-4 md:p-6 text-center hover-elevate"
-      style={{ animationDelay: `${index * 100}ms` }}
-      data-testid={`card-metric-${index}`}
-    >
-      <Icon className="w-6 h-6 md:w-8 md:h-8 text-[hsl(var(--brand-primary))] mx-auto mb-2 md:mb-3" />
-      <div className="font-mono text-2xl md:text-3xl font-bold text-white mb-2">
-        {achievement.metric.includes('£') && '£'}
-        {isVisible ? displayValue : hasDecimal ? '0.0' : '0'}
-        {achievement.metric.includes('M') && 'M'}
-        {achievement.metric.includes('+') && '+'}
-        {achievement.metric.includes('%') && '%'}
-      </div>
-      <p className="text-xs md:text-sm text-white/60 leading-tight">{achievement.description}</p>
-    </Card>
-  );
-}
-
-function CareerTimeline({ activeRegion, setActiveRegion }: { activeRegion: string | null; setActiveRegion: (region: string | null) => void }) {
-  return (
-    <section id="experience" className="relative py-12 md:py-20" data-testid="section-experience">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-10 md:mb-16">
-          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4">
-            Career Journey
-          </h2>
-          <p className="text-base md:text-lg text-white/60 max-w-2xl mx-auto px-4">
-            Delivering complex programmes across insurance, fintech, telecoms, and engineering sectors
-          </p>
-        </div>
-        
-        <div className="space-y-4 md:space-y-6">
-          {timelineProjects.map((exp, index) => (
-            <TimelineCard 
-              key={exp.id} 
-              experience={exp} 
-              index={index}
-              onHover={() => setActiveRegion(null)}
-              onLeave={() => setActiveRegion(null)}
-            />
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function TimelineCard({ experience, index, onHover, onLeave }: { experience: any; index: number; onHover: () => void; onLeave: () => void }) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [showImpactDialog, setShowImpactDialog] = useState(false);
-
-  return (
-    <>
-      <Card
-        className="bg-white/5 backdrop-blur-xl border-white/10 p-4 sm:p-6 md:p-8 hover-elevate transition-all duration-300"
-        onMouseEnter={onHover}
-        onMouseLeave={onLeave}
-        data-testid={`card-experience-${index}`}
-      >
-        <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6">
-          <div className="flex-shrink-0">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-md bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] flex items-center justify-center">
-              <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-            </div>
-          </div>
-          
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
-              <div>
-                <h3 className="font-display text-lg sm:text-xl font-bold text-white mb-1 leading-tight">{experience.role}</h3>
-                <p className="text-[hsl(var(--brand-primary))] font-medium text-sm sm:text-base">{experience.company}</p>
-              </div>
-              
-              <div className="flex flex-col sm:items-end gap-2">
-                <div className="flex flex-wrap gap-1.5 justify-end">
-                  <Badge 
-                    className={`${
-                      experience.current 
-                        ? 'bg-[hsl(145,70%,50%)]/20 border-[hsl(145,70%,50%)]/30 text-[hsl(145,70%,70%)]' 
-                        : 'bg-white/10 border-white/20 text-white/70'
-                    } backdrop-blur-md text-xs`}
-                  >
-                    {experience.period}
-                  </Badge>
-                  <Badge 
-                    className={`text-xs ${
-                      experience.employmentType === 'Contract' 
-                        ? 'bg-orange-500/20 border-orange-500/30 text-orange-300' 
-                        : 'bg-blue-500/20 border-blue-500/30 text-blue-300'
-                    }`}
-                    data-testid={`badge-timeline-employment-${index}`}
-                  >
-                    {experience.employmentType}
-                  </Badge>
-                </div>
-                <p className="text-xs sm:text-sm text-white/50">{experience.location}</p>
-              </div>
-            </div>
-            
-            {experience.description && (
-              <p className="text-white/70 text-sm sm:text-base leading-relaxed mb-3" data-testid={`text-career-journey-description-${index}`}>
-                {experience.description}
-              </p>
-            )}
-            
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mt-4">
-              <Button
-                size="sm"
-                variant="ghost"
-                className="text-xs text-[hsl(var(--brand-primary))] hover:text-[hsl(var(--brand-primary-soft))] h-auto py-2 px-3 w-full sm:w-auto justify-center sm:justify-start"
-                onClick={() => setShowImpactDialog(true)}
-                data-testid={`button-view-impact-exp-${index}`}
-              >
-                View Full Impact <ArrowRight className="ml-1 w-3 h-3" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      {/* Impact Dialog */}
-      <Dialog open={showImpactDialog} onOpenChange={(open) => { if (!open) setShowImpactDialog(false); }}>
-        <DialogContent className="bg-[hsl(270,8%,12%)] border-white/10 text-white max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="font-display text-xl sm:text-2xl text-white pr-6">
-              {experience.role}
-            </DialogTitle>
-            <DialogDescription className="text-[hsl(var(--brand-primary))] text-sm sm:text-base">
-              {experience.company} • {experience.period}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-xs sm:text-sm font-semibold text-white/70 mb-3 flex items-center gap-2">
-                <Target className="w-4 h-4" />
-                Full Impact
-              </h3>
-              <ul className="space-y-2.5">
-                {experience.keyAchievements && experience.keyAchievements.map((achievement: string, idx: number) => (
-                  <li key={idx} className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[hsl(var(--brand-primary))] mt-0.5 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm text-white/80 leading-relaxed">{achievement}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="flex flex-wrap gap-2 pt-2">
-              <Badge className="text-xs bg-white/5 border-white/10 text-white/70">
-                {experience.industry}
-              </Badge>
-              <Badge className="text-xs bg-white/5 border-white/10 text-white/70">
-                {experience.location}
-              </Badge>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
-  );
-}
-
-function GeographicMap({ activeRegion, setActiveRegion }: { activeRegion: string | null; setActiveRegion: (region: string | null) => void }) {
-  const regions = [
-    { id: 'europe', name: 'Europe', projects: 8, left: '48%', top: '25%' },
-    { id: 'uk', name: 'United Kingdom', projects: 12, left: '46%', top: '30%' },
-    { id: 'mena', name: 'MENA', projects: 5, left: '55%', top: '45%' },
-    { id: 'us', name: 'United States', projects: 4, left: '20%', top: '35%' },
-    { id: 'asia', name: 'South East Asia', projects: 6, left: '75%', top: '50%' }
-  ];
-
-  return (
-    <section id="global" className="relative py-12 md:py-20" data-testid="section-global">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-10 md:mb-16">
-          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4">
-            Global Delivery Footprint
-          </h2>
-          <p className="text-base md:text-lg text-white/60 max-w-2xl mx-auto px-4">
-            Successfully delivered programmes across 4 continents, managing teams in 6 time zones
-          </p>
-        </div>
-        
-        <div className="relative w-full h-[350px] sm:h-[400px] md:h-[500px] bg-white/5 backdrop-blur-xl border border-white/10 rounded-lg overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-[hsl(270,8%,12%)]/50 to-[hsl(240,12%,18%)]/50" />
-          
-          <svg className="absolute inset-0 w-full h-full opacity-20" viewBox="0 0 1000 500">
-            <path d="M 400 150 Q 500 100 600 200" stroke="hsl(var(--brand-primary))" strokeWidth="2" fill="none" className="animate-pulse" />
-            <path d="M 200 200 Q 400 150 450 180" stroke="hsl(var(--brand-primary))" strokeWidth="2" fill="none" className="animate-pulse" style={{ animationDelay: '0.5s' }} />
-            <path d="M 450 180 Q 600 150 750 300" stroke="hsl(var(--brand-primary))" strokeWidth="2" fill="none" className="animate-pulse" style={{ animationDelay: '1s' }} />
-          </svg>
-          
-          {regions.map((region) => (
-            <button
-              key={region.id}
-              className={`absolute transform -translate-x-1/2 -translate-y-1/2 transition-all duration-300 ${
-                activeRegion === region.id || activeRegion === null
-                  ? 'opacity-100 scale-100'
-                  : 'opacity-40 scale-90'
-              }`}
-              style={{ left: region.left, top: region.top }}
-              onMouseEnter={() => setActiveRegion(region.id)}
-              onMouseLeave={() => setActiveRegion(null)}
-              onClick={() => setActiveRegion(activeRegion === region.id ? null : region.id)}
-              data-testid={`button-region-${region.id}`}
-            >
-              <div className="relative">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] flex items-center justify-center shadow-lg shadow-[hsl(var(--brand-primary))]/50 hover-elevate">
-                  <MapPin className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
-                </div>
-                
-                {/* Desktop: show on hover or all, Mobile: show only on click */}
-                {activeRegion === region.id && (
-                  <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-md px-3 py-2 whitespace-nowrap z-10">
-                    <p className="text-white text-sm font-semibold">{region.name}</p>
-                    <p className="text-white/60 text-xs">{region.projects} projects</p>
-                  </div>
-                )}
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-
-function CertificationsWall() {
-  const [selectedCert, setSelectedCert] = useState<string | null>(null);
-  const [selectedEdu, setSelectedEdu] = useState<string | null>(null);
-
-  return (
-    <section id="certifications" className="relative py-12 md:py-20" data-testid="section-certifications">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-10 md:mb-16">
-          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4">
-            Certifications & Education
-          </h2>
-          <p className="text-base md:text-lg text-white/60 max-w-2xl mx-auto px-4">
-            Industry-recognized qualifications and academic credentials
-          </p>
-        </div>
-
-        <div className="space-y-10 md:space-y-12">
-          <div>
-            <h3 className="font-display text-xl sm:text-2xl font-bold text-white mb-4 md:mb-6 flex items-center gap-2">
-              <Award className="w-5 h-5 sm:w-6 sm:h-6 text-[hsl(var(--brand-primary))]" />
-              Professional Certifications
-            </h3>
-            <div className="grid md:grid-cols-2 gap-4 md:gap-6">
-              {detailedCertifications.map((cert, index) => (
-                <Card
-                  key={cert.id}
-                  className="bg-white/5 backdrop-blur-xl border-white/10 p-6 hover-elevate transition-all duration-300 cursor-pointer"
-                  onClick={() => setSelectedCert(selectedCert === cert.id ? null : cert.id)}
-                  data-testid={`card-cert-${index}`}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="w-16 h-16 rounded-md bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] flex items-center justify-center flex-shrink-0">
-                      <Award className="w-8 h-8 text-white" />
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-display text-xl font-bold text-white mb-1">{cert.name}</h3>
-                      <p className="text-[hsl(var(--brand-primary))] text-sm mb-2">{cert.issuer}</p>
-                      
-                      <div className="flex items-center gap-2 text-xs text-white/50 mb-3">
-                        <Calendar className="w-3 h-3" />
-                        <span>Obtained {cert.dateObtained}</span>
-                        {cert.verificationUrl && (
-                          <>
-                            <span>•</span>
-                            <a 
-                              href={cert.verificationUrl}
-                              onClick={(e) => e.stopPropagation()}
-                              className="flex items-center gap-1 text-[hsl(var(--brand-primary))] hover:text-[hsl(var(--brand-primary-soft))]"
-                            >
-                              <ExternalLink className="w-3 h-3" />
-                              Verify
-                            </a>
-                          </>
-                        )}
-                      </div>
-
-                      {selectedCert === cert.id && (
-                        <div className="space-y-3 mt-4 pt-4 border-t border-white/10">
-                          <p className="text-sm text-white/70">{cert.description}</p>
-                          
-                          <div>
-                            <p className="text-xs font-semibold text-white mb-2">Skills Validated:</p>
-                            <div className="flex flex-wrap gap-2">
-                              {cert.skills.map((skill, idx) => (
-                                <Badge 
-                                  key={idx}
-                                  className="bg-white/10 border-white/20 text-white/80 text-xs"
-                                >
-                                  {skill}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h3 className="font-display text-2xl font-bold text-white mb-6 flex items-center gap-2">
-              <GraduationCap className="w-6 h-6 text-[hsl(var(--brand-primary))]" />
-              Education
-            </h3>
-            <div className="grid md:grid-cols-2 gap-6">
-              {education.map((edu, index) => (
-                <Card
-                  key={edu.id}
-                  className="bg-white/5 backdrop-blur-xl border-white/10 p-6 hover-elevate transition-all duration-300 cursor-pointer"
-                  onClick={() => setSelectedEdu(selectedEdu === edu.id ? null : edu.id)}
-                  data-testid={`card-edu-${index}`}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="w-16 h-16 rounded-md bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] flex items-center justify-center flex-shrink-0">
-                      <GraduationCap className="w-8 h-8 text-white" />
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-display text-xl font-bold text-white mb-1">{edu.degree}</h3>
-                      <p className="text-[hsl(var(--brand-primary))] text-sm mb-2">{edu.institution}</p>
-                      
-                      <div className="flex flex-col gap-1 text-xs text-white/50 mb-3">
-                        <div className="flex items-center gap-2">
-                          <Calendar className="w-3 h-3" />
-                          <span>{edu.period}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-3 h-3" />
-                          <span>{edu.location}</span>
-                        </div>
-                        {edu.fieldOfStudy && (
-                          <p className="text-white/60 mt-1">{edu.fieldOfStudy}</p>
-                        )}
-                      </div>
-
-                      {selectedEdu === edu.id && edu.achievements && (
-                        <div className="space-y-3 mt-4 pt-4 border-t border-white/10">
-                          <div>
-                            <p className="text-xs font-semibold text-white mb-2">Highlights:</p>
-                            <ul className="space-y-2">
-                              {edu.achievements.map((achievement, idx) => (
-                                <li key={idx} className="flex items-start gap-2">
-                                  <CheckCircle2 className="w-3 h-3 text-green-400 mt-0.5 flex-shrink-0" />
-                                  <span className="text-sm text-white/70">{achievement}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-
-function IndustryExperienceMap() {
-  const [expandedIndustry, setExpandedIndustry] = useState<string | null>(null);
-
-  return (
-    <section id="industries" className="relative py-12 md:py-20 lg:py-24" data-testid="section-industries">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-10 md:mb-16">
-          <Badge className="mb-3 md:mb-4 bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20" data-testid="badge-industries">
-            Industry Expertise
-          </Badge>
-          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4" data-testid="text-industries-title">
-            Cross-Industry Experience
-          </h2>
-          <p className="text-base md:text-lg lg:text-xl text-white/60 max-w-2xl mx-auto px-4" data-testid="text-industries-subtitle">
-            Delivering excellence across 7+ industries
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {industryExperience.map((industry) => {
-            const isExpanded = expandedIndustry === industry.id;
-            
-            return (
-              <Card
-                key={industry.id}
-                className="bg-white/5 backdrop-blur-xl border-white/10 overflow-hidden hover-elevate"
-                data-testid={`card-industry-${industry.id}`}
-              >
-                <div className="p-6 space-y-4">
-                  <div className="flex items-center gap-4">
-                    <div 
-                      className="w-14 h-14 rounded-lg flex items-center justify-center text-2xl font-bold text-white flex-shrink-0"
-                      style={{ backgroundColor: industry.color + '30', border: `2px solid ${industry.color}` }}
-                    >
-                      {industry.years}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-lg text-white mb-1.5 leading-tight" data-testid={`text-industry-name-${industry.id}`}>
-                        {industry.name}
-                      </h3>
-                      <p className="text-sm text-white/60">{industry.years} years experience</p>
-                    </div>
-                  </div>
-
-                  <Button
-                    variant="ghost"
-                    onClick={() => setExpandedIndustry(isExpanded ? null : industry.id)}
-                    className="w-full flex items-center justify-between text-white/70 hover:text-white h-10 px-3"
-                    data-testid={`button-industry-toggle-${industry.id}`}
-                  >
-                    <span className="flex-1 text-left text-sm">{isExpanded ? 'Hide' : 'View'} Projects ({industry.projects.length})</span>
-                    <ChevronDown className={`w-4 h-4 transition-transform flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`} />
-                  </Button>
-
-                  {isExpanded && (
-                    <div className="space-y-3 pt-4 border-t border-white/10" data-testid={`list-industry-projects-${industry.id}`}>
-                      {industry.projects.map((project, idx) => (
-                        <div 
-                          key={idx}
-                          className="p-3 rounded-lg bg-white/5 border border-white/10"
-                          data-testid={`item-industry-project-${industry.id}-${idx}`}
-                        >
-                          <p className="font-medium text-white text-sm" data-testid={`text-project-company-${idx}`}>
-                            {project.company}
-                          </p>
-                          <p className="text-xs text-white/60" data-testid={`text-project-role-${idx}`}>
-                            {project.role} • {project.period}
-                          </p>
-                          <p className="text-xs text-[hsl(var(--brand-primary))] mt-2" data-testid={`text-project-achievement-${idx}`}>
-                            {project.keyAchievement}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </Card>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function ContactSection() {
-  return (
-    <section id="contact" className="relative py-12 md:py-20" data-testid="section-contact">
-      <ContactSectionInner />
-    </section>
-  );
-}
-
-function ContactSectionInner() {
-  const { data: settings = {} } = useQuery<Record<string, string>>({ queryKey: ['/api/site/settings'] });
-  const heading = settings['contact.heading'] || "Let's Work Together";
-  const tagline = settings['contact.tagline'] || "Looking for an experienced project manager to deliver your next critical programme? Let's discuss how I can help drive your success.";
-  const email = settings['contact.email'] || 'odmlawal@gmail.com';
-  const linkedinUrl = settings['contact.linkedin_url'] || 'https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/';
-  const phoneUk = settings['contact.phone_uk'] || '+44 (0) 7908226038';
-  const phoneUae = settings['contact.phone_uae'] || '+971 (0) 509082234';
-
-  return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6">
-      <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6 sm:p-8 md:p-12">
-        <div className="text-center space-y-4 md:space-y-6">
-          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold text-white">
-            {heading}
-          </h2>
-          <p className="text-base md:text-lg text-white/70 max-w-2xl mx-auto px-2">
-            {tagline}
-          </p>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 pt-2 md:pt-4">
-            <Button
-              size="lg"
-              className="w-full sm:w-auto bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0 hover-elevate active-elevate-2 min-h-12"
-              onClick={() => window.location.href = `mailto:${email}`}
-              data-testid="button-email-contact"
-            >
-              <Mail className="mr-2 w-5 h-5" />
-              {email}
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="w-full sm:w-auto bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10 min-h-12"
-              onClick={() => window.open(linkedinUrl, '_blank')}
-              data-testid="button-linkedin-contact"
-            >
-              <Linkedin className="mr-2 w-5 h-5" />
-              Connect on LinkedIn
-            </Button>
-          </div>
-          <div className="pt-8 border-t border-white/10">
-            {phoneUk && (
-              <p className="text-white/50 text-sm">
-                <span className="font-mono">{phoneUk}</span>
-                <span className="mx-3">•</span>
-                <span>London, UK</span>
-              </p>
-            )}
-            {phoneUae && (
-              <p className="text-white/50 text-sm mt-2">
-                <span className="font-mono">{phoneUae}</span>
-                <span className="mx-3">•</span>
-                <span>Dubai, UAE</span>
-              </p>
-            )}
-          </div>
-        </div>
-      </Card>
-    </div>
-  );
-}
-
-function CVDownloadDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleCVDownload = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setIsSubmitting(true);
-
+    if (!cvForm.name || !cvForm.email) { setCvError('Name and email are required.'); return; }
+    setCvSubmitting(true);
+    setCvError('');
     try {
-      const response = await fetch('/api/cv/download', {
+      const res = await fetch('/api/cv/download', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email, phone }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cvForm),
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to process request');
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Download failed');
       }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = 'Mujeeb_Lawal_CV.pdf';
-      document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-
-      // Reset form and close dialog
-      setName('');
-      setEmail('');
-      setPhone('');
-      onOpenChange(false);
-    } catch (err) {
-      setError('Unable to download CV. Please try again or contact me directly.');
+      URL.revokeObjectURL(url);
+      setCvModalOpen(false);
+      setCvForm({ name: '', email: '', phone: '' });
+    } catch (err: any) {
+      setCvError(err.message || 'Something went wrong');
     } finally {
-      setIsSubmitting(false);
+      setCvSubmitting(false);
     }
   };
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-[hsl(270,8%,12%)] border-white/20 text-white sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-white font-display text-2xl">Download My CV</DialogTitle>
-          <DialogDescription className="text-white/60">
-            Please share your details to receive my CV
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-white/80 mb-2">
-              Full Name <span className="text-red-400">*</span>
-            </label>
-            <input
-              id="name"
-              type="text"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-md text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[hsl(var(--brand-primary))] focus:border-transparent"
-              placeholder="John Doe"
-              data-testid="input-cv-name"
-            />
-          </div>
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-white/80 mb-2">
-              Email Address <span className="text-red-400">*</span>
-            </label>
-            <input
-              id="email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-md text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[hsl(var(--brand-primary))] focus:border-transparent"
-              placeholder="john@example.com"
-              data-testid="input-cv-email"
-            />
-          </div>
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-white/80 mb-2">
-              Phone Number <span className="text-white/40 text-xs">(Optional)</span>
-            </label>
-            <input
-              id="phone"
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-md text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[hsl(var(--brand-primary))] focus:border-transparent"
-              placeholder="+44 7900 000000"
-              data-testid="input-cv-phone"
-            />
-          </div>
-          {error && (
-            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-md text-red-400 text-sm">
-              {error}
-            </div>
-          )}
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              className="flex-1 bg-transparent border-white/20 text-white hover:bg-white/10"
-              data-testid="button-cv-cancel"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex-1 bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0 hover:opacity-90"
-              data-testid="button-cv-submit"
-            >
-              {isSubmitting ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                  Downloading...
-                </>
-              ) : (
-                <>
-                  <Download className="w-4 h-4 mr-2" />
-                  Download CV
-                </>
-              )}
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
-}
+  // Skills grouped by category
+  const methodologies = skills.filter(s => s.category === 'methodology').map(s => s.name);
+  const tools = skills.filter(s => s.category === 'tool').map(s => s.name);
+  const certifications = skills.filter(s => s.category === 'certification').map(s => s.name);
+  const industries = skills.filter(s => s.category === 'industry').map(s => s.name);
 
-function Footer() {
-  const { data: settings = {} } = useQuery<Record<string, string>>({ queryKey: ['/api/site/settings'] });
-  const copyright = settings['footer.copyright'] || '© 2026 Mujeeb Lawal. All rights reserved.';
   const email = settings['contact.email'] || 'odmlawal@gmail.com';
-  const linkedinUrl = settings['contact.linkedin_url'] || 'https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/';
+  const phoneUK = settings['contact.phone_uk'] || '+44 7908226038';
+  const phoneUAE = settings['contact.phone_uae'] || '+971 509082234';
+  const whatsapp = settings['contact.whatsapp'] || '971509082234';
+  const linkedIn = settings['contact.linkedin_url'] || 'https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/';
+  const copyright = settings['footer.copyright'] || '© 2025 Mujeeb Lawal. All rights reserved.';
+
+  const s = (id: string, el: HTMLElement | null) => { sectionRefs.current[id] = el; };
 
   return (
-    <footer className="relative py-12 border-t border-white/10" data-testid="footer">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <img
-              src="/logo-light.png"
-              alt="Mujeeb Lawal"
-              className="w-8 h-8 object-contain block dark:hidden"
-              data-testid="img-logo-footer-light"
-            />
-            <img
-              src="/logo-dark.png"
-              alt="Mujeeb Lawal"
-              className="w-8 h-8 object-contain hidden dark:block"
-              data-testid="img-logo-footer-dark"
-            />
-            <span className="text-white/60 text-sm" data-testid="text-footer-copyright">{copyright}</span>
-          </div>
+    <div style={{ fontFamily: 'Inter, sans-serif', display: 'flex', height: '100vh', overflow: 'hidden' }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        a { text-decoration: none; }
+        ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: hsl(220,20%,30%); }
+      `}</style>
 
-          <div className="flex items-center gap-6">
-            <a
-              href={`mailto:${email}`}
-              className="text-white/40 hover:text-white transition-colors"
-              data-testid="link-footer-email"
-            >
-              <Mail className="w-5 h-5" />
-            </a>
-            <a
-              href={linkedinUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-white/40 hover:text-white transition-colors"
-              data-testid="link-footer-linkedin"
-            >
-              <Linkedin className="w-5 h-5" />
-            </a>
+      {/* ── LEFT PANEL ── */}
+      <aside style={{ width: 340, background: INK, color: PAPER, height: '100vh', display: 'flex', flexDirection: 'column', padding: '52px 44px', flexShrink: 0, overflowY: 'auto' }}>
+        {/* Logo */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 52 }}>
+          <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+            <rect width="40" height="40" rx="2" fill={BRASS} />
+            <text x="20" y="28" textAnchor="middle" fontFamily="Cormorant Garamond,serif" fontWeight="600" fontSize="22" fill={PAPER}>M</text>
+          </svg>
+        </div>
+
+        {/* Name + title */}
+        <div style={{ marginBottom: 40 }}>
+          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 44, fontWeight: 400, lineHeight: 1.05, color: PAPER, marginBottom: 10 }}>Mujeeb<br />Lawal</div>
+          <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: BRASS_LIGHT }}>Senior Programme Director</div>
+        </div>
+
+        {/* Stats */}
+        <div style={{ display: 'flex', flexDirection: 'column', marginBottom: 44, borderTop: '1px solid hsl(220,20%,25%)' }}>
+          {[
+            { val: '£50M+', label: 'Programmes led' },
+            { val: '17 yrs', label: 'Experience' },
+            { val: '34', label: 'Largest team' },
+          ].map((stat, i) => (
+            <div key={i} style={{ padding: '16px 0', borderBottom: '1px solid hsl(220,20%,25%)', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+              <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 28, fontWeight: 500, color: BRASS_LIGHT }}>{stat.val}</div>
+              <div style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'hsl(220,15%,50%)' }}>{stat.label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Nav */}
+        <nav style={{ flex: 1 }}>
+          {NAV_ITEMS.map(item => (
+            <button
+              key={item.id}
+              onClick={() => scrollTo(item.id)}
+              data-testid={`nav-${item.id}`}
+              style={{
+                display: 'block', width: '100%', textAlign: 'left',
+                padding: '12px 0 12px 12px', background: 'none', border: 'none', cursor: 'pointer',
+                fontSize: 11, fontWeight: activeSection === item.id ? 600 : 400,
+                letterSpacing: '0.16em', textTransform: 'uppercase',
+                color: activeSection === item.id ? BRASS_LIGHT : 'hsl(220,15%,50%)',
+                borderLeft: activeSection === item.id ? `2px solid ${BRASS_LIGHT}` : '2px solid transparent',
+                transition: 'all 0.15s',
+              }}
+            >{item.label}</button>
+          ))}
+
+          {/* Cross-site links */}
+          <div style={{ marginTop: 24, paddingTop: 24, borderTop: '1px solid hsl(220,20%,22%)' }}>
+            <Link href="/case-studies" style={{ display: 'block', padding: '10px 0 10px 12px', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'hsl(220,15%,42%)', borderLeft: '2px solid transparent' }}>Case Studies</Link>
+            <Link href="/projects" style={{ display: 'block', padding: '10px 0 10px 12px', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'hsl(220,15%,42%)', borderLeft: '2px solid transparent' }}>Built Projects</Link>
+            <Link href="/insights" style={{ display: 'block', padding: '10px 0 10px 12px', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'hsl(220,15%,42%)', borderLeft: '2px solid transparent' }}>Insights</Link>
+          </div>
+        </nav>
+
+        {/* Contact + Download CV */}
+        <div style={{ marginTop: 36, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <a href={`mailto:${email}`} style={{ fontSize: 12, color: 'hsl(220,15%,55%)', textDecoration: 'none' }}>{email}</a>
+          <a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: 'hsl(220,15%,55%)', textDecoration: 'none' }}>WhatsApp: {phoneUAE}</a>
+          <div style={{ marginTop: 12 }}>
+            <button
+              data-testid="btn-download-cv"
+              onClick={() => setCvModalOpen(true)}
+              style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: INK, background: BRASS, padding: '10px 20px', border: 'none', cursor: 'pointer' }}
+            >Download CV</button>
           </div>
         </div>
-      </div>
-    </footer>
-  );
-}
+      </aside>
 
-function CertificationsSection() {
-  const { data: certs = [], isLoading } = useQuery<SiteCertificationRow[]>({ queryKey: ['/api/site/certifications'] });
-  const { data: settings = {} } = useQuery<Record<string, string>>({ queryKey: ['/api/site/settings'] });
-  if (!isLoading && certs.length === 0) return null;
-  return (
-    <section id="certifications" className="relative py-16 md:py-24 bg-white/[0.015]" data-testid="section-certifications">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-12">
-          <Badge className="bg-white/10 backdrop-blur-md border border-white/20 text-white mb-4">{settings['certifications.eyebrow'] || 'Credentials'}</Badge>
-          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-4">{settings['certifications.heading'] || 'Certifications'}</h2>
-          <p className="text-lg text-white/60 max-w-2xl mx-auto">{settings['certifications.subheading'] || 'Verified credentials backing my delivery and leadership work.'}</p>
-        </div>
-        {isLoading ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[0,1,2,3].map(i => <Card key={i} className="bg-white/5 border-white/10 p-6 h-48 animate-pulse" />)}
-          </div>
-        ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {certs.map(cert => (
-              <Card key={cert.id} className="bg-white/5 border-white/10 p-6 hover-elevate transition" data-testid={`card-cert-${cert.id}`}>
-                <div className="flex items-start gap-4 mb-4">
-                  {cert.badgeImage ? (
-                    <img src={cert.badgeImage} alt="" className="w-14 h-14 rounded object-contain bg-white/10 flex-shrink-0" />
-                  ) : (
-                    <div className="w-14 h-14 rounded bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] flex items-center justify-center flex-shrink-0">
-                      <Award className="w-7 h-7 text-white" />
-                    </div>
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-display text-lg font-bold text-white leading-tight">{cert.name}</h3>
-                    <div className="text-sm text-[hsl(var(--brand-primary))] font-medium mt-1">{cert.issuer}</div>
-                    <div className="text-xs text-white/50 mt-1">
-                      {cert.dateObtained}{cert.validUntil ? ` – ${cert.validUntil}` : ''}
-                    </div>
-                  </div>
-                </div>
-                {cert.description && (
-                  <p className="text-sm text-white/70 leading-relaxed mb-3">{cert.description}</p>
-                )}
-                {cert.skills && cert.skills.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mb-3">
-                    {cert.skills.map((s, i) => (
-                      <Badge key={i} variant="outline" className="border-white/20 text-white/70 text-xs">{s}</Badge>
-                    ))}
-                  </div>
-                )}
-                <div className="flex items-center justify-between text-xs text-white/50 pt-3 border-t border-white/10">
-                  <span className="truncate" data-testid={`text-cert-credential-${cert.id}`}>
-                    {cert.credentialId ? `ID: ${cert.credentialId}` : ''}
-                  </span>
-                  {cert.verificationUrl && (
-                    <a href={cert.verificationUrl} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-[hsl(var(--brand-primary))] hover:underline"
-                      data-testid={`link-cert-verify-${cert.id}`}>
-                      Verify <ExternalLink className="w-3 h-3" />
-                    </a>
-                  )}
-                </div>
-              </Card>
+      {/* ── RIGHT PANEL ── */}
+      <main ref={mainRef} style={{ flex: 1, background: PAPER, overflowY: 'auto', height: '100vh' }}>
+
+        {/* PROFILE */}
+        <section id="profile" ref={el => s('profile', el)} style={{ padding: '72px 64px 64px', borderBottom: `1px solid ${HAIRLINE}` }}>
+          <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: BRASS, marginBottom: 20 }}>Profile</div>
+          <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 26, fontWeight: 400, lineHeight: 1.5, color: INK, maxWidth: 620, marginBottom: 32, fontStyle: 'italic' }}>
+            "A programme director who builds institutions, not just outputs — governing at scale, delivering under pressure, and leaving infrastructure behind."
+          </p>
+          <p style={{ fontSize: 14, lineHeight: 1.8, color: 'hsl(220,15%,40%)', maxWidth: 600, marginBottom: 44 }}>
+            17 years leading complex change across financial services, telecoms, insurance, and sustainability. Comfortable at board level and delivery level simultaneously. PRINCE2 Practitioner, Certified Scrum Master. London and Dubai based.
+          </p>
+          {/* Trust strip */}
+          <div style={{ display: 'flex', gap: 40, alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'hsl(220,15%,55%)' }}>Past employers</div>
+            {['Mercer', 'GSMA', 'Simply Business', '6Connex'].map(c => (
+              <div key={c} style={{ fontSize: 13, fontWeight: 600, color: 'hsl(220,25%,25%)', letterSpacing: '0.02em' }}>{c}</div>
             ))}
           </div>
-        )}
-      </div>
-    </section>
-  );
-}
+        </section>
 
-function EducationSection() {
-  const { data: items = [], isLoading } = useQuery<SiteEducationRow[]>({ queryKey: ['/api/site/education'] });
-  const { data: settings = {} } = useQuery<Record<string, string>>({ queryKey: ['/api/site/settings'] });
-  if (!isLoading && items.length === 0) return null;
-  return (
-    <section id="education" className="relative py-16 md:py-24" data-testid="section-education">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-12">
-          <Badge className="bg-white/10 backdrop-blur-md border border-white/20 text-white mb-4">{settings['education.eyebrow'] || 'Education'}</Badge>
-          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-4">{settings['education.heading'] || 'Academic Background'}</h2>
-        </div>
-        {isLoading ? (
-          <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
-            {[0,1].map(i => <Card key={i} className="bg-white/5 border-white/10 p-6 h-40 animate-pulse" />)}
-          </div>
-        ) : (
-          <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
-            {items.map(edu => (
-              <Card key={edu.id} className="bg-white/5 border-white/10 p-6" data-testid={`card-edu-${edu.id}`}>
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="w-10 h-10 rounded bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] flex items-center justify-center flex-shrink-0">
-                    <GraduationCap className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-display text-lg font-bold text-white leading-tight">{edu.degree}</h3>
-                    <div className="text-sm text-[hsl(var(--brand-primary))] font-medium mt-1">{edu.institution}</div>
-                    <div className="text-xs text-white/50 mt-1">
-                      {edu.period}{edu.location ? ` · ${edu.location}` : ''}
+        {/* MANDATES */}
+        <section id="mandates" ref={el => s('mandates', el)} style={{ padding: '64px', borderBottom: `1px solid ${HAIRLINE}` }}>
+          <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: BRASS, marginBottom: 40 }}>Selected Mandates</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
+            {flagshipWins.length > 0
+              ? flagshipWins.slice(0, 3).map((win, i) => (
+                <div key={win.id} style={{ display: 'grid', gridTemplateColumns: '56px 1fr', gap: 0 }}>
+                  <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 300, color: 'hsl(40,15%,82%)', lineHeight: 1 }}>0{i + 1}</div>
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+                      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 500, color: INK }}>{win.title}</div>
+                      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 20, fontWeight: 500, color: BRASS }}>{(win.metrics as string[])?.[0] || ''}</div>
                     </div>
+                    <div style={{ fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'hsl(220,15%,55%)', marginBottom: 12 }}>{win.company} · {win.period}</div>
+                    <div style={{ fontSize: 13, lineHeight: 1.75, color: 'hsl(220,15%,40%)' }}>{(win.metrics as string[])?.slice(1).join(' · ')}</div>
                   </div>
                 </div>
-                {edu.fieldOfStudy && (
-                  <p className="text-sm text-white/70 mb-2"><span className="text-white/50">Field:</span> {edu.fieldOfStudy}</p>
-                )}
-                {edu.achievements && edu.achievements.length > 0 && (
-                  <ul className="space-y-1 mt-3">
-                    {edu.achievements.map((a, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-white/70">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[hsl(var(--brand-primary))] mt-0.5 flex-shrink-0" />
-                        <span>{a}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </Card>
+              ))
+              : [
+                { num: '01', title: 'PMO Build — Mercer', metric: '+36% efficiency', sub: 'Financial Services · 2022–24', body: 'Built PMO governance, tooling, and reporting framework from scratch for a 34-person cross-functional team. Board-level Power BI dashboard delivered in week six.' },
+                { num: '02', title: 'FCA Regulatory Programme — Simply Business', metric: '£1.2M on time', sub: 'Insurance · 2020–22', body: 'Led FCA-mandated change across underwriting and claims. Zero compliance breaches. Coordinated 12-person team across two time-zones with full audit trail.' },
+                { num: '03', title: 'UN SDG Energy Mandate — 6Connex', metric: '−35% energy', sub: 'SaaS / Sustainability · 2018–20', body: 'Infrastructure rationalisation aligned to UN SDG targets. Quarterly board reporting against measurable reduction milestones. Recognised by the UN Global Compact.' },
+              ].map((m, i) => (
+                <div key={i} style={{ display: 'grid', gridTemplateColumns: '56px 1fr', gap: 0 }}>
+                  <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 300, color: 'hsl(40,15%,82%)', lineHeight: 1 }}>{m.num}</div>
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+                      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 500, color: INK }}>{m.title}</div>
+                      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 20, fontWeight: 500, color: BRASS }}>{m.metric}</div>
+                    </div>
+                    <div style={{ fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'hsl(220,15%,55%)', marginBottom: 12 }}>{m.sub}</div>
+                    <div style={{ fontSize: 13, lineHeight: 1.75, color: 'hsl(220,15%,40%)' }}>{m.body}</div>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+          <div style={{ marginTop: 40 }}>
+            <Link href="/case-studies" style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: BRASS }}>All case studies →</Link>
+          </div>
+        </section>
+
+        {/* CAPABILITY */}
+        <section id="capability" ref={el => s('capability', el)} style={{ padding: '64px', borderBottom: `1px solid ${HAIRLINE}` }}>
+          <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: BRASS, marginBottom: 40 }}>Capability</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
+            {[
+              { label: 'Methodology', items: methodologies.length > 0 ? methodologies : ['Agile / SAFe', 'PRINCE2 Practitioner', 'Waterfall', 'Scrum Master', 'MSP'] },
+              { label: 'Tooling', items: tools.length > 0 ? tools : ['Jira · Confluence', 'Power BI · Tableau', 'MS Project', 'ServiceNow', 'Smartsheet'] },
+              { label: 'Certifications', items: certifications.length > 0 ? certifications : ['PRINCE2 Practitioner', 'Scrum Master (PSM I & II)', 'Six Sigma'] },
+              { label: 'Industry', items: industries.length > 0 ? industries : ['Financial Services', 'Insurance', 'Telecoms', 'SaaS / Tech', 'Sustainability', 'Engineering'] },
+            ].map((col, i) => (
+              <div key={i}>
+                <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: INK, marginBottom: 16 }}>{col.label}</div>
+                {col.items.slice(0, 7).map((item, j) => (
+                  <div key={j} style={{ fontSize: 13, color: 'hsl(220,15%,38%)', padding: '9px 0', borderBottom: `1px solid ${HAIRLINE}` }}>{item}</div>
+                ))}
+              </div>
             ))}
           </div>
-        )}
-      </div>
-    </section>
+        </section>
+
+        {/* CAREER */}
+        <section id="career" ref={el => s('career', el)} style={{ padding: '64px', borderBottom: `1px solid ${HAIRLINE}` }}>
+          <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: BRASS, marginBottom: 40 }}>Career</div>
+          {(careerRoles.length > 0 ? careerRoles : [
+            { id: 1, role: 'Head of Projects & PMO Lead', company: 'Novocycle Technology', period: 'Apr 2024 – Present', employmentType: 'Permanent', description: 'Built PMO from scratch; EU-funded battery recycling programmes; 36% reporting efficiency gain' },
+            { id: 2, role: 'Senior Technical Project Manager', company: 'Caravan and Motorhome Club', period: 'Oct 2022 – Nov 2023', employmentType: 'Contract', description: 'Mutual agreement insurance product transformation; vendor negotiation' },
+            { id: 3, role: 'Programme Manager', company: 'Simply Business', period: 'Aug 2022 – Mar 2023', employmentType: 'Contract', description: '£1.2M FCA-regulated product; 34-person team; two FCA compliance programmes' },
+            { id: 4, role: 'Programme Manager & Digital Transformation Lead', company: 'Mercer', period: 'Oct 2021 – Jun 2022', employmentType: 'Contract', description: 'Global benefits platform for Amazon, Estée Lauder, Marsh & McLennan' },
+            { id: 5, role: 'Senior International Project Manager', company: '6Connex', period: 'Jul 2020 – Mar 2022', employmentType: 'Contract', description: 'Virtual events across 6 time-zones; Agile engineering coordination' },
+            { id: 6, role: 'Project Manager', company: 'GSMA', period: 'Jan 2019 – Mar 2020', employmentType: 'Contract', description: 'UN SDG energy benchmark tool; 35% energy reduction for major operators' },
+            { id: 7, role: 'Project Delivery Manager', company: 'Best Future Education', period: 'Mar 2020 – Dec 2020', employmentType: 'Contract', description: 'Digital pivot through COVID-19; remote learning platform delivery' },
+            { id: 8, role: 'Senior Implementation Consultant', company: 'Dictate.IT', period: 'Sep 2014 – May 2016', employmentType: 'Permanent', description: 'NHS digital dictation deployment; St George\'s, Royal Free, Nuffield Health' },
+            { id: 9, role: 'Technical Project Manager', company: 'BSS Industrial', period: 'Nov 2013 – Aug 2014', employmentType: 'Permanent', description: 'High-profile construction; Hilton Brighton, commercial fit-outs' },
+            { id: 10, role: 'Project Support Engineer', company: 'Alfa Laval', period: 'Sep 2008 – Nov 2013', employmentType: 'Permanent', description: 'The Shard, London 2012 Olympic Aquatic Centre, 20 Fenchurch Street' },
+          ] as any[]).map((role: any, i: number) => (
+            <div key={role.id || i} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 90px', alignItems: 'start', padding: '18px 0', borderBottom: `1px solid ${HAIRLINE}`, gap: 24 }}>
+              <div>
+                <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 18, fontWeight: 500, color: INK, marginBottom: 2 }}>{role.role}</div>
+                <div style={{ fontSize: 12, color: MUTED }}>{role.company}</div>
+              </div>
+              <div style={{ fontSize: 12, color: 'hsl(220,15%,45%)', paddingTop: 3 }}>{role.description || (Array.isArray(role.keyAchievements) ? role.keyAchievements[0] : '')}</div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: 11, color: MUTED, marginBottom: 4 }}>{role.period}</div>
+                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: role.employmentType === 'Permanent' ? BRASS : 'hsl(200,55%,45%)' }}>{role.employmentType}</div>
+              </div>
+            </div>
+          ))}
+        </section>
+
+        {/* EDUCATION */}
+        <section id="education" ref={el => s('education', el)} style={{ padding: '64px', borderBottom: `1px solid ${HAIRLINE}` }}>
+          <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: BRASS, marginBottom: 40 }}>Education</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
+            {(education.length > 0 ? education : [
+              { id: 1, degree: 'MSc Project Management', institution: 'University of Westminster', period: '2010', location: 'London, UK' },
+              { id: 2, degree: 'BSc Business Administration', institution: 'Lagos State University', period: '2006', location: 'Lagos, Nigeria' },
+            ] as any[]).map((edu: any) => (
+              <div key={edu.id} style={{ padding: '28px', border: `1px solid ${HAIRLINE}` }}>
+                <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 500, color: INK, marginBottom: 8 }}>{edu.degree}</div>
+                <div style={{ fontSize: 12, color: MUTED, marginBottom: 4 }}>{edu.institution}</div>
+                <div style={{ fontSize: 11, color: BRASS_LIGHT, fontWeight: 600, letterSpacing: '0.1em' }}>{edu.period} {edu.location ? `· ${edu.location}` : ''}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* CONTACT */}
+        <section id="contact" ref={el => s('contact', el)} style={{ padding: '64px' }}>
+          <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: BRASS, marginBottom: 40 }}>Contact</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
+            {[
+              { label: 'Email', value: email, href: `mailto:${email}` },
+              { label: 'LinkedIn', value: 'linkedin.com/in/mujeeb-lawal', href: linkedIn },
+              { label: 'WhatsApp', value: phoneUAE, href: `https://wa.me/${whatsapp}` },
+              { label: 'Phone (UK)', value: phoneUK, href: `tel:${phoneUK.replace(/\s/g, '')}` },
+            ].map((c, i) => (
+              <a key={i} href={c.href} target={c.href.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer" style={{ display: 'block', padding: '28px', border: `1px solid ${HAIRLINE}`, textDecoration: 'none' }}>
+                <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: BRASS, marginBottom: 8 }}>{c.label}</div>
+                <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 20, fontWeight: 500, color: INK }}>{c.value}</div>
+              </a>
+            ))}
+          </div>
+          <div style={{ marginTop: 40 }}>
+            <button
+              data-testid="btn-download-cv-contact"
+              onClick={() => setCvModalOpen(true)}
+              style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: PAPER, background: INK, padding: '14px 28px', border: 'none', cursor: 'pointer' }}
+            >Download CV</button>
+          </div>
+          <div style={{ marginTop: 64, paddingTop: 24, borderTop: `1px solid ${HAIRLINE}`, fontSize: 11, color: 'hsl(220,15%,65%)' }}>{copyright}</div>
+        </section>
+      </main>
+
+      {/* ── CV DOWNLOAD MODAL ── */}
+      {cvModalOpen && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
+          onClick={(e) => { if (e.target === e.currentTarget) setCvModalOpen(false); }}
+        >
+          <div style={{ background: PAPER, maxWidth: 480, width: '100%', padding: '48px 44px' }}>
+            <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: BRASS, marginBottom: 16 }}>Download CV</div>
+            <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 28, fontWeight: 400, color: INK, marginBottom: 8 }}>Just one quick step</div>
+            <div style={{ fontSize: 13, color: MUTED, marginBottom: 32, lineHeight: 1.6 }}>Leave your details and the CV will download immediately.</div>
+            <form onSubmit={handleCVDownload}>
+              {[
+                { label: 'Name *', key: 'name' as const, type: 'text', placeholder: 'Your name' },
+                { label: 'Email *', key: 'email' as const, type: 'email', placeholder: 'your@email.com' },
+                { label: 'Phone', key: 'phone' as const, type: 'tel', placeholder: 'Optional' },
+              ].map((field) => (
+                <div key={field.key} style={{ marginBottom: 20 }}>
+                  <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: INK, marginBottom: 8 }}>{field.label}</div>
+                  <input
+                    data-testid={`input-cv-${field.key}`}
+                    type={field.type}
+                    placeholder={field.placeholder}
+                    value={cvForm[field.key]}
+                    onChange={e => setCvForm(f => ({ ...f, [field.key]: e.target.value }))}
+                    style={{ width: '100%', padding: '12px 16px', border: `1px solid ${HAIRLINE}`, background: 'transparent', fontSize: 14, color: INK, outline: 'none', fontFamily: 'Inter, sans-serif' }}
+                  />
+                </div>
+              ))}
+              {cvError && <div style={{ fontSize: 12, color: 'hsl(0,60%,50%)', marginBottom: 16 }}>{cvError}</div>}
+              <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+                <button
+                  type="submit"
+                  data-testid="btn-cv-submit"
+                  disabled={cvSubmitting}
+                  style={{ flex: 1, padding: '14px', background: INK, color: PAPER, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' }}
+                >{cvSubmitting ? 'Downloading…' : 'Download CV'}</button>
+                <button
+                  type="button"
+                  onClick={() => setCvModalOpen(false)}
+                  style={{ padding: '14px 20px', background: 'transparent', color: MUTED, border: `1px solid ${HAIRLINE}`, cursor: 'pointer', fontSize: 11 }}
+                >Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

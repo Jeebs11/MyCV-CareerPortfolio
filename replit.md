@@ -2,16 +2,22 @@
 
 ## Overview
 
-This is a professional portfolio website for Mujeeb Lawal, a Senior Project Manager with 17+ years of international experience, **optimized specifically to target recruiters and maximize employment opportunities**. Built with React, TypeScript, and modern web technologies, the portfolio follows a recruiter-first information architecture with reduced scroll weight, immediate credibility signals, and scannable value propositions. Recent redesign (Nov 2025) pivoted from dashboard aesthetic to executive-focused presentation. Key capabilities include:
+Professional portfolio for Mujeeb Lawal, Senior Programme Director with 17+ years of international experience. Built with React, TypeScript, and modern web technologies. **May 2026: Full site redesigned to Variant E "Contrast Split"** — dark 340px sticky left panel, light scrollable right panel — using Cormorant Garamond (headings) + Inter (body) and a brass/ink/paper brand palette.
 
--   **Recruiter-Focused Hero Section**: Centered single-column layout with powerful headline "Senior Project Manager | £50M+ Delivery | 17+ Years", company logo trust bar (Mercer, GSMA, Simply Business, 6Connex), dual CTAs (Download CV + Contact), and immediate contact access (Email, LinkedIn, WhatsApp: +971 509082234).
--   **Sticky Contact Bar**: Appears after 600px scroll with always-visible Email, WhatsApp, LinkedIn, and CV download buttons for friction-free engagement.
--   **Top 3 Flagship Achievements**: Challenge → Impact cards showcasing signature wins: (1) PMO build with 36% efficiency gain, (2) £1.2M FCA-regulated programme with 34-person team, (3) 35% energy reduction for UN SDGs.
--   **Skills & Certifications Grid**: Scannable 5-card layout displaying Methodologies (Agile, Waterfall, SAFe, Prince2), Tools (Jira, Confluence, PowerBI, Tableau), Professional Certifications (Prince2 Practitioner, Scrum Master), Scale & Complexity metrics (team sizes, budget authority, compliance), and Industry Experience across 7 sectors.
--   **Collapsible Career Journey**: Accordion-based component showing all 12 roles (2008-2024) collapsed by default with company logos (via Clearbit Logo API), role title, period, and employment type badges (blue for Permanent, orange for Contract). Expandable on click to reveal full role description, key achievements, metrics, and technologies. Significantly reduces scroll weight while maintaining comprehensive career detail.
--   **Self-Managed Blog System with Rich Content**: A complete CMS for thought leadership featuring ReactQuill WYSIWYG editor with cyan-to-blue gradient toolbar, rich text formatting, hero image support for visual storytelling, DOMPurify HTML sanitization for security, and database-backed storage with admin panel.
--   **CV Download with Contact Capture**: Visitors can download the CV by providing their name, email, and optional phone number through a form modal. CV downloads trigger immediately upon form submission.
--   **Admin Dashboard with CV Management**: Tab-based admin interface for managing blog posts and CV downloads. Features include CV file upload (PDF, DOC, DOCX), viewing all contact submissions with download timestamps, and CSV export of contact data for lead management.
+### Site Structure (post-May 2026 redesign)
+- **`/`** — Home: split-panel profile, Selected Mandates, Capability grid, Career accordion, Contact strip. All content DB-driven via `/api/site/*`.
+- **`/case-studies`** — Case Studies: sidebar scrollspy list of career mandates with Challenge / Approach / Outcome detail panels (feeds from `projectsTable` with fallback seed data).
+- **`/projects`** — Built Projects: image-hover-to-text-reveal card grid of Replit-built apps, type filter sidebar (feeds from `builtProjectsTable` with fallback seed data).
+- **`/insights`** — Insights: article list with tag filter, read modal (feeds from `blogPostsTable`).
+- **`/admin`** — Admin dashboard: unchanged tab-based interface; "Portfolio Projects" tab renamed to "Case Studies"; new "Built Projects" tab added with full CRUD.
+
+### Key Features
+-   **Variant E Layout**: 340px dark sticky left panel (ink `hsl(220,25%,14%)`) + full-height scrollable light right panel (paper `hsl(40,20%,97%)`). Brass accent `hsl(35,45%,45%)`. Scrollspy nav highlights active section.
+-   **Self-Managed Blog / Insights**: ReactQuill WYSIWYG editor, DOMPurify sanitization, hero image support, admin-managed.
+-   **CV Download with Contact Capture**: Name/email/phone modal → immediate blob download + DB lead capture.
+-   **Admin Dashboard**: Bearer-auth protected. Tabs: Blog, Case Studies, Built Projects, CV Management, Career, Skills, Certifications, Education, Settings, Appearance.
+-   **Admin-Managed Site Content**: All hero copy, flagship wins, skills, certifications, education, career roles editable from admin.
+-   **Theme/Appearance**: CSS variable tokens (`--brand-primary`, `--brand-accent`, `--background`, `--font-sans`, `--font-display`) served via `/api/theme.css` with admin colour/font picker and live preview.
 
 ## Recent Changes (Apr 2026)
 

@@ -1,12 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import DOMPurify from 'dompurify';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { BookOpen, Clock, Calendar, ArrowRight, Filter, Sparkles, Loader2 } from 'lucide-react';
 import { Link } from 'wouter';
+import DOMPurify from 'dompurify';
+
+const INK = 'hsl(220,25%,14%)';
+const PAPER = 'hsl(40,20%,97%)';
+const BRASS = 'hsl(35,45%,45%)';
+const BRASS_LIGHT = 'hsl(35,55%,62%)';
+const HAIRLINE = 'hsl(40,15%,87%)';
+const MUTED = 'hsl(220,12%,52%)';
 
 interface BlogPost {
   id: string;
@@ -22,339 +24,145 @@ interface BlogPost {
 }
 
 export default function InsightsPage() {
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
 
-  // Fetch blog posts from database
-  const { data: blogPosts = [], isLoading } = useQuery<BlogPost[]>({
-    queryKey: ['/api/blog-posts'],
-  });
+  const { data: blogPosts = [], isLoading } = useQuery<BlogPost[]>({ queryKey: ['/api/blog-posts'] });
 
-  const categories = ['All', ...Array.from(new Set(blogPosts.map(post => post.category)))];
-  const featuredPost = blogPosts.find(post => post.featured);
-  
-  const filteredPosts = selectedCategory === 'All' 
-    ? blogPosts 
-    : blogPosts.filter(post => post.category === selectedCategory);
+  useEffect(() => {
+    document.title = "Insights — Mujeeb Lawal | Programme Delivery Practitioner's Notes";
+  }, []);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-[hsl(262,50%,8%)] via-[hsl(245,30%,12%)] to-[hsl(220,40%,10%)] flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 text-[hsl(var(--brand-primary))] animate-spin mx-auto mb-4" />
-          <p className="text-white/60">Loading insights...</p>
-        </div>
-      </div>
-    );
-  }
+  const categories = ['All', ...Array.from(new Set(blogPosts.map(p => p.category)))];
+  const filtered = selectedCategory === 'All' ? blogPosts : blogPosts.filter(p => p.category === selectedCategory);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[hsl(262,50%,8%)] via-[hsl(245,30%,12%)] to-[hsl(220,40%,10%)]">
-      {/* Hero Section */}
-      <section className="relative py-20 px-6 overflow-hidden" data-testid="section-hero">
-        <div className="absolute inset-0 bg-gradient-to-b from-[hsl(var(--brand-primary))]/10 via-transparent to-transparent" />
-        <div className="absolute top-20 right-10 w-72 h-72 bg-[hsl(var(--brand-accent))]/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-10 left-10 w-96 h-96 bg-[hsl(262,50%,50%)]/20 rounded-full blur-3xl" />
-        
-        <div className="max-w-7xl mx-auto relative">
-          <Link href="/">
-            <Button 
-              variant="ghost" 
-              className="mb-8 text-white/70 hover:text-white"
-              data-testid="button-back-home"
-            >
-              ← Back to Portfolio
-            </Button>
-          </Link>
+    <div style={{ fontFamily: 'Inter, sans-serif', display: 'flex', minHeight: '100vh' }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        a { text-decoration: none; }
+        ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: hsl(220,20%,30%); }
+        .article-hover:hover { background: hsl(40,18%,94%) !important; }
+      `}</style>
 
-          <div className="text-center mb-12">
-            <Badge 
-              className="mb-4 bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20"
-              data-testid="badge-insights"
-            >
-              <Sparkles className="w-3 h-3 mr-1" />
-              Insights & Thought Leadership
-            </Badge>
-            <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6" data-testid="text-insights-title">
-              Knowledge from the Field
-            </h1>
-            <p className="text-xl text-white/60 max-w-3xl mx-auto" data-testid="text-insights-subtitle">
-              17+ years of project management wisdom, lessons learned, and practical methodologies shared through real-world experiences
-            </p>
-          </div>
+      {/* LEFT PANEL */}
+      <aside style={{ width: 340, background: INK, color: PAPER, position: 'sticky', top: 0, height: '100vh', display: 'flex', flexDirection: 'column', padding: '52px 44px', flexShrink: 0, overflowY: 'auto' }}>
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 52, textDecoration: 'none' }}>
+          <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+            <rect width="40" height="40" rx="2" fill={BRASS} />
+            <text x="20" y="28" textAnchor="middle" fontFamily="Cormorant Garamond,serif" fontWeight="600" fontSize="22" fill={PAPER}>M</text>
+          </svg>
+          <span style={{ fontSize: 11, color: 'hsl(220,15%,50%)', letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 500 }}>Mujeeb Lawal</span>
+        </Link>
 
-          {/* Category Filter */}
-          <div className="flex flex-wrap justify-center gap-3 mb-12" data-testid="category-filters">
-            {categories.map((category) => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? "default" : "outline"}
-                className={`
-                  ${selectedCategory === category 
-                    ? 'bg-[hsl(var(--brand-primary))] text-white border-[hsl(var(--brand-primary))]' 
-                    : 'bg-white/5 backdrop-blur-md border-white/20 text-white/80 hover:bg-white/10'
-                  }
-                `}
-                onClick={() => setSelectedCategory(category)}
-                data-testid={`button-filter-${category.toLowerCase().replace(/\s+/g, '-')}`}
-              >
-                <Filter className="w-4 h-4 mr-2" />
-                {category}
-              </Button>
-            ))}
-          </div>
+        <div style={{ marginBottom: 40 }}>
+          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 32, fontWeight: 400, lineHeight: 1.1, color: PAPER, marginBottom: 8 }}>Insights</div>
+          <div style={{ fontSize: 13, color: 'hsl(220,15%,50%)', lineHeight: 1.6 }}>Thought leadership on programme delivery, governance, and leading complex change at scale.</div>
         </div>
-      </section>
 
-      {/* Featured Post */}
-      {featuredPost && selectedCategory === 'All' && (
-        <section className="relative py-12 px-6" data-testid="section-featured">
-          <div className="max-w-7xl mx-auto">
-            <div className="mb-6 flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-[hsl(var(--brand-primary))]" />
-              <h2 className="font-display text-2xl font-bold text-white">Featured Article</h2>
-            </div>
+        <div style={{ marginBottom: 36 }}>
+          <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'hsl(220,15%,40%)', marginBottom: 16 }}>Filter by topic</div>
+          {categories.map((cat, i) => (
+            <button key={i} onClick={() => setSelectedCategory(cat)} style={{
+              display: 'block', width: '100%', textAlign: 'left',
+              padding: '9px 0 9px 12px', background: 'none', border: 'none', cursor: 'pointer',
+              fontSize: 12, fontWeight: selectedCategory === cat ? 600 : 400,
+              color: selectedCategory === cat ? BRASS_LIGHT : 'hsl(220,15%,50%)',
+              borderLeft: selectedCategory === cat ? `2px solid ${BRASS_LIGHT}` : '2px solid transparent',
+              letterSpacing: '0.04em',
+            }}>{cat}</button>
+          ))}
+        </div>
 
-            <Card 
-              className="bg-white/5 backdrop-blur-xl border-white/10 p-8 hover-elevate transition-all duration-300 cursor-pointer"
-              onClick={() => setSelectedPost(featuredPost)}
-              data-testid="card-featured-post"
-            >
-              <div className="grid md:grid-cols-2 gap-8 items-center">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <Badge className="bg-[hsl(var(--brand-accent))]/20 border-[hsl(var(--brand-accent))]/30 text-[hsl(var(--brand-accent-soft))] backdrop-blur-md">
-                      {featuredPost.category}
-                    </Badge>
-                    <Badge className="bg-[hsl(var(--brand-primary))]/20 border-[hsl(var(--brand-primary))]/30 text-[hsl(var(--brand-primary-soft))] backdrop-blur-md">
-                      <Sparkles className="w-3 h-3 mr-1" />
-                      Featured
-                    </Badge>
-                  </div>
-                  
-                  <h3 className="font-display text-3xl font-bold text-white">
-                    {featuredPost.title}
-                  </h3>
-                  
-                  <p className="text-white/70 text-lg leading-relaxed">
-                    {featuredPost.excerpt}
-                  </p>
+        <div style={{ flex: 1 }} />
 
-                  <div className="flex items-center gap-4 text-sm text-white/50">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
-                      {featuredPost.readTime}
-                    </span>
-                    <span>•</span>
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
-                      {new Date(featuredPost.publishDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                    </span>
-                  </div>
+        <div style={{ borderTop: '1px solid hsl(220,20%,22%)', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <Link href="/" style={{ fontSize: 12, color: 'hsl(220,15%,50%)' }}>← Back to Profile</Link>
+          <Link href="/case-studies" style={{ fontSize: 12, color: 'hsl(220,15%,50%)' }}>Case Studies</Link>
+          <Link href="/projects" style={{ fontSize: 12, color: 'hsl(220,15%,50%)' }}>Built Projects</Link>
+        </div>
+      </aside>
 
-                  <Button 
-                    className="bg-[hsl(var(--brand-primary))] text-white hover:bg-[hsl(var(--brand-primary-strong))] mt-4"
-                    data-testid="button-read-featured"
-                  >
-                    Read Article
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </Button>
-                </div>
-
-                <div className="relative h-64 md:h-full min-h-[300px] bg-gradient-to-br from-[hsl(var(--brand-primary))]/20 to-[hsl(var(--brand-accent))]/20 rounded-xl flex items-center justify-center border border-white/10 overflow-hidden">
-                  {featuredPost.heroImage ? (
-                    <img 
-                      src={featuredPost.heroImage} 
-                      alt={featuredPost.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <BookOpen className="w-24 h-24 text-white/30" />
-                  )}
-                </div>
-              </div>
-            </Card>
+      {/* RIGHT PANEL */}
+      <main style={{ flex: 1, background: PAPER, overflowY: 'auto', height: '100vh' }}>
+        <div style={{ padding: '52px 64px 40px', borderBottom: `1px solid ${HAIRLINE}` }}>
+          <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.24em', textTransform: 'uppercase', color: BRASS, marginBottom: 12 }}>
+            {isLoading ? '...' : `${filtered.length} articles`}
           </div>
-        </section>
-      )}
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 48, fontWeight: 400, color: INK, lineHeight: 1.1 }}>Practitioner's Notes</h1>
+        </div>
 
-      {/* Articles Grid */}
-      <section className="relative py-12 px-6 pb-24" data-testid="section-articles">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-8">
-            <h2 className="font-display text-2xl font-bold text-white mb-2">
-              {selectedCategory === 'All' ? 'All Articles' : `${selectedCategory} Articles`}
-            </h2>
-            <p className="text-white/60">
-              {filteredPosts.length} {filteredPosts.length === 1 ? 'article' : 'articles'} found
-            </p>
+        {isLoading ? (
+          <div style={{ padding: '80px 64px', textAlign: 'center', color: MUTED, fontSize: 13 }}>Loading articles…</div>
+        ) : filtered.length === 0 ? (
+          <div style={{ padding: '80px 64px', textAlign: 'center', color: MUTED }}>
+            <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 24, fontWeight: 400, marginBottom: 12 }}>No articles yet</div>
+            <div style={{ fontSize: 13 }}>Check back soon — new insights are added regularly.</div>
           </div>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            {filteredPosts.map((post, index) => (
-              <Card
+        ) : (
+          <div>
+            {filtered.map((post, i) => (
+              <article
                 key={post.id}
-                className="bg-white/5 backdrop-blur-xl border-white/10 overflow-hidden hover-elevate transition-all duration-300 cursor-pointer"
+                className="article-hover"
+                data-testid={`article-${post.id}`}
                 onClick={() => setSelectedPost(post)}
-                data-testid={`card-blog-${index}`}
+                style={{ padding: '40px 64px', borderBottom: `1px solid ${HAIRLINE}`, cursor: 'pointer', background: 'transparent', transition: 'background 0.15s' }}
               >
                 {post.heroImage && (
-                  <div className="relative h-48 overflow-hidden">
-                    <img 
-                      src={post.heroImage} 
-                      alt={post.title}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                      decoding="async"
-                    />
+                  <div style={{ marginBottom: 20, borderRadius: 2, overflow: 'hidden', height: 200 }}>
+                    <img src={post.heroImage} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </div>
                 )}
-                
-                <div className="p-6">
-                  <div className="flex items-start gap-4 mb-4">
-                    {!post.heroImage && (
-                      <div className="w-12 h-12 rounded-md bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] flex items-center justify-center flex-shrink-0">
-                        <BookOpen className="w-6 h-6 text-white" />
-                      </div>
-                    )}
-                    
-                    <div className="flex-1 min-w-0">
-                      <Badge className="bg-[hsl(var(--brand-accent))]/20 border-[hsl(var(--brand-accent))]/30 text-[hsl(var(--brand-accent-soft))] backdrop-blur-md text-xs mb-2">
-                        {post.category}
-                      </Badge>
-                      <h3 className="font-display text-xl font-bold text-white mb-2 line-clamp-2">
-                        {post.title}
-                      </h3>
-                    </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 12 }}>
+                  <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+                    <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: BRASS, background: 'hsla(35,45%,45%,0.08)', padding: '4px 10px', border: `1px solid hsl(35,45%,75%)` }}>{post.category}</span>
+                    <span style={{ fontSize: 11, color: MUTED }}>{post.publishDate}</span>
                   </div>
-
-                  <p className="text-white/70 text-sm mb-4 line-clamp-3">
-                    {post.excerpt}
-                  </p>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3 text-xs text-white/50">
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {post.readTime}
-                      </span>
-                      <span>•</span>
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
-                        {new Date(post.publishDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                      </span>
-                    </div>
-
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="text-[hsl(var(--brand-primary))] hover:text-[hsl(var(--brand-primary-soft))]"
-                      data-testid={`button-read-more-${index}`}
-                    >
-                      Read More
-                      <ArrowRight className="ml-1 w-3 h-3" />
-                    </Button>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    {post.tags.slice(0, 3).map((tag, idx) => (
-                      <Badge 
-                        key={idx}
-                        className="bg-white/5 border-white/10 text-white/60 text-xs"
-                      >
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
+                  <span style={{ fontSize: 11, color: MUTED }}>{post.readTime}</span>
                 </div>
-              </Card>
+                <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 26, fontWeight: 500, color: INK, marginBottom: 10, lineHeight: 1.2 }}>{post.title}</h2>
+                <p style={{ fontSize: 14, color: 'hsl(220,15%,42%)', lineHeight: 1.75, maxWidth: 620 }}>{post.excerpt}</p>
+                <div style={{ marginTop: 20, fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: BRASS }}>Read →</div>
+              </article>
             ))}
           </div>
+        )}
 
-          {filteredPosts.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-white/60 text-lg">No articles found in this category.</p>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Article Detail Dialog */}
-      <Dialog open={!!selectedPost} onOpenChange={() => setSelectedPost(null)}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto bg-[hsl(245,30%,12%)] border-white/10">
-          <DialogHeader>
-            <div className="flex items-center gap-3 mb-4">
-              <Badge className="bg-[hsl(var(--brand-accent))]/20 border-[hsl(var(--brand-accent))]/30 text-[hsl(var(--brand-accent-soft))] backdrop-blur-md">
-                {selectedPost?.category}
-              </Badge>
-              {selectedPost?.featured && (
-                <Badge className="bg-[hsl(var(--brand-primary))]/20 border-[hsl(var(--brand-primary))]/30 text-[hsl(var(--brand-primary-soft))] backdrop-blur-md">
-                  <Sparkles className="w-3 h-3 mr-1" />
-                  Featured
-                </Badge>
+        {/* Article modal */}
+        {selectedPost && (
+          <div
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 1000, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflowY: 'auto', padding: '40px 20px' }}
+            onClick={(e) => { if (e.target === e.currentTarget) setSelectedPost(null); }}
+          >
+            <div style={{ background: PAPER, maxWidth: 720, width: '100%', position: 'relative' }}>
+              {selectedPost.heroImage && (
+                <img src={selectedPost.heroImage} alt={selectedPost.title} style={{ width: '100%', height: 320, objectFit: 'cover', display: 'block' }} />
               )}
-            </div>
-            <DialogTitle className="font-display text-3xl font-bold text-white mb-4">
-              {selectedPost?.title}
-            </DialogTitle>
-            <DialogDescription className="text-white/60 text-base mb-6">
-              {selectedPost?.excerpt}
-            </DialogDescription>
-            <div className="flex items-center gap-4 text-sm text-white/50 mb-6">
-              <span className="flex items-center gap-1">
-                <Clock className="w-4 h-4" />
-                {selectedPost?.readTime}
-              </span>
-              <span>•</span>
-              <span className="flex items-center gap-1">
-                <Calendar className="w-4 h-4" />
-                {selectedPost && new Date(selectedPost.publishDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-              </span>
-            </div>
-          </DialogHeader>
-          
-          {selectedPost?.heroImage && (
-            <div className="mb-6 rounded-lg overflow-hidden">
-              <img 
-                src={selectedPost.heroImage} 
-                alt={selectedPost.title}
-                className="w-full h-64 object-cover"
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
-          )}
-          
-          <div 
-            className="prose prose-invert prose-lg max-w-none
-              prose-headings:text-white prose-headings:font-display
-              prose-p:text-white/80 prose-p:leading-relaxed
-              prose-a:text-[hsl(var(--brand-primary))] prose-a:no-underline hover:prose-a:underline
-              prose-strong:text-white prose-strong:font-semibold
-              prose-code:text-[hsl(var(--brand-primary))] prose-code:bg-white/10 prose-code:px-1 prose-code:rounded
-              prose-pre:bg-white/5 prose-pre:border prose-pre:border-white/10
-              prose-blockquote:border-l-[hsl(var(--brand-primary))] prose-blockquote:text-white/70
-              prose-ul:text-white/80 prose-ol:text-white/80
-              prose-li:text-white/80
-              prose-img:rounded-lg prose-img:border prose-img:border-white/10"
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedPost?.content || '') }}
-          />
-
-          <div className="mt-6 pt-6 border-t border-white/10">
-            <p className="text-sm text-white/60 mb-3">Topics covered:</p>
-            <div className="flex flex-wrap gap-2">
-              {selectedPost?.tags.map((tag, idx) => (
-                <Badge 
-                  key={idx}
-                  className="bg-white/10 border-white/20 text-white/80 text-xs"
-                >
-                  {tag}
-                </Badge>
-              ))}
+              <div style={{ padding: '48px 56px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+                  <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: BRASS, border: `1px solid hsl(35,45%,72%)`, padding: '4px 10px' }}>{selectedPost.category}</span>
+                  <button onClick={() => setSelectedPost(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, color: MUTED, lineHeight: 1 }}>×</button>
+                </div>
+                <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 400, color: INK, lineHeight: 1.15, marginBottom: 12 }}>{selectedPost.title}</h2>
+                <div style={{ fontSize: 12, color: MUTED, marginBottom: 32 }}>{selectedPost.publishDate} · {selectedPost.readTime}</div>
+                <div
+                  style={{ fontSize: 15, lineHeight: 1.85, color: 'hsl(220,15%,30%)' }}
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedPost.content) }}
+                />
+                {selectedPost.tags.length > 0 && (
+                  <div style={{ marginTop: 40, paddingTop: 24, borderTop: `1px solid ${HAIRLINE}`, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                    {selectedPost.tags.map((tag, i) => (
+                      <span key={i} style={{ fontSize: 11, color: MUTED, border: `1px solid ${HAIRLINE}`, padding: '4px 12px' }}>{tag}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        )}
+      </main>
     </div>
   );
 }

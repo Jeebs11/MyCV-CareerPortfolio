@@ -51,7 +51,7 @@ import {
   Building2,
   ExternalLink as ExternalLinkIcon
 } from 'lucide-react';
-import type { ProjectRow } from '@shared/schema';
+import type { ProjectRow, BuiltProjectRow } from '@shared/schema';
 import { Link } from 'wouter';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CareerRolesAdmin, FlagshipWinsAdmin, SiteSkillsAdmin, SiteCertificationsAdmin, SiteEducationAdmin, SiteSettingsAdmin } from '@/components/admin/SiteContentTabs';
@@ -141,6 +141,13 @@ export default function AdminPage() {
   const [isProjectDialogOpen, setIsProjectDialogOpen] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingHero, setUploadingHero] = useState(false);
+  const [editingBuiltProject, setEditingBuiltProject] = useState<BuiltProjectRow | null>(null);
+  const [isBuiltProjectDialogOpen, setIsBuiltProjectDialogOpen] = useState(false);
+  const [uploadingBuiltImage, setUploadingBuiltImage] = useState(false);
+  const [builtForm, setBuiltForm] = useState({
+    title: '', description: '', type: 'Web App', stack: '', lines: '',
+    status: 'Live', url: '', image: '', highlight: false, sortOrder: 0,
+  });
   const { toast } = useToast();
 
   // Fetch blog posts
@@ -179,6 +186,12 @@ export default function AdminPage() {
   const { data: projects = [], isLoading: isLoadingProjects } = useQuery<ProjectRow[]>({
     queryKey: ['/api/projects'],
     enabled: isAuthenticated && activeTab === 'projects',
+  });
+
+  // Built Projects query
+  const { data: builtProjects = [], isLoading: isLoadingBuiltProjects } = useQuery<BuiltProjectRow[]>({
+    queryKey: ['/api/built-projects'],
+    enabled: isAuthenticated && activeTab === 'built-projects',
   });
 
   const projectForm = useForm<ProjectFormData>({
@@ -308,6 +321,130 @@ export default function AdminPage() {
       queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
     },
   });
+
+  // ── BUILT PROJECTS helpers ────────────────────────────────────────────────
+
+  const BUILT_TYPES = ['Web App', 'Automation', 'Dashboard', 'Tool'];
+  const BUILT_STATUSES = ['Live', 'Beta'];
+
+  const openNewBuiltProject = () => {
+    setEditingBuiltProject(null);
+    setBuiltForm({ title: '', description: '', type: 'Web App', stack: '', lines: '', status: 'Live', url: '', image: '', highlight: false, sortOrder: 0 });
+    setIsBuiltProjectDialogOpen(true);
+  };
+
+  const openEditBuiltProject = (p: BuiltProjectRow) => {
+    setEditingBuiltProject(p);
+    setBuiltForm({
+      title: p.title,
+      description: p.description,
+      type: p.type,
+      stack: Array.isArray(p.stack) ? p.stack.join('\n') : '',
+      lines: Array.isArray(p.lines) ? p.lines.join('\n') : '',
+      status: p.status,
+      url: p.url ?? '',
+      image: p.image ?? '',
+      highlight: p.highlight,
+      sortOrder: p.sortOrder,
+    });
+    setIsBuiltProjectDialogOpen(true);
+  };
+
+  const createBuiltProjectMutation = useMutation({
+    mutationFn: async (payload: object) => {
+      const res = await fetch('/api/built-projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminPassword}` },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(await res.text() || 'Failed to create');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/built-projects'] });
+      toast({ title: 'Success', description: 'Project created' });
+      setIsBuiltProjectDialogOpen(false);
+    },
+    onError: (err: Error) => toast({ title: 'Error', description: err.message, variant: 'destructive' }),
+  });
+
+  const updateBuiltProjectMutation = useMutation({
+    mutationFn: async ({ id, payload }: { id: number; payload: object }) => {
+      const res = await fetch(`/api/built-projects/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminPassword}` },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(await res.text() || 'Failed to update');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/built-projects'] });
+      toast({ title: 'Success', description: 'Project updated' });
+      setIsBuiltProjectDialogOpen(false);
+      setEditingBuiltProject(null);
+    },
+    onError: (err: Error) => toast({ title: 'Error', description: err.message, variant: 'destructive' }),
+  });
+
+  const deleteBuiltProjectMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await fetch(`/api/built-projects/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${adminPassword}` },
+      });
+      if (!res.ok) throw new Error('Failed to delete');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/built-projects'] });
+      toast({ title: 'Deleted', description: 'Project removed' });
+    },
+    onError: () => toast({ title: 'Error', description: 'Failed to delete', variant: 'destructive' }),
+  });
+
+  const uploadBuiltImage = async (file: File) => {
+    setUploadingBuiltImage(true);
+    try {
+      const fd = new FormData();
+      fd.append('image', file);
+      const res = await fetch('/api/built-projects/upload-image', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${adminPassword}` },
+        body: fd,
+      });
+      if (!res.ok) throw new Error('Upload failed');
+      const { url } = await res.json();
+      setBuiltForm(f => ({ ...f, image: url }));
+      toast({ title: 'Uploaded', description: 'Screenshot saved' });
+    } catch {
+      toast({ title: 'Error', description: 'Upload failed', variant: 'destructive' });
+    } finally {
+      setUploadingBuiltImage(false);
+    }
+  };
+
+  const handleBuiltFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const toArr = (s: string) => s.split('\n').map(x => x.trim()).filter(Boolean);
+    const payload = {
+      title: builtForm.title,
+      description: builtForm.description,
+      type: builtForm.type,
+      stack: toArr(builtForm.stack),
+      lines: toArr(builtForm.lines),
+      status: builtForm.status,
+      url: builtForm.url || null,
+      image: builtForm.image || null,
+      highlight: builtForm.highlight,
+      sortOrder: Number(builtForm.sortOrder),
+    };
+    if (editingBuiltProject) {
+      updateBuiltProjectMutation.mutate({ id: editingBuiltProject.id, payload });
+    } else {
+      createBuiltProjectMutation.mutate(payload);
+    }
+  };
 
   const handleProjectMove = (index: number, direction: 'up' | 'down') => {
     const target = direction === 'up' ? index - 1 : index + 1;
@@ -770,7 +907,14 @@ export default function AdminPage() {
               className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--brand-primary))] data-[state=active]:to-[hsl(var(--brand-accent))] data-[state=active]:text-white"
               data-testid="tab-projects"
             >
-              Portfolio Projects
+              Case Studies
+            </TabsTrigger>
+            <TabsTrigger 
+              value="built-projects" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--brand-primary))] data-[state=active]:to-[hsl(var(--brand-accent))] data-[state=active]:text-white"
+              data-testid="tab-built-projects"
+            >
+              Built Projects
             </TabsTrigger>
             <TabsTrigger 
               value="cv" 
@@ -1608,6 +1752,157 @@ export default function AdminPage() {
                     </DialogFooter>
                   </form>
                 </Form>
+              </DialogContent>
+            </Dialog>
+          </TabsContent>
+
+          {/* Built Projects Tab */}
+          <TabsContent value="built-projects" className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-white flex items-center gap-2">
+                <Building2 className="w-5 h-5" />
+                Built Projects ({builtProjects.length})
+              </h2>
+              <Button
+                onClick={openNewBuiltProject}
+                className="bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white"
+                data-testid="button-add-built-project"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add Project
+              </Button>
+            </div>
+
+            {isLoadingBuiltProjects ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-8 h-8 text-[hsl(var(--brand-primary))] animate-spin" />
+              </div>
+            ) : builtProjects.length === 0 ? (
+              <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-12 text-center">
+                <Building2 className="w-12 h-12 mx-auto mb-4 text-white/40" />
+                <p className="text-white/60">No built projects yet. Click "Add Project" to get started.</p>
+              </Card>
+            ) : (
+              <div className="space-y-3">
+                {builtProjects.map(p => {
+                  const stack = Array.isArray(p.stack) ? p.stack : [];
+                  return (
+                    <Card key={p.id} className="bg-white/5 backdrop-blur-xl border-white/10 p-4" data-testid={`card-built-project-${p.id}`}>
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <Badge className="bg-[hsl(var(--brand-primary))]/20 text-[hsl(var(--brand-primary))] border-0">{p.type}</Badge>
+                            <Badge className={`border-0 ${p.status === 'Live' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>{p.status}</Badge>
+                            {p.highlight && <Badge className="bg-yellow-500/20 text-yellow-300 border-0">Highlighted</Badge>}
+                          </div>
+                          <h3 className="text-white font-semibold text-lg leading-tight">{p.title}</h3>
+                          <p className="text-white/60 text-sm mt-1 line-clamp-2">{p.description}</p>
+                          {stack.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {stack.slice(0, 6).map((s, i) => (
+                                <span key={i} className="text-xs bg-white/5 text-white/50 px-2 py-0.5 rounded">{s}</span>
+                              ))}
+                            </div>
+                          )}
+                          {p.url && (
+                            <a href={p.url} target="_blank" rel="noopener noreferrer" className="text-xs text-[hsl(var(--brand-primary))] flex items-center gap-1 mt-1">
+                              <ExternalLinkIcon className="w-3 h-3" />{p.url}
+                            </a>
+                          )}
+                        </div>
+                        <div className="flex gap-2 flex-shrink-0">
+                          <Button size="icon" variant="ghost" className="text-white/70 hover:text-white" onClick={() => openEditBuiltProject(p)} data-testid={`btn-edit-built-${p.id}`}>
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button size="icon" variant="ghost" className="text-red-400 hover:text-red-300" onClick={() => { if (confirm('Delete this project?')) deleteBuiltProjectMutation.mutate(p.id); }} data-testid={`btn-delete-built-${p.id}`}>
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Create / Edit dialog */}
+            <Dialog open={isBuiltProjectDialogOpen} onOpenChange={setIsBuiltProjectDialogOpen}>
+              <DialogContent className="bg-[hsl(245,30%,12%)] border-white/10 text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>{editingBuiltProject ? 'Edit Built Project' : 'Add Built Project'}</DialogTitle>
+                  <DialogDescription className="text-white/60">
+                    {editingBuiltProject ? 'Update project details.' : 'Add a new project to your built work portfolio.'}
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleBuiltFormSubmit} className="space-y-4 mt-2">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="col-span-2">
+                      <label className="text-sm font-medium text-white/80 block mb-1">Title *</label>
+                      <Input value={builtForm.title} onChange={e => setBuiltForm(f => ({ ...f, title: e.target.value }))} className="bg-white/5 border-white/10 text-white" placeholder="PM Portfolio Site" required data-testid="input-built-title" />
+                    </div>
+                    <div className="col-span-2">
+                      <label className="text-sm font-medium text-white/80 block mb-1">Description *</label>
+                      <Textarea value={builtForm.description} onChange={e => setBuiltForm(f => ({ ...f, description: e.target.value }))} className="bg-white/5 border-white/10 text-white" rows={3} placeholder="One or two sentences describing what it does and why." required data-testid="input-built-description" />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-white/80 block mb-1">Type *</label>
+                      <select value={builtForm.type} onChange={e => setBuiltForm(f => ({ ...f, type: e.target.value }))} className="w-full bg-[hsl(245,30%,18%)] border border-white/10 text-white rounded-md px-3 py-2 text-sm" data-testid="select-built-type">
+                        {BUILT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-white/80 block mb-1">Status</label>
+                      <select value={builtForm.status} onChange={e => setBuiltForm(f => ({ ...f, status: e.target.value }))} className="w-full bg-[hsl(245,30%,18%)] border border-white/10 text-white rounded-md px-3 py-2 text-sm" data-testid="select-built-status">
+                        {BUILT_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                    </div>
+                    <div className="col-span-2">
+                      <label className="text-sm font-medium text-white/80 block mb-1">Tech Stack <span className="text-white/40">(one per line)</span></label>
+                      <Textarea value={builtForm.stack} onChange={e => setBuiltForm(f => ({ ...f, stack: e.target.value }))} className="bg-white/5 border-white/10 text-white" rows={4} placeholder="React&#10;TypeScript&#10;PostgreSQL" data-testid="input-built-stack" />
+                    </div>
+                    <div className="col-span-2">
+                      <label className="text-sm font-medium text-white/80 block mb-1">Feature Bullets <span className="text-white/40">(one per line — shown on hover)</span></label>
+                      <Textarea value={builtForm.lines} onChange={e => setBuiltForm(f => ({ ...f, lines: e.target.value }))} className="bg-white/5 border-white/10 text-white" rows={4} placeholder="Contact capture & lead export&#10;Admin blog editor&#10;AI chatbot" data-testid="input-built-lines" />
+                    </div>
+                    <div className="col-span-2">
+                      <label className="text-sm font-medium text-white/80 block mb-1">Live URL <span className="text-white/40">(optional)</span></label>
+                      <Input value={builtForm.url} onChange={e => setBuiltForm(f => ({ ...f, url: e.target.value }))} className="bg-white/5 border-white/10 text-white" placeholder="https://..." data-testid="input-built-url" />
+                    </div>
+                    <div className="col-span-2">
+                      <label className="text-sm font-medium text-white/80 block mb-1">Screenshot <span className="text-white/40">(optional — hover-to-reveal)</span></label>
+                      <div className="flex gap-2">
+                        <Input value={builtForm.image} onChange={e => setBuiltForm(f => ({ ...f, image: e.target.value }))} className="bg-white/5 border-white/10 text-white" placeholder="https://..." data-testid="input-built-image" />
+                        <label className="cursor-pointer">
+                          <input type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) uploadBuiltImage(f); }} />
+                          <span className="inline-flex items-center justify-center h-10 px-3 rounded-md bg-white/10 hover:bg-white/20 border border-white/10">
+                            {uploadingBuiltImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageIcon className="w-4 h-4" />}
+                          </span>
+                        </label>
+                      </div>
+                      {builtForm.image && <img src={builtForm.image} alt="preview" className="mt-2 w-full h-32 object-cover rounded" />}
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-white/80 block mb-1">Sort Order</label>
+                      <Input type="number" value={builtForm.sortOrder} onChange={e => setBuiltForm(f => ({ ...f, sortOrder: Number(e.target.value) }))} className="bg-white/5 border-white/10 text-white" data-testid="input-built-sort" />
+                    </div>
+                    <div className="flex items-center gap-3 pt-6">
+                      <input type="checkbox" id="highlight" checked={builtForm.highlight} onChange={e => setBuiltForm(f => ({ ...f, highlight: e.target.checked }))} className="w-4 h-4" data-testid="check-built-highlight" />
+                      <label htmlFor="highlight" className="text-sm text-white/80">Dark / highlighted card</label>
+                    </div>
+                  </div>
+                  <DialogFooter className="gap-2 flex-wrap">
+                    <Button type="button" variant="ghost" onClick={() => setIsBuiltProjectDialogOpen(false)} className="text-white/70">Cancel</Button>
+                    <Button
+                      type="submit"
+                      disabled={createBuiltProjectMutation.isPending || updateBuiltProjectMutation.isPending}
+                      className="bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0"
+                      data-testid="button-save-built-project"
+                    >
+                      {(createBuiltProjectMutation.isPending || updateBuiltProjectMutation.isPending) && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                      {editingBuiltProject ? 'Update' : 'Create'} Project
+                    </Button>
+                  </DialogFooter>
+                </form>
               </DialogContent>
             </Dialog>
           </TabsContent>

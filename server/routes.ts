@@ -5,6 +5,7 @@ import { chatWithAssistantStream } from "./openai";
 import {
   insertBlogPostSchema, updateBlogPostSchema, insertCVContactSchema,
   insertProjectSchema, updateProjectSchema,
+  insertBuiltProjectSchema, updateBuiltProjectSchema,
   insertCareerRoleSchema, updateCareerRoleSchema,
   insertFlagshipWinSchema, updateFlagshipWinSchema,
   insertSiteSkillSchema, updateSiteSkillSchema,
@@ -473,6 +474,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error uploading project image:", error);
       res.status(500).json({ error: "Failed to upload image" });
     }
+  });
+
+  // ============ BUILT PROJECTS ROUTES ============
+
+  // Get all built projects (public)
+  app.get("/api/built-projects", async (_req, res) => {
+    try { res.json(await storage.getAllBuiltProjects()); }
+    catch (e) { console.error(e); res.status(500).json({ error: "Failed to fetch" }); }
+  });
+
+  // Create (admin)
+  app.post("/api/built-projects", adminAuth, async (req, res) => {
+    try {
+      const v = insertBuiltProjectSchema.safeParse(req.body);
+      if (!v.success) return res.status(400).json({ error: fromZodError(v.error).toString() });
+      res.status(201).json(await storage.createBuiltProject(v.data));
+    } catch (e) { console.error(e); res.status(500).json({ error: "Failed to create" }); }
+  });
+
+  // Update (admin)
+  app.patch("/api/built-projects/:id", adminAuth, async (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+    try {
+      const v = updateBuiltProjectSchema.safeParse(req.body);
+      if (!v.success) return res.status(400).json({ error: fromZodError(v.error).toString() });
+      const r = await storage.updateBuiltProject(id, v.data);
+      if (!r) return res.status(404).json({ error: "Not found" });
+      res.json(r);
+    } catch (e) { console.error(e); res.status(500).json({ error: "Failed to update" }); }
+  });
+
+  // Delete (admin)
+  app.delete("/api/built-projects/:id", adminAuth, async (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+    try {
+      const ok = await storage.deleteBuiltProject(id);
+      if (!ok) return res.status(404).json({ error: "Not found" });
+      res.json({ success: true });
+    } catch (e) { console.error(e); res.status(500).json({ error: "Failed to delete" }); }
+  });
+
+  // Upload screenshot image (admin) — reuses projectImageUpload multer
+  app.post("/api/built-projects/upload-image", adminAuth, projectImageUpload.single('image'), async (req, res) => {
+    try {
+      if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+      res.status(201).json({ url: `/uploads/projects/${req.file.filename}` });
+    } catch (e) { console.error(e); res.status(500).json({ error: "Failed to upload" }); }
   });
 
   // ============ SITE CONTENT ROUTES ============
