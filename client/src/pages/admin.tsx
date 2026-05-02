@@ -1258,12 +1258,12 @@ export default function AdminPage() {
         </Dialog>
           </TabsContent>
 
-          {/* Portfolio Projects Tab */}
+          {/* Case Studies Tab */}
           <TabsContent value="projects" className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-semibold text-white">Portfolio Projects</h2>
-                <p className="text-sm text-white/60 mt-1">Manage case studies shown on the public Portfolio page</p>
+                <h2 className="text-xl font-semibold text-white">Case Studies</h2>
+                <p className="text-sm text-white/60 mt-1">Manage case studies shown on the public Case Studies page</p>
               </div>
               <Button
                 onClick={() => {

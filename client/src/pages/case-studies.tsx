@@ -11,6 +11,16 @@ const BRASS_LIGHT = 'hsl(35,55%,62%)';
 const HAIRLINE = 'hsl(40,15%,87%)';
 const MUTED = 'hsl(220,12%,52%)';
 
+function SectionRule({ label }: { label: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', padding: '0 64px', marginBottom: 36 }}>
+      <div style={{ flex: 1, height: 1, background: BRASS, opacity: 0.35 }} />
+      <div style={{ padding: '0 22px', fontSize: 8.5, fontWeight: 600, letterSpacing: '0.28em', textTransform: 'uppercase', color: BRASS, flexShrink: 0 }}>{label}</div>
+      <div style={{ flex: 1, height: 1, background: BRASS, opacity: 0.35 }} />
+    </div>
+  );
+}
+
 const FALLBACK_MANDATES = [
   {
     id: 0, title: 'PMO Build — Mercer', sector: 'Financial Services', year: '2022–24',
@@ -94,7 +104,6 @@ export default function CaseStudiesPage() {
   return (
     <div style={{ fontFamily: 'Inter, sans-serif', display: 'flex', minHeight: '100vh' }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
         a { text-decoration: none; }
         ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: hsl(220,20%,30%); }
@@ -138,43 +147,50 @@ export default function CaseStudiesPage() {
 
         <div style={{ borderTop: '1px solid hsl(220,20%,22%)', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 10 }}>
           <Link href="/" style={{ fontSize: 12, color: 'hsl(220,15%,50%)' }}>← Back to Profile</Link>
-          <Link href="/projects" style={{ fontSize: 12, color: 'hsl(220,15%,50%)' }}>Built Projects</Link>
+          <Link href="/portfolio" style={{ fontSize: 12, color: 'hsl(220,15%,50%)' }}>Portfolio</Link>
           <Link href="/insights" style={{ fontSize: 12, color: 'hsl(220,15%,50%)' }}>Insights</Link>
         </div>
       </aside>
 
       {/* RIGHT PANEL */}
       <main style={{ flex: 1, background: PAPER, overflowY: 'auto', height: '100vh' }}>
+
         {/* Mandate header */}
-        <div style={{ padding: '52px 64px 44px', borderBottom: `1px solid ${HAIRLINE}` }}>
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 20 }}>
-            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: BRASS, border: `1px solid hsl(35,45%,72%)`, padding: '4px 10px' }}>{p.sector}</span>
-            <span style={{ fontSize: 11, color: MUTED }}>{p.year}</span>
-            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: p.employmentType === 'Permanent' ? BRASS : 'hsl(200,45%,48%)' }}>{p.employmentType}</span>
-          </div>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 44, fontWeight: 400, color: INK, lineHeight: 1.1, marginBottom: 24 }}>{p.title}</h1>
-          <div>
-            <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 56, fontWeight: 400, color: BRASS, lineHeight: 1 }}>{p.metric}</div>
-            <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: MUTED, marginTop: 6 }}>{p.metricLabel}</div>
+        <div style={{ paddingTop: 52, paddingBottom: 44 }}>
+          <SectionRule label={`${p.sector} · ${p.year}`} />
+          <div style={{ padding: '0 64px' }}>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 20 }}>
+              <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: BRASS, border: `1px solid hsl(35,45%,72%)`, padding: '4px 10px' }}>{p.sector}</span>
+              <span style={{ fontSize: 11, color: MUTED }}>{p.year}</span>
+              <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: p.employmentType === 'Permanent' ? BRASS : 'hsl(200,45%,48%)' }}>{p.employmentType}</span>
+            </div>
+            <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 44, fontWeight: 400, color: INK, lineHeight: 1.1, marginBottom: 24 }}>{p.title}</h1>
+            <div>
+              <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 56, fontWeight: 400, color: BRASS, lineHeight: 1 }}>{p.metric}</div>
+              <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: MUTED, marginTop: 6 }}>{p.metricLabel}</div>
+            </div>
           </div>
         </div>
 
         {/* Three acts */}
-        <div style={{ padding: '52px 64px', gap: 0 }}>
+        <div style={{ paddingBottom: 52 }}>
           {[
             { label: 'The Challenge', body: p.challenge },
             { label: 'The Approach', body: p.approach },
             { label: 'The Outcome', body: p.outcome },
           ].map((act, i) => (
-            <div key={i} style={{ paddingTop: 36, paddingBottom: 36, borderTop: `1px solid ${HAIRLINE}`, display: 'grid', gridTemplateColumns: '160px 1fr', gap: 40 }}>
-              <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: BRASS, paddingTop: 4 }}>{act.label}</div>
-              <p style={{ fontSize: 15, lineHeight: 1.8, color: 'hsl(220,15%,35%)' }}>{act.body}</p>
+            <div key={i} style={{ paddingBottom: 40 }}>
+              <SectionRule label={act.label} />
+              <div style={{ padding: '0 64px' }}>
+                <p style={{ fontSize: 15, lineHeight: 1.85, color: 'hsl(220,15%,35%)', maxWidth: 680 }}>{act.body}</p>
+              </div>
             </div>
           ))}
+
           {p.tags.length > 0 && (
-            <div style={{ borderTop: `1px solid ${HAIRLINE}`, paddingTop: 36, display: 'grid', gridTemplateColumns: '160px 1fr', gap: 40 }}>
-              <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: BRASS, paddingTop: 4 }}>Technologies</div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            <div style={{ paddingBottom: 24 }}>
+              <SectionRule label="Technologies" />
+              <div style={{ padding: '0 64px', display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 {p.tags.map((tag, j) => (
                   <span key={j} style={{ fontSize: 11, fontWeight: 500, color: INK, border: `1px solid ${HAIRLINE}`, padding: '6px 14px', letterSpacing: '0.04em' }}>{tag}</span>
                 ))}

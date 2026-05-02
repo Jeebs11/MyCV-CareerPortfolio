@@ -19,6 +19,20 @@ Professional portfolio for Mujeeb Lawal, Senior Programme Director with 17+ year
 -   **Admin-Managed Site Content**: All hero copy, flagship wins, skills, certifications, education, career roles editable from admin.
 -   **Theme/Appearance**: CSS variable tokens (`--brand-primary`, `--brand-accent`, `--background`, `--font-sans`, `--font-display`) served via `/api/theme.css` with admin colour/font picker and live preview.
 
+## Recent Changes (May 2026)
+
+### Variant E "Contrast Split" — Full Site Graduation (Option C dividers)
+All public pages have been fully redesigned to Variant E. The user selected **Option C "Full-width Section Dividers"** from a canvas mockup — a centered brass rule (brass `hsl(35,45%,45%)`, 35% opacity) with a small-caps label spanning the full width of the right panel, replacing the old thin hairline `borderBottom` + inline section-label pattern.
+
+Changes applied across all four public pages:
+- **`/` (home.tsx)**: Complete rewrite — scrollspy left-panel nav, 6 sections (Profile, Top Key Achievements, Career, Capability, Education, Contact), all DB-driven via `/api/site/*` with fallbacks. CV download modal with contact capture. `SectionRule` component applied to every section transition.
+- **`/case-studies`**: `SectionRule` applied to mandate header, The Challenge, The Approach, The Outcome, and Technologies sections. Sidebar scrollspy list navigates between 4 mandates (DB-driven via `/api/projects` with fallbacks).
+- **`/portfolio`** (also `/projects`): `SectionRule` applied to the "Built on Replit" intro and project count. Image-hover-to-text-reveal card grid (DB-driven via `/api/built-projects` with fallbacks).
+- **`/insights`**: `SectionRule` applied to page intro and article count section. Article list with tag filter, read modal.
+- **`/admin`**: "Portfolio Projects" tab heading and description renamed to "Case Studies". All tab triggers were already correct.
+
+The `SectionRule` pattern: `flex row` with two `flex:1, height:1, background:BRASS, opacity:0.35` lines flanking a `fontSize:8.5, letterSpacing:0.28em, textTransform:uppercase` centered label.
+
 ## Recent Changes (Apr 2026)
 
 ### Theme & Style Customization

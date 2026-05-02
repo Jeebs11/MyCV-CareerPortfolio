@@ -24,6 +24,16 @@ interface BlogPost {
   heroImage?: string;
 }
 
+function SectionRule({ label }: { label: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', padding: '0 64px', marginBottom: 0 }}>
+      <div style={{ flex: 1, height: 1, background: BRASS, opacity: 0.35 }} />
+      <div style={{ padding: '0 22px', fontSize: 8.5, fontWeight: 600, letterSpacing: '0.28em', textTransform: 'uppercase', color: BRASS, flexShrink: 0 }}>{label}</div>
+      <div style={{ flex: 1, height: 1, background: BRASS, opacity: 0.35 }} />
+    </div>
+  );
+}
+
 const PAGE_SIZE = 10;
 
 export default function InsightsPage() {
@@ -42,10 +52,7 @@ export default function InsightsPage() {
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  function changeCategory(cat: string) {
-    setSelectedCategory(cat);
-    setPage(1);
-  }
+  function changeCategory(cat: string) { setSelectedCategory(cat); setPage(1); }
 
   return (
     <div style={{ fontFamily: 'Inter, sans-serif', display: 'flex', minHeight: '100vh' }}>
@@ -97,23 +104,33 @@ export default function InsightsPage() {
 
       {/* RIGHT PANEL */}
       <main style={{ flex: 1, background: PAPER, overflowY: 'auto', height: '100vh' }}>
-        <div style={{ padding: '52px 64px 40px', borderBottom: `1px solid ${HAIRLINE}` }}>
-          <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.24em', textTransform: 'uppercase', color: BRASS, marginBottom: 12 }}>
-            {isLoading ? '...' : `${filtered.length} articles`}
+
+        {/* Page header */}
+        <div style={{ paddingTop: 52, paddingBottom: 44 }}>
+          <SectionRule label="Practitioner's Notes" />
+          <div style={{ padding: '32px 64px 0' }}>
+            <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 48, fontWeight: 400, color: INK, lineHeight: 1.1 }}>Thought Leadership</h1>
           </div>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 48, fontWeight: 400, color: INK, lineHeight: 1.1 }}>Practitioner's Notes</h1>
         </div>
 
+        {/* Articles */}
         {isLoading ? (
-          <div style={{ padding: '80px 64px', textAlign: 'center', color: MUTED, fontSize: 13 }}>Loading articles…</div>
+          <div style={{ paddingBottom: 48 }}>
+            <SectionRule label="Loading" />
+            <div style={{ padding: '60px 64px', textAlign: 'center', color: MUTED, fontSize: 13 }}>Loading articles…</div>
+          </div>
         ) : filtered.length === 0 ? (
-          <div style={{ padding: '80px 64px', textAlign: 'center', color: MUTED }}>
-            <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 24, fontWeight: 400, marginBottom: 12 }}>No articles yet</div>
-            <div style={{ fontSize: 13 }}>Check back soon — new insights are added regularly.</div>
+          <div style={{ paddingBottom: 48 }}>
+            <SectionRule label="Articles" />
+            <div style={{ padding: '60px 64px', textAlign: 'center', color: MUTED }}>
+              <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 24, fontWeight: 400, marginBottom: 12 }}>No articles yet</div>
+              <div style={{ fontSize: 13 }}>Check back soon — new insights are added regularly.</div>
+            </div>
           </div>
         ) : (
           <div>
-            {paginated.map((post, i) => (
+            <SectionRule label={`${filtered.length} articles`} />
+            {paginated.map((post) => (
               <article
                 key={post.id}
                 className="article-hover"
@@ -122,7 +139,7 @@ export default function InsightsPage() {
                 style={{ padding: '40px 64px', borderBottom: `1px solid ${HAIRLINE}`, cursor: 'pointer', background: 'transparent', transition: 'background 0.15s' }}
               >
                 {post.heroImage && (
-                  <div style={{ marginBottom: 20, borderRadius: 2, overflow: 'hidden', height: 200 }}>
+                  <div style={{ marginBottom: 20, overflow: 'hidden', height: 200 }}>
                     <img src={post.heroImage} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </div>
                 )}
@@ -139,31 +156,18 @@ export default function InsightsPage() {
               </article>
             ))}
 
-            {/* PAGINATION */}
             {totalPages > 1 && (
               <div style={{ padding: '32px 64px 48px', borderTop: `1px solid ${HAIRLINE}`, display: 'flex', alignItems: 'center', gap: 24 }}>
-                <button
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                  style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: page === 1 ? 'hsl(220,15%,75%)' : INK, background: 'none', border: 'none', cursor: page === 1 ? 'default' : 'pointer', padding: 0 }}
-                >← Prev</button>
-
+                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+                  style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: page === 1 ? 'hsl(220,15%,75%)' : INK, background: 'none', border: 'none', cursor: page === 1 ? 'default' : 'pointer', padding: 0 }}>← Prev</button>
                 <div style={{ display: 'flex', gap: 6 }}>
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
-                    <button
-                      key={n}
-                      onClick={() => setPage(n)}
-                      style={{ width: 32, height: 32, fontSize: 12, fontWeight: n === page ? 600 : 400, color: n === page ? PAPER : MUTED, background: n === page ? INK : 'transparent', border: `1px solid ${n === page ? 'transparent' : HAIRLINE}`, cursor: 'pointer' }}
-                    >{n}</button>
+                    <button key={n} onClick={() => setPage(n)}
+                      style={{ width: 32, height: 32, fontSize: 12, fontWeight: n === page ? 600 : 400, color: n === page ? PAPER : MUTED, background: n === page ? INK : 'transparent', border: `1px solid ${n === page ? 'transparent' : HAIRLINE}`, cursor: 'pointer' }}>{n}</button>
                   ))}
                 </div>
-
-                <button
-                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                  disabled={page === totalPages}
-                  style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: page === totalPages ? 'hsl(220,15%,75%)' : INK, background: 'none', border: 'none', cursor: page === totalPages ? 'default' : 'pointer', padding: 0 }}
-                >Next →</button>
-
+                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+                  style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: page === totalPages ? 'hsl(220,15%,75%)' : INK, background: 'none', border: 'none', cursor: page === totalPages ? 'default' : 'pointer', padding: 0 }}>Next →</button>
                 <span style={{ marginLeft: 'auto', fontSize: 11, color: MUTED }}>
                   {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}
                 </span>

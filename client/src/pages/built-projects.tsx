@@ -13,6 +13,16 @@ const MUTED = 'hsl(220,12%,52%)';
 
 const FILTERS = ['All', 'Web App', 'Automation', 'Dashboard', 'Tool'];
 
+function SectionRule({ label }: { label: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', padding: '0 64px', marginBottom: 40 }}>
+      <div style={{ flex: 1, height: 1, background: BRASS, opacity: 0.35 }} />
+      <div style={{ padding: '0 22px', fontSize: 8.5, fontWeight: 600, letterSpacing: '0.28em', textTransform: 'uppercase', color: BRASS, flexShrink: 0 }}>{label}</div>
+      <div style={{ flex: 1, height: 1, background: BRASS, opacity: 0.35 }} />
+    </div>
+  );
+}
+
 const FALLBACK: BuiltProjectRow[] = [
   {
     id: 1, title: 'PM Portfolio — This Site', description: 'Full-stack portfolio website with admin CMS, blog engine, CV download gate, and AI chatbot. Built end-to-end on Replit.',
@@ -70,10 +80,7 @@ export default function BuiltProjectsPage() {
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  function changeFilter(f: string) {
-    setFilter(f);
-    setPage(1);
-  }
+  function changeFilter(f: string) { setFilter(f); setPage(1); }
 
   return (
     <div style={{ fontFamily: 'Inter, sans-serif', display: 'flex', minHeight: '100vh' }}>
@@ -131,104 +138,87 @@ export default function BuiltProjectsPage() {
 
       {/* RIGHT PANEL */}
       <main style={{ flex: 1, background: PAPER, overflowY: 'auto', height: '100vh' }}>
-        <div style={{ padding: '52px 64px 40px', borderBottom: `1px solid ${HAIRLINE}` }}>
-          <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.24em', textTransform: 'uppercase', color: BRASS, marginBottom: 12 }}>Built on Replit</div>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 48, fontWeight: 400, color: INK, lineHeight: 1.1, marginBottom: 12 }}>Portfolio</h1>
-          <p style={{ fontSize: 14, color: MUTED, maxWidth: 560 }}>I don't just manage delivery — I build. These are working tools and applications, each solving a real problem I encountered in programme work.</p>
+        <div style={{ paddingTop: 52, paddingBottom: 44 }}>
+          <SectionRule label="Built on Replit" />
+          <div style={{ padding: '0 64px' }}>
+            <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 48, fontWeight: 400, color: INK, lineHeight: 1.1, marginBottom: 12 }}>Portfolio</h1>
+            <p style={{ fontSize: 14, color: MUTED, maxWidth: 560 }}>I don't just manage delivery — I build. These are working tools and applications, each solving a real problem I encountered in programme work.</p>
+          </div>
         </div>
 
-        <div style={{ padding: '48px 64px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-          {paginated.map((p, i) => {
-            const isHovered = hoveredCard === i;
-            const cardBg = p.highlight ? INK : 'transparent';
-            const cardTextColor = p.highlight ? PAPER : INK;
-            const stack = Array.isArray(p.stack) ? p.stack : [];
-            const lines = Array.isArray(p.lines) ? p.lines : [];
+        <div style={{ paddingBottom: 48 }}>
+          <SectionRule label={`${filtered.length} ${filter === 'All' ? 'projects' : filter.toLowerCase() + 's'}`} />
+          <div style={{ padding: '0 64px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+            {paginated.map((p, i) => {
+              const isHovered = hoveredCard === i;
+              const cardBg = p.highlight ? INK : 'transparent';
+              const cardTextColor = p.highlight ? PAPER : INK;
+              const stack = Array.isArray(p.stack) ? p.stack : [];
+              const lines = Array.isArray(p.lines) ? p.lines : [];
 
-            return (
-              <div
-                key={p.id}
-                data-testid={`card-project-${p.id}`}
-                onMouseEnter={() => setHoveredCard(i)}
-                onMouseLeave={() => setHoveredCard(null)}
-                style={{ background: cardBg, border: `1px solid ${p.highlight ? 'transparent' : HAIRLINE}`, padding: '36px 32px', display: 'flex', flexDirection: 'column', color: cardTextColor }}
-              >
-                {/* Type badge + Status */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                  <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: p.highlight ? BRASS_LIGHT : BRASS, border: `1px solid ${p.highlight ? 'hsl(220,20%,28%)' : 'hsl(35,45%,72%)'}`, padding: '4px 10px' }}>{p.type}</span>
-                  <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: p.status === 'Live' ? 'hsl(145,45%,48%)' : 'hsl(35,65%,58%)' }}>{p.status}</span>
-                </div>
-
-                {/* Title */}
-                <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 24, fontWeight: 500, lineHeight: 1.15, marginBottom: 12, color: cardTextColor }}>{p.title}</div>
-
-                {/* Description */}
-                <p style={{ fontSize: 13, lineHeight: 1.7, marginBottom: 20, color: p.highlight ? 'hsl(220,15%,68%)' : 'hsl(220,15%,42%)' }}>{p.description}</p>
-
-                {/* Image / Bullets area */}
-                <div style={{ position: 'relative', flex: 1 }}>
-                  {/* Text layer */}
-                  <div>
-                    <div style={{ marginBottom: 20 }}>
-                      {lines.map((l, j) => (
-                        <div key={j} style={{ fontSize: 12, padding: '5px 0', borderBottom: `1px solid ${p.highlight ? 'hsl(220,20%,22%)' : HAIRLINE}`, display: 'flex', alignItems: 'center', gap: 8, color: p.highlight ? 'hsl(220,15%,55%)' : MUTED }}>
-                          <span style={{ color: BRASS_LIGHT, fontSize: 10 }}>—</span>{l}
-                        </div>
-                      ))}
-                    </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                      {stack.map((s, j) => (
-                        <span key={j} style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: p.highlight ? 'hsl(220,15%,55%)' : MUTED, background: p.highlight ? 'hsl(220,20%,20%)' : 'hsl(40,15%,92%)', padding: '4px 10px' }}>{s}</span>
-                      ))}
-                    </div>
+              return (
+                <div
+                  key={p.id}
+                  data-testid={`card-project-${p.id}`}
+                  onMouseEnter={() => setHoveredCard(i)}
+                  onMouseLeave={() => setHoveredCard(null)}
+                  style={{ background: cardBg, border: `1px solid ${p.highlight ? 'transparent' : HAIRLINE}`, padding: '36px 32px', display: 'flex', flexDirection: 'column', color: cardTextColor }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                    <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: p.highlight ? BRASS_LIGHT : BRASS, border: `1px solid ${p.highlight ? 'hsl(220,20%,28%)' : 'hsl(35,45%,72%)'}`, padding: '4px 10px' }}>{p.type}</span>
+                    <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: p.status === 'Live' ? 'hsl(145,45%,48%)' : 'hsl(35,65%,58%)' }}>{p.status}</span>
                   </div>
 
-                  {/* Screenshot overlay */}
-                  {p.image && (
-                    <div style={{ position: 'absolute', inset: 0, opacity: isHovered ? 0 : 1, transition: 'opacity 0.45s cubic-bezier(0.4,0,0.2,1)', pointerEvents: isHovered ? 'none' : 'auto', borderRadius: 2, overflow: 'hidden' }}>
-                      <img src={p.image} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }} />
-                      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '40%', background: `linear-gradient(to bottom, transparent, ${cardBg === 'transparent' ? PAPER : cardBg})` }} />
-                      <div style={{ position: 'absolute', bottom: 10, right: 12, fontSize: 9, fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: p.highlight ? 'hsl(220,15%,55%)' : MUTED, opacity: isHovered ? 0 : 1, transition: 'opacity 0.3s ease' }}>Hover to explore →</div>
+                  <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 24, fontWeight: 500, lineHeight: 1.15, marginBottom: 12, color: cardTextColor }}>{p.title}</div>
+                  <p style={{ fontSize: 13, lineHeight: 1.7, marginBottom: 20, color: p.highlight ? 'hsl(220,15%,68%)' : 'hsl(220,15%,42%)' }}>{p.description}</p>
+
+                  <div style={{ position: 'relative', flex: 1 }}>
+                    <div>
+                      <div style={{ marginBottom: 20 }}>
+                        {lines.map((l, j) => (
+                          <div key={j} style={{ fontSize: 12, padding: '5px 0', borderBottom: `1px solid ${p.highlight ? 'hsl(220,20%,22%)' : HAIRLINE}`, display: 'flex', alignItems: 'center', gap: 8, color: p.highlight ? 'hsl(220,15%,55%)' : MUTED }}>
+                            <span style={{ color: BRASS_LIGHT, fontSize: 10 }}>—</span>{l}
+                          </div>
+                        ))}
+                      </div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                        {stack.map((s, j) => (
+                          <span key={j} style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: p.highlight ? 'hsl(220,15%,55%)' : MUTED, background: p.highlight ? 'hsl(220,20%,20%)' : 'hsl(40,15%,92%)', padding: '4px 10px' }}>{s}</span>
+                        ))}
+                      </div>
                     </div>
+                    {p.image && (
+                      <div style={{ position: 'absolute', inset: 0, opacity: isHovered ? 0 : 1, transition: 'opacity 0.45s cubic-bezier(0.4,0,0.2,1)', pointerEvents: isHovered ? 'none' : 'auto', overflow: 'hidden' }}>
+                        <img src={p.image} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }} />
+                        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '40%', background: `linear-gradient(to bottom, transparent, ${cardBg === 'transparent' ? PAPER : cardBg})` }} />
+                        <div style={{ position: 'absolute', bottom: 10, right: 12, fontSize: 9, fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: p.highlight ? 'hsl(220,15%,55%)' : MUTED, opacity: isHovered ? 0 : 1, transition: 'opacity 0.3s ease' }}>Hover to explore →</div>
+                      </div>
+                    )}
+                  </div>
+
+                  {p.url && (
+                    <a href={p.url} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: 24, fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: BRASS_LIGHT, opacity: (!p.image || isHovered) ? 1 : 0, transition: 'opacity 0.35s ease' }}>
+                      View project →
+                    </a>
                   )}
                 </div>
-
-                {/* View project link */}
-                {p.url && (
-                  <a href={p.url} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: 24, fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: BRASS_LIGHT, opacity: (!p.image || isHovered) ? 1 : 0, transition: 'opacity 0.35s ease' }}>
-                    View project →
-                  </a>
-                )}
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
-        {/* PAGINATION */}
         {totalPages > 1 && (
           <div style={{ padding: '32px 64px 48px', borderTop: `1px solid ${HAIRLINE}`, display: 'flex', alignItems: 'center', gap: 24 }}>
-            <button
-              onClick={() => setPage(p => Math.max(1, p - 1))}
-              disabled={page === 1}
-              style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: page === 1 ? 'hsl(220,15%,75%)' : INK, background: 'none', border: 'none', cursor: page === 1 ? 'default' : 'pointer', padding: 0 }}
-            >← Prev</button>
-
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+              style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: page === 1 ? 'hsl(220,15%,75%)' : INK, background: 'none', border: 'none', cursor: page === 1 ? 'default' : 'pointer', padding: 0 }}>← Prev</button>
             <div style={{ display: 'flex', gap: 6 }}>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
-                <button
-                  key={n}
-                  onClick={() => setPage(n)}
-                  style={{ width: 32, height: 32, fontSize: 12, fontWeight: n === page ? 600 : 400, color: n === page ? PAPER : MUTED, background: n === page ? INK : 'transparent', border: `1px solid ${n === page ? 'transparent' : HAIRLINE}`, cursor: 'pointer' }}
-                >{n}</button>
+                <button key={n} onClick={() => setPage(n)}
+                  style={{ width: 32, height: 32, fontSize: 12, fontWeight: n === page ? 600 : 400, color: n === page ? PAPER : MUTED, background: n === page ? INK : 'transparent', border: `1px solid ${n === page ? 'transparent' : HAIRLINE}`, cursor: 'pointer' }}>{n}</button>
               ))}
             </div>
-
-            <button
-              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages}
-              style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: page === totalPages ? 'hsl(220,15%,75%)' : INK, background: 'none', border: 'none', cursor: page === totalPages ? 'default' : 'pointer', padding: 0 }}
-            >Next →</button>
-
+            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+              style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: page === totalPages ? 'hsl(220,15%,75%)' : INK, background: 'none', border: 'none', cursor: page === totalPages ? 'default' : 'pointer', padding: 0 }}>Next →</button>
             <span style={{ marginLeft: 'auto', fontSize: 11, color: MUTED }}>
               {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}
             </span>
