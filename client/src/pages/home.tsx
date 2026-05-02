@@ -330,7 +330,10 @@ export default function Home() {
               style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: PAPER, background: INK, padding: '14px 28px', border: 'none', cursor: 'pointer' }}
             >Download CV</button>
           </div>
-          <div style={{ marginTop: 64, paddingTop: 24, borderTop: `1px solid ${HAIRLINE}`, fontSize: 11, color: 'hsl(220,15%,65%)' }}>{copyright}</div>
+          <div style={{ marginTop: 64, paddingTop: 24, borderTop: `1px solid ${HAIRLINE}`, fontSize: 11, color: 'hsl(220,15%,65%)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+            <span>{copyright}</span>
+            <a href="/privacy" style={{ color: 'hsl(220,15%,55%)', textDecoration: 'none', borderBottom: '1px solid hsl(220,15%,35%)' }}>Privacy Policy</a>
+          </div>
         </section>
       </main>
       {/* ── CV DOWNLOAD MODAL ── */}
