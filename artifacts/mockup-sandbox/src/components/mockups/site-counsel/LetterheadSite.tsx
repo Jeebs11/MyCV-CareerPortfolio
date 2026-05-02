@@ -79,7 +79,7 @@ export default function LetterheadSite() {
           <h1 className="font-display font-medium text-[56px] leading-[1.1] tracking-tight text-[hsl(220,25%,15%)] mb-10 max-w-3xl">
             <span
               style={{
-                borderBottom: \`1px solid \${colors.brass}\`,
+                borderBottom: `1px solid ${colors.brass}`,
                 paddingBottom: "4px",
               }}
             >
