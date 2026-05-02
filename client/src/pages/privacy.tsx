@@ -54,7 +54,7 @@ export default function PrivacyPage() {
           {[
             {
               heading: '1. Who we are',
-              body: 'This website is a personal portfolio operated by Mujeeb Lawal ("I", "me", "my"). Contact: odmlawal@gmail.com. For the purposes of UK GDPR and the Data Protection Act 2018, I am the data controller for information collected via this site.',
+              body: 'This website is a personal portfolio operated by Mujeeb Lawal ("I", "me", "my"). For the purposes of UK GDPR and the Data Protection Act 2018, I am the data controller for information collected via this site.',
             },
             {
               heading: '2. What data I collect',
@@ -78,7 +78,7 @@ export default function PrivacyPage() {
             },
             {
               heading: '7. Your rights',
-              body: 'Under UK GDPR you have the right to: access your data, correct inaccuracies, request deletion ("right to be forgotten"), restrict or object to processing, and lodge a complaint with the ICO (ico.org.uk). To exercise any right, email odmlawal@gmail.com.',
+              body: 'Under UK GDPR you have the right to: access your data, correct inaccuracies, request deletion ("right to be forgotten"), restrict or object to processing, and lodge a complaint with the ICO (ico.org.uk).',
             },
             {
               heading: '8. Data security',
