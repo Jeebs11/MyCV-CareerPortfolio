@@ -152,19 +152,19 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
       data-testid="navigation"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-20 md:h-24">
+        <div className="flex items-center justify-between h-16 md:h-24">
           {/* Logo */}
           <a href="/" className="flex items-center" aria-label="Mujeeb Lawal — Home">
             <img
               src="/logo-light.png"
               alt="Mujeeb Lawal"
-              className="h-16 w-16 md:h-20 md:w-20 object-contain block dark:hidden"
+              className="h-11 w-11 md:h-20 md:w-20 object-contain block dark:hidden"
               data-testid="img-logo-nav-light"
             />
             <img
               src="/logo-dark.png"
               alt="Mujeeb Lawal"
-              className="h-16 w-16 md:h-20 md:w-20 object-contain hidden dark:block"
+              className="h-11 w-11 md:h-20 md:w-20 object-contain hidden dark:block"
               data-testid="img-logo-nav-dark"
             />
           </a>
@@ -367,7 +367,7 @@ function FlagshipAchievements() {
           <Badge className="bg-white/10 backdrop-blur-md border border-white/20 text-white mb-4">
             Signature Wins
           </Badge>
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
+          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
             {heading}
           </h2>
           <p className="text-lg md:text-xl text-white/60 max-w-3xl mx-auto">
@@ -451,7 +451,7 @@ function SkillsAndCertificationsGrid() {
           <Badge className="bg-white/10 backdrop-blur-md border border-white/20 text-white mb-4">
             Expertise Overview
           </Badge>
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
+          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
             {heading}
           </h2>
           <p className="text-lg md:text-xl text-white/60 max-w-3xl mx-auto">
@@ -650,7 +650,7 @@ function CollapsibleCareerJourney() {
           <Badge className="bg-white/10 backdrop-blur-md border border-white/20 text-white mb-4">
             Full Career History
           </Badge>
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
+          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
             {heading}
           </h2>
           <p className="text-lg md:text-xl text-white/60 max-w-3xl mx-auto">
@@ -1139,23 +1139,23 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
   const whatsapp = settings['contact.whatsapp'] || '971509082234';
 
   return (
-    <section id="hero" className="relative min-h-[85vh] md:min-h-screen flex items-center justify-center overflow-hidden pt-20 md:pt-24" data-testid="section-hero">
+    <section id="hero" className="relative min-h-[85vh] md:min-h-screen flex items-center justify-center overflow-hidden pt-16 md:pt-24" data-testid="section-hero">
       <div className="absolute inset-0">
         <div className="absolute top-1/4 left-1/4 w-64 h-64 md:w-96 md:h-96 bg-[hsl(var(--brand-primary))]/20 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-64 h-64 md:w-96 md:h-96 bg-[hsl(var(--brand-accent))]/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] md:w-[600px] md:h-[600px] bg-[hsl(270,65%,35%)]/10 rounded-full blur-3xl" />
       </div>
       
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-20">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-20">
         <div className="flex flex-col items-center text-center">
-          <div className="space-y-6 md:space-y-8 max-w-5xl">
-            <div className="space-y-4 md:space-y-6">
-              <div className="flex items-center justify-center gap-3 md:gap-4" data-testid="wordmark-name">
-                <span className="h-px w-8 md:w-12 bg-[hsl(var(--brand-primary))]/50" />
-                <span className="font-display text-xs md:text-sm font-semibold tracking-[0.3em] md:tracking-[0.4em] text-[hsl(var(--brand-primary))] uppercase">
+          <div className="space-y-5 md:space-y-8 max-w-5xl">
+            <div className="space-y-3 md:space-y-6">
+              <div className="flex items-center justify-center gap-2 md:gap-4" data-testid="wordmark-name">
+                <span className="h-px w-6 md:w-12 bg-[hsl(var(--brand-primary))]/50" />
+                <span className="font-display text-[0.65rem] md:text-sm font-semibold tracking-[0.25em] md:tracking-[0.4em] text-[hsl(var(--brand-primary))] uppercase">
                   Mujeeb Lawal
                 </span>
-                <span className="h-px w-8 md:w-12 bg-[hsl(var(--brand-primary))]/50" />
+                <span className="h-px w-6 md:w-12 bg-[hsl(var(--brand-primary))]/50" />
               </div>
 
               <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-green-500/20 border border-green-500/30">
@@ -1165,49 +1165,49 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
                 </span>
               </div>
               
-              <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.1]" data-testid="text-hero-title">
+              <h1 className="font-display text-[2rem] leading-[1.05] sm:text-5xl sm:leading-[1.1] md:text-6xl lg:text-7xl font-bold text-white" data-testid="text-hero-title">
                 {headlineMain}
-                <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white/70 mt-1">
+                <span className="block text-xl sm:text-3xl md:text-5xl lg:text-6xl font-semibold text-white/70 mt-1.5 md:mt-1">
                   {headlineSub1}
                 </span>
-                <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white/70 mt-1">
+                <span className="block text-xl sm:text-3xl md:text-5xl lg:text-6xl font-semibold text-white/70 mt-0.5 md:mt-1">
                   {headlineSub2}
                 </span>
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] mt-2">
+                <span className="block text-2xl sm:text-3xl md:text-5xl lg:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] mt-3 md:mt-2">
                   {headlineAccent}
                 </span>
               </h1>
             </div>
             
-            <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-center justify-center">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-2.5 md:gap-3 items-center justify-center">
               <Button 
                 size="lg"
-                className="bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0 hover-elevate active-elevate-2 text-base md:text-lg px-8 md:px-10 py-6 md:py-7 w-full sm:w-auto font-semibold"
+                className="bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white border-0 hover-elevate active-elevate-2 text-sm md:text-lg px-6 md:px-10 py-5 md:py-7 w-full sm:w-auto font-semibold"
                 onClick={() => setShowCVDialog(true)}
                 data-testid="button-primary-cta"
               >
-                <Download className="mr-2 w-5 h-5" /> Download CV
+                <Download className="mr-2 w-4 h-4 md:w-5 md:h-5" /> Download CV
               </Button>
 
               <Link href="/portfolio">
                 <Button 
                   size="lg"
                   variant="outline"
-                  className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10 text-base md:text-lg px-8 md:px-10 py-6 md:py-7 w-full sm:w-auto"
+                  className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10 text-sm md:text-lg px-6 md:px-10 py-5 md:py-7 w-full sm:w-auto"
                   data-testid="button-view-portfolio"
                 >
-                  <FolderKanban className="mr-2 w-5 h-5" /> View Portfolio
+                  <FolderKanban className="mr-2 w-4 h-4 md:w-5 md:h-5" /> View Portfolio
                 </Button>
               </Link>
               
               <Button 
                 size="lg"
                 variant="outline"
-                className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10 text-base md:text-lg px-8 md:px-10 py-6 md:py-7 w-full sm:w-auto"
+                className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10 text-sm md:text-lg px-6 md:px-10 py-5 md:py-7 w-full sm:w-auto"
                 onClick={() => scrollToSection('contact')}
                 data-testid="button-secondary-cta"
               >
-                <Mail className="mr-2 w-5 h-5" /> Get in Touch
+                <Mail className="mr-2 w-4 h-4 md:w-5 md:h-5" /> Get in Touch
               </Button>
             </div>
             
@@ -1265,7 +1265,7 @@ function MetricsDashboard() {
     <section id="metrics" className="relative py-12 md:py-20" data-testid="section-metrics">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-8 md:mb-12">
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4" data-testid="text-metrics-title">
+          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4" data-testid="text-metrics-title">
             Impact by Numbers
           </h2>
           <p className="text-base md:text-lg text-white/60 max-w-2xl mx-auto px-4">
@@ -1361,7 +1361,7 @@ function CareerTimeline({ activeRegion, setActiveRegion }: { activeRegion: strin
     <section id="experience" className="relative py-12 md:py-20" data-testid="section-experience">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-10 md:mb-16">
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4">
+          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4">
             Career Journey
           </h2>
           <p className="text-base md:text-lg text-white/60 max-w-2xl mx-auto px-4">
@@ -1514,7 +1514,7 @@ function GeographicMap({ activeRegion, setActiveRegion }: { activeRegion: string
     <section id="global" className="relative py-12 md:py-20" data-testid="section-global">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-10 md:mb-16">
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4">
+          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4">
             Global Delivery Footprint
           </h2>
           <p className="text-base md:text-lg text-white/60 max-w-2xl mx-auto px-4">
@@ -1575,7 +1575,7 @@ function CertificationsWall() {
     <section id="certifications" className="relative py-12 md:py-20" data-testid="section-certifications">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-10 md:mb-16">
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4">
+          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4">
             Certifications & Education
           </h2>
           <p className="text-base md:text-lg text-white/60 max-w-2xl mx-auto px-4">
@@ -1724,7 +1724,7 @@ function IndustryExperienceMap() {
           <Badge className="mb-3 md:mb-4 bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20" data-testid="badge-industries">
             Industry Expertise
           </Badge>
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4" data-testid="text-industries-title">
+          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4" data-testid="text-industries-title">
             Cross-Industry Experience
           </h2>
           <p className="text-base md:text-lg lg:text-xl text-white/60 max-w-2xl mx-auto px-4" data-testid="text-industries-subtitle">
@@ -1820,7 +1820,7 @@ function ContactSectionInner() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6">
       <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6 sm:p-8 md:p-12">
         <div className="text-center space-y-4 md:space-y-6">
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white">
+          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold text-white">
             {heading}
           </h2>
           <p className="text-base md:text-lg text-white/70 max-w-2xl mx-auto px-2">
@@ -2069,7 +2069,7 @@ function CertificationsSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12">
           <Badge className="bg-white/10 backdrop-blur-md border border-white/20 text-white mb-4">{settings['certifications.eyebrow'] || 'Credentials'}</Badge>
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">{settings['certifications.heading'] || 'Certifications'}</h2>
+          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-4">{settings['certifications.heading'] || 'Certifications'}</h2>
           <p className="text-lg text-white/60 max-w-2xl mx-auto">{settings['certifications.subheading'] || 'Verified credentials backing my delivery and leadership work.'}</p>
         </div>
         {isLoading ? (
@@ -2136,7 +2136,7 @@ function EducationSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12">
           <Badge className="bg-white/10 backdrop-blur-md border border-white/20 text-white mb-4">{settings['education.eyebrow'] || 'Education'}</Badge>
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">{settings['education.heading'] || 'Academic Background'}</h2>
+          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-4">{settings['education.heading'] || 'Academic Background'}</h2>
         </div>
         {isLoading ? (
           <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
