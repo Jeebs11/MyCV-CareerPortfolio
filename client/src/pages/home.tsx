@@ -258,14 +258,14 @@ export default function Home() {
             { id: 9, role: 'Technical Project Manager', company: 'BSS Industrial', period: 'Nov 2013 – Aug 2014', employmentType: 'Permanent', description: 'High-profile construction; Hilton Brighton, commercial fit-outs' },
             { id: 10, role: 'Project Support Engineer', company: 'Alfa Laval', period: 'Sep 2008 – Nov 2013', employmentType: 'Permanent', description: 'The Shard, London 2012 Olympic Aquatic Centre, 20 Fenchurch Street' },
           ] as any[]).map((role: any, i: number) => (
-            <div key={role.id || i} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 90px', alignItems: 'start', padding: '18px 0', borderBottom: `1px solid ${HAIRLINE}`, gap: 24 }}>
+            <div key={role.id || i} style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr 148px', alignItems: 'start', padding: '18px 0', borderBottom: `1px solid ${HAIRLINE}`, gap: 24 }}>
               <div>
                 <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 18, fontWeight: 500, color: INK, marginBottom: 2 }}>{role.role}</div>
                 <div style={{ fontSize: 12, color: MUTED }}>{role.company}</div>
               </div>
               <div style={{ fontSize: 12, color: 'hsl(220,15%,45%)', paddingTop: 3 }}>{role.description || (Array.isArray(role.keyAchievements) ? role.keyAchievements[0] : '')}</div>
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: 11, color: MUTED, marginBottom: 4 }}>{role.period}</div>
+                <div style={{ fontSize: 11, color: MUTED, marginBottom: 4, whiteSpace: 'nowrap' }}>{role.period}</div>
                 <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: role.employmentType === 'Permanent' ? BRASS : 'hsl(200,55%,45%)' }}>{role.employmentType}</div>
               </div>
             </div>
