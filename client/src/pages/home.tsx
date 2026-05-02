@@ -249,9 +249,6 @@ export default function Home() {
               ))
             }
           </div>
-          <div style={{ marginTop: 40 }}>
-            <Link href="/case-studies" style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: BRASS }}>All case studies →</Link>
-          </div>
         </section>
 
         {/* CAREER */}
