@@ -1,0 +1,73 @@
+uploads = []
+
+[[generated]]
+id = "3NsXA2-13feq83OE0rBN_"
+uri = "file://attached_assets/generated_images/logo_monogram_geo.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "0lD-X0vUaNg4Tydj-cdM6"
+uri = "file://attached_assets/generated_images/logo_layered_m.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "R5d7c1pqqljaqiA6KuDB2"
+uri = "file://attached_assets/generated_images/logo_isometric_cube.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "o0CNPFWSMzUiUCogoesj4"
+uri = "file://attached_assets/generated_images/logo_hex_badge.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "15BB1bexcLVfxRDbb72P4"
+uri = "file://attached_assets/generated_images/logo_circle_seal.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "bD7PVeypGwXl1A8_HNZUC"
+uri = "file://attached_assets/generated_images/logo_wordmark.png"
+type = "image"
+title = "generated_image"
+
+[[outputs]]
+id = "hGUNbnsJfRcGILQdax3wR"
+uri = "file://attached_assets/generated_images/logo_monogram_geo.png"
+type = "image"
+title = "1. Geometric ML Monogram"
+
+[[outputs]]
+id = "gBOdrS1rjknrD5tZFwje7"
+uri = "file://attached_assets/generated_images/logo_hex_badge.png"
+type = "image"
+title = "2. Hexagon Executive Badge"
+
+[[outputs]]
+id = "eKe_nAZqj9-9GHuZfNj2h"
+uri = "file://attached_assets/generated_images/logo_layered_m.png"
+type = "image"
+title = "3. Layered M (Project Phases)"
+
+[[outputs]]
+id = "THhD4pBSGBH7sQ6hknynK"
+uri = "file://attached_assets/generated_images/logo_circle_seal.png"
+type = "image"
+title = "4. Circular Minimalist Seal"
+
+[[outputs]]
+id = "AQlLEqMsiWY2KsHnR0k3o"
+uri = "file://attached_assets/generated_images/logo_wordmark.png"
+type = "image"
+title = "5. Wordmark with Accent Bar"
+
+[[outputs]]
+id = "cYKfenVMEUmoXqExx19xU"
+uri = "file://attached_assets/generated_images/logo_isometric_cube.png"
+type = "image"
+title = "6. Isometric Cube Mark"
