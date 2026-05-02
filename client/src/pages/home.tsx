@@ -155,9 +155,18 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] flex items-center justify-center font-display font-bold text-white text-sm">
-              ML
-            </div>
+            <img
+              src="/logo-light.png"
+              alt="Mujeeb Lawal"
+              className="w-10 h-10 object-contain block dark:hidden"
+              data-testid="img-logo-nav-light"
+            />
+            <img
+              src="/logo-dark.png"
+              alt="Mujeeb Lawal"
+              className="w-10 h-10 object-contain hidden dark:block"
+              data-testid="img-logo-nav-dark"
+            />
             <span className="font-display text-lg font-semibold text-white hidden sm:block">Mujeeb Lawal</span>
           </div>
           
@@ -2005,9 +2014,18 @@ function Footer() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-md bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] flex items-center justify-center font-display font-bold text-white text-sm">
-              ML
-            </div>
+            <img
+              src="/logo-light.png"
+              alt="Mujeeb Lawal"
+              className="w-8 h-8 object-contain block dark:hidden"
+              data-testid="img-logo-footer-light"
+            />
+            <img
+              src="/logo-dark.png"
+              alt="Mujeeb Lawal"
+              className="w-8 h-8 object-contain hidden dark:block"
+              data-testid="img-logo-footer-dark"
+            />
             <span className="text-white/60 text-sm" data-testid="text-footer-copyright">{copyright}</span>
           </div>
 
