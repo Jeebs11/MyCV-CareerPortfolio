@@ -4,11 +4,12 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Home from "@/pages/home";
-import InsightsPage from "@/pages/insights";
-import BuiltProjectsPage from "@/pages/built-projects";
 
+const Home = lazy(() => import("@/pages/home"));
+const InsightsPage = lazy(() => import("@/pages/insights"));
+const BuiltProjectsPage = lazy(() => import("@/pages/built-projects"));
 const AdminPage = lazy(() => import("@/pages/admin"));
+const PrivacyPage = lazy(() => import("@/pages/privacy"));
 
 function LoadingFallback() {
   return (
@@ -28,6 +29,7 @@ function Router() {
         <Route path="/portfolio" component={BuiltProjectsPage} />
         <Route path="/projects" component={BuiltProjectsPage} />
         <Route path="/admin" component={AdminPage} />
+        <Route path="/privacy" component={PrivacyPage} />
         <Route path="*" component={Home} />
       </Switch>
     </Suspense>

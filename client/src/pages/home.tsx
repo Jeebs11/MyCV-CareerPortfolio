@@ -116,7 +116,6 @@ export default function Home() {
   return (
     <div style={{ fontFamily: 'Inter, sans-serif', display: 'flex', height: '100vh', overflow: 'hidden' }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
         a { text-decoration: none; }
         ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: hsl(220,20%,30%); }
@@ -363,6 +362,9 @@ export default function Home() {
                 </div>
               ))}
               {cvError && <div style={{ fontSize: 12, color: 'hsl(0,60%,50%)', marginBottom: 16 }}>{cvError}</div>}
+              <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.6, marginBottom: 16 }}>
+                By downloading you consent to your details being stored so I can follow up on opportunities. See the <a href="/privacy" target="_blank" style={{ color: BRASS, textDecoration: 'underline' }}>Privacy Policy</a>. You can request deletion at any time.
+              </div>
               <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
                 <button
                   type="submit"
