@@ -152,19 +152,19 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
       data-testid="navigation"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20 md:h-24">
           {/* Logo */}
           <a href="/" className="flex items-center" aria-label="Mujeeb Lawal — Home">
             <img
               src="/logo-light.png"
               alt="Mujeeb Lawal"
-              className="h-14 w-14 md:h-16 md:w-16 object-contain block dark:hidden"
+              className="h-16 w-16 md:h-20 md:w-20 object-contain block dark:hidden"
               data-testid="img-logo-nav-light"
             />
             <img
               src="/logo-dark.png"
               alt="Mujeeb Lawal"
-              className="h-14 w-14 md:h-16 md:w-16 object-contain hidden dark:block"
+              className="h-16 w-16 md:h-20 md:w-20 object-contain hidden dark:block"
               data-testid="img-logo-nav-dark"
             />
           </a>
