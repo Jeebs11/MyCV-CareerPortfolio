@@ -18,19 +18,19 @@ const FALLBACK: BuiltProjectRow[] = [
     id: 1, title: 'PM Portfolio — This Site', description: 'Full-stack portfolio website with admin CMS, blog engine, CV download gate, and AI chatbot. Built end-to-end on Replit.',
     type: 'Web App', stack: ['React', 'TypeScript', 'Drizzle ORM', 'PostgreSQL'],
     lines: ['Contact capture & lead export', 'Admin blog editor (ReactQuill)', 'AI chatbot for recruiter Q&A', 'Theme/brand customisation panel'],
-    status: 'Live', url: null, image: null, highlight: true, sortOrder: 0, createdAt: new Date(), updatedAt: new Date(),
+    status: 'Live', url: null, image: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=900&q=80', highlight: true, sortOrder: 0, createdAt: new Date(), updatedAt: new Date(),
   },
   {
     id: 2, title: 'Programme Health Dashboard', description: 'Real-time portfolio health dashboard with RAG status, risk register, and milestone tracker. Modelled on the Power BI boards built for Mercer.',
     type: 'Dashboard', stack: ['React', 'Recharts', 'Express', 'PostgreSQL'],
     lines: ['RAG status per workstream', 'Risk escalation timeline', 'Budget burn vs. forecast', 'Exportable board pack PDF'],
-    status: 'Live', url: null, image: null, highlight: false, sortOrder: 1, createdAt: new Date(), updatedAt: new Date(),
+    status: 'Live', url: null, image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=900&q=80', highlight: false, sortOrder: 1, createdAt: new Date(), updatedAt: new Date(),
   },
   {
     id: 3, title: 'Meeting Notes → Action Tracker', description: 'Paste meeting transcript → GPT extracts actions, owners, and deadlines → pushes to a shared Google Sheet.',
     type: 'Automation', stack: ['Node.js', 'OpenAI API', 'Google Sheets API'],
     lines: ['Owner detection from transcript', 'Deadline extraction', 'Google Sheets push', 'Slack summary notification'],
-    status: 'Live', url: null, image: null, highlight: false, sortOrder: 2, createdAt: new Date(), updatedAt: new Date(),
+    status: 'Live', url: null, image: 'https://images.unsplash.com/photo-1512486130939-2c4f79935e4f?w=900&q=80', highlight: false, sortOrder: 2, createdAt: new Date(), updatedAt: new Date(),
   },
   {
     id: 4, title: 'Risk Register Builder', description: 'Structured risk register with P×I heat map, owner assignment, and mitigation tracking. Exportable to CSV for board packs.',
