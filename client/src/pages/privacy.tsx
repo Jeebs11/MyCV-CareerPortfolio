@@ -26,9 +26,15 @@ export default function PrivacyPage() {
 
       {/* LEFT PANEL */}
       <aside style={{ width: 340, background: INK, color: PAPER, position: 'sticky', top: 0, height: '100vh', display: 'flex', flexDirection: 'column', padding: '52px 44px', flexShrink: 0 }}>
-        <div style={{ marginBottom: 40 }}>
-          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 32, fontWeight: 400, lineHeight: 1.1, color: PAPER, marginBottom: 8 }}>Privacy Policy</div>
-          <div style={{ fontSize: 13, color: 'hsl(220,15%,50%)', lineHeight: 1.6 }}>How your data is collected, used, and protected.</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 40 }}>
+          <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+            <rect width="40" height="40" rx="2" fill={BRASS} />
+            <text x="20" y="27" textAnchor="middle" fontFamily="Cormorant Garamond,serif" fontWeight="600" fontSize="15" fill={PAPER}>ML</text>
+          </svg>
+          <div>
+            <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 400, lineHeight: 1.1, color: PAPER }}>Privacy Policy</div>
+            <div style={{ fontSize: 11, color: 'hsl(220,15%,50%)', marginTop: 4 }}>How your data is used.</div>
+          </div>
         </div>
 
         <div style={{ fontSize: 11, color: 'hsl(220,15%,40%)', lineHeight: 1.7 }}>

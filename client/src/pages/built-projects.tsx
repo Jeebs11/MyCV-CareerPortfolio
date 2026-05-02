@@ -90,7 +90,7 @@ export default function BuiltProjectsPage() {
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 52, textDecoration: 'none' }}>
           <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
             <rect width="40" height="40" rx="2" fill={BRASS} />
-            <text x="20" y="28" textAnchor="middle" fontFamily="Cormorant Garamond,serif" fontWeight="600" fontSize="22" fill={PAPER}>M</text>
+            <text x="20" y="27" textAnchor="middle" fontFamily="Cormorant Garamond,serif" fontWeight="600" fontSize="15" fill={PAPER}>ML</text>
           </svg>
           <span style={{ fontSize: 11, color: 'hsl(220,15%,50%)', letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 500 }}>Mujeeb Lawal</span>
         </Link>
