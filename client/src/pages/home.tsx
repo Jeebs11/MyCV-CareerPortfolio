@@ -14,8 +14,8 @@ const MUTED = 'hsl(220,12%,52%)';
 const NAV_ITEMS = [
   { id: 'profile', label: 'Profile' },
   { id: 'mandates', label: 'Selected Mandates' },
-  { id: 'capability', label: 'Capability' },
   { id: 'career', label: 'Career' },
+  { id: 'capability', label: 'Capability' },
   { id: 'education', label: 'Education' },
   { id: 'contact', label: 'Contact' },
 ];
@@ -254,26 +254,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* CAPABILITY */}
-        <section id="capability" ref={el => s('capability', el)} style={{ padding: '64px', borderBottom: `1px solid ${HAIRLINE}` }}>
-          <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: BRASS, marginBottom: 40 }}>Capability</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
-            {[
-              { label: 'Methodology', items: methodologies.length > 0 ? methodologies : ['Agile / SAFe', 'PRINCE2 Practitioner', 'Waterfall', 'Scrum Master', 'MSP'] },
-              { label: 'Tooling', items: tools.length > 0 ? tools : ['Jira · Confluence', 'Power BI · Tableau', 'MS Project', 'ServiceNow', 'Smartsheet'] },
-              { label: 'Certifications', items: certifications.length > 0 ? certifications : ['PRINCE2 Practitioner', 'Scrum Master (PSM I & II)', 'Six Sigma'] },
-              { label: 'Industry', items: industries.length > 0 ? industries : ['Financial Services', 'Insurance', 'Telecoms', 'SaaS / Tech', 'Sustainability', 'Engineering'] },
-            ].map((col, i) => (
-              <div key={i}>
-                <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: INK, marginBottom: 16 }}>{col.label}</div>
-                {col.items.slice(0, 7).map((item, j) => (
-                  <div key={j} style={{ fontSize: 13, color: 'hsl(220,15%,38%)', padding: '9px 0', borderBottom: `1px solid ${HAIRLINE}` }}>{item}</div>
-                ))}
-              </div>
-            ))}
-          </div>
-        </section>
-
         {/* CAREER */}
         <section id="career" ref={el => s('career', el)} style={{ padding: '64px', borderBottom: `1px solid ${HAIRLINE}` }}>
           <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: BRASS, marginBottom: 40 }}>Career</div>
@@ -301,6 +281,25 @@ export default function Home() {
               </div>
             </div>
           ))}
+        </section>
+
+        <section id="capability" ref={el => s('capability', el)} style={{ padding: '64px', borderBottom: `1px solid ${HAIRLINE}` }}>
+          <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: BRASS, marginBottom: 40 }}>Capability</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
+            {[
+              { label: 'Methodology', items: methodologies.length > 0 ? methodologies : ['Agile / SAFe', 'PRINCE2 Practitioner', 'Waterfall', 'Scrum Master', 'MSP'] },
+              { label: 'Tooling', items: tools.length > 0 ? tools : ['Jira · Confluence', 'Power BI · Tableau', 'MS Project', 'ServiceNow', 'Smartsheet'] },
+              { label: 'Certifications', items: certifications.length > 0 ? certifications : ['PRINCE2 Practitioner', 'Scrum Master (PSM I & II)', 'Six Sigma'] },
+              { label: 'Industry', items: industries.length > 0 ? industries : ['Financial Services', 'Insurance', 'Telecoms', 'SaaS / Tech', 'Sustainability', 'Engineering'] },
+            ].map((col, i) => (
+              <div key={i}>
+                <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: INK, marginBottom: 16 }}>{col.label}</div>
+                {col.items.slice(0, 7).map((item, j) => (
+                  <div key={j} style={{ fontSize: 13, color: 'hsl(220,15%,38%)', padding: '9px 0', borderBottom: `1px solid ${HAIRLINE}` }}>{item}</div>
+                ))}
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* EDUCATION */}
