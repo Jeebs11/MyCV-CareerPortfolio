@@ -52,8 +52,11 @@ const FALLBACK: BuiltProjectRow[] = [
   },
 ];
 
+const PAGE_SIZE = 10;
+
 export default function BuiltProjectsPage() {
   const [filter, setFilter] = useState('All');
+  const [page, setPage] = useState(1);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
 
   const { data: dbProjects = [] } = useQuery<BuiltProjectRow[]>({ queryKey: ['/api/built-projects'] });
@@ -64,6 +67,13 @@ export default function BuiltProjectsPage() {
 
   const all: BuiltProjectRow[] = dbProjects.length > 0 ? dbProjects : FALLBACK;
   const filtered = filter === 'All' ? all : all.filter(p => p.type === filter);
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  function changeFilter(f: string) {
+    setFilter(f);
+    setPage(1);
+  }
 
   return (
     <div style={{ fontFamily: 'Inter, sans-serif', display: 'flex', minHeight: '100vh' }}>
@@ -101,7 +111,7 @@ export default function BuiltProjectsPage() {
         <div style={{ marginBottom: 36 }}>
           <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'hsl(220,15%,38%)', marginBottom: 14 }}>Filter by type</div>
           {FILTERS.map((f, i) => (
-            <button key={i} onClick={() => setFilter(f)} style={{
+            <button key={i} onClick={() => changeFilter(f)} style={{
               display: 'block', width: '100%', textAlign: 'left',
               padding: '9px 0 9px 12px', background: 'none', border: 'none', cursor: 'pointer',
               fontSize: 12, fontWeight: filter === f ? 600 : 400,
@@ -129,7 +139,7 @@ export default function BuiltProjectsPage() {
         </div>
 
         <div style={{ padding: '48px 64px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-          {filtered.map((p, i) => {
+          {paginated.map((p, i) => {
             const isHovered = hoveredCard === i;
             const cardBg = p.highlight ? INK : 'transparent';
             const cardTextColor = p.highlight ? PAPER : INK;
@@ -194,6 +204,37 @@ export default function BuiltProjectsPage() {
             );
           })}
         </div>
+
+        {/* PAGINATION */}
+        {totalPages > 1 && (
+          <div style={{ padding: '32px 64px 48px', borderTop: `1px solid ${HAIRLINE}`, display: 'flex', alignItems: 'center', gap: 24 }}>
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: page === 1 ? 'hsl(220,15%,75%)' : INK, background: 'none', border: 'none', cursor: page === 1 ? 'default' : 'pointer', padding: 0 }}
+            >← Prev</button>
+
+            <div style={{ display: 'flex', gap: 6 }}>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
+                <button
+                  key={n}
+                  onClick={() => setPage(n)}
+                  style={{ width: 32, height: 32, fontSize: 12, fontWeight: n === page ? 600 : 400, color: n === page ? PAPER : MUTED, background: n === page ? INK : 'transparent', border: `1px solid ${n === page ? 'transparent' : HAIRLINE}`, cursor: 'pointer' }}
+                >{n}</button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: page === totalPages ? 'hsl(220,15%,75%)' : INK, background: 'none', border: 'none', cursor: page === totalPages ? 'default' : 'pointer', padding: 0 }}
+            >Next →</button>
+
+            <span style={{ marginLeft: 'auto', fontSize: 11, color: MUTED }}>
+              {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}
+            </span>
+          </div>
+        )}
       </main>
     </div>
   );
