@@ -178,20 +178,20 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
             >
               Journey
             </button>
-            <a
+            <Link
               href="/portfolio"
               className="text-sm font-medium text-white/70 hover:text-white transition-colors"
               data-testid="link-portfolio-nav"
             >
               Portfolio
-            </a>
-            <a 
+            </Link>
+            <Link
               href="/insights"
               className="text-sm font-medium text-white/70 hover:text-white transition-colors"
               data-testid="link-insights"
             >
               Thought Leadership
-            </a>
+            </Link>
             <Button 
               onClick={() => scrollToSection('contact')}
               size="sm"
@@ -233,22 +233,24 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
                     <div className="font-medium">Journey</div>
                     <div className="text-sm text-white/60">17 Years of Experience</div>
                   </button>
-                  <a
+                  <Link
                     href="/portfolio"
+                    onClick={() => setMobileMenuOpen(false)}
                     className="text-left text-white/90 hover:text-white transition-colors py-3 px-4 rounded-md hover-elevate"
                     data-testid="mobile-link-portfolio"
                   >
                     <div className="font-medium">Portfolio</div>
                     <div className="text-sm text-white/60">Selected case studies</div>
-                  </a>
-                  <a 
+                  </Link>
+                  <Link
                     href="/insights"
+                    onClick={() => setMobileMenuOpen(false)}
                     className="text-left text-white/90 hover:text-white transition-colors py-3 px-4 rounded-md hover-elevate"
                     data-testid="mobile-link-insights"
                   >
                     <div className="font-medium">Thought Leadership</div>
                     <div className="text-sm text-white/60">Articles & Insights</div>
-                  </a>
+                  </Link>
                   <button 
                     onClick={() => {
                       setMobileMenuOpen(false);

@@ -1,14 +1,14 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "@/pages/home";
+import InsightsPage from "@/pages/insights";
+import PortfolioPage from "@/pages/portfolio";
 
-const InsightsPage = lazy(() => import("@/pages/insights"));
 const AdminPage = lazy(() => import("@/pages/admin"));
-const PortfolioPage = lazy(() => import("@/pages/portfolio"));
 
 function LoadingFallback() {
   return (
@@ -35,10 +35,27 @@ function Router() {
   );
 }
 
+function PrefetchOnIdle() {
+  useEffect(() => {
+    const prefetch = () => {
+      queryClient.prefetchQuery({ queryKey: ['/api/projects'] });
+      queryClient.prefetchQuery({ queryKey: ['/api/blog-posts'] });
+    };
+    const w = window as Window & { requestIdleCallback?: (cb: () => void) => number };
+    if (typeof w.requestIdleCallback === 'function') {
+      w.requestIdleCallback(prefetch);
+    } else {
+      setTimeout(prefetch, 1500);
+    }
+  }, []);
+  return null;
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <PrefetchOnIdle />
         <Toaster />
         <Router />
       </TooltipProvider>
