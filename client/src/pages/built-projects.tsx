@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
 import type { BuiltProjectRow } from '@shared/schema';
+import FloatingNav from '@/components/FloatingNav';
 
 const INK = 'hsl(220,25%,14%)';
 const PAPER = 'hsl(40,20%,97%)';
@@ -72,6 +73,8 @@ export default function BuiltProjectsPage() {
         a { text-decoration: none; }
         ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: hsl(220,20%,30%); }
       `}</style>
+
+      <FloatingNav />
 
       {/* LEFT PANEL */}
       <aside style={{ width: 340, background: INK, color: PAPER, position: 'sticky', top: 0, height: '100vh', display: 'flex', flexDirection: 'column', padding: '52px 44px', flexShrink: 0, overflowY: 'auto' }}>
