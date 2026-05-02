@@ -154,21 +154,20 @@ function Navigation({ scrollToSection }: { scrollToSection: (id: string) => void
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center gap-3">
+          <a href="/" className="flex items-center" aria-label="Mujeeb Lawal — Home">
             <img
               src="/logo-light.png"
               alt="Mujeeb Lawal"
-              className="w-10 h-10 object-contain block dark:hidden"
+              className="h-14 w-14 md:h-16 md:w-16 object-contain block dark:hidden"
               data-testid="img-logo-nav-light"
             />
             <img
               src="/logo-dark.png"
               alt="Mujeeb Lawal"
-              className="w-10 h-10 object-contain hidden dark:block"
+              className="h-14 w-14 md:h-16 md:w-16 object-contain hidden dark:block"
               data-testid="img-logo-nav-dark"
             />
-            <span className="font-display text-lg font-semibold text-white hidden sm:block">Mujeeb Lawal</span>
-          </div>
+          </a>
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
@@ -1151,6 +1150,14 @@ function HeroSection({ scrollToSection }: { scrollToSection: (id: string) => voi
         <div className="flex flex-col items-center text-center">
           <div className="space-y-6 md:space-y-8 max-w-5xl">
             <div className="space-y-4 md:space-y-6">
+              <div className="flex items-center justify-center gap-3 md:gap-4" data-testid="wordmark-name">
+                <span className="h-px w-8 md:w-12 bg-[hsl(var(--brand-primary))]/50" />
+                <span className="font-display text-xs md:text-sm font-semibold tracking-[0.3em] md:tracking-[0.4em] text-[hsl(var(--brand-primary))] uppercase">
+                  Mujeeb Lawal
+                </span>
+                <span className="h-px w-8 md:w-12 bg-[hsl(var(--brand-primary))]/50" />
+              </div>
+
               <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-green-500/20 border border-green-500/30">
                 <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                 <span className="text-xs md:text-sm font-medium text-green-300" data-testid="badge-status">
