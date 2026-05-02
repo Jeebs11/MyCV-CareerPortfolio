@@ -16,6 +16,7 @@ export const modules: ModuleMap = {
   "./components/mockups/site-counsel/ChambersSite.tsx": () => import("../components/mockups/site-counsel/ChambersSite.tsx"),
   "./components/mockups/site-counsel/CinematicSite.tsx": () => import("../components/mockups/site-counsel/CinematicSite.tsx"),
   "./components/mockups/site-counsel/ContrastSplitBlog.tsx": () => import("../components/mockups/site-counsel/ContrastSplitBlog.tsx"),
+  "./components/mockups/site-counsel/ContrastSplitPortfolio.tsx": () => import("../components/mockups/site-counsel/ContrastSplitPortfolio.tsx"),
   "./components/mockups/site-counsel/ContrastSplitPost.tsx": () => import("../components/mockups/site-counsel/ContrastSplitPost.tsx"),
   "./components/mockups/site-counsel/ContrastSplitProjects.tsx": () => import("../components/mockups/site-counsel/ContrastSplitProjects.tsx"),
   "./components/mockups/site-counsel/ContrastSplitSite.tsx": () => import("../components/mockups/site-counsel/ContrastSplitSite.tsx"),
