@@ -14,5 +14,8 @@ export const modules: ModuleMap = {
   "./components/mockups/portfolio/MagazineGrid.tsx": () => import("../components/mockups/portfolio/MagazineGrid.tsx"),
   "./components/mockups/site-counsel/AnnualReportSite.tsx": () => import("../components/mockups/site-counsel/AnnualReportSite.tsx"),
   "./components/mockups/site-counsel/ChambersSite.tsx": () => import("../components/mockups/site-counsel/ChambersSite.tsx"),
+  "./components/mockups/site-counsel/CinematicSite.tsx": () => import("../components/mockups/site-counsel/CinematicSite.tsx"),
+  "./components/mockups/site-counsel/ContrastSplitSite.tsx": () => import("../components/mockups/site-counsel/ContrastSplitSite.tsx"),
+  "./components/mockups/site-counsel/InkFoilSite.tsx": () => import("../components/mockups/site-counsel/InkFoilSite.tsx"),
   "./components/mockups/site-counsel/LetterheadSite.tsx": () => import("../components/mockups/site-counsel/LetterheadSite.tsx")
 };
