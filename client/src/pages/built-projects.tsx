@@ -116,7 +116,7 @@ export default function BuiltProjectsPage() {
 
         <div style={{ borderTop: '1px solid hsl(220,20%,22%)', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 10 }}>
           <Link href="/" style={{ fontSize: 12, color: 'hsl(220,15%,50%)' }}>← Back to Profile</Link>
-          <Link href="/insights" style={{ fontSize: 12, color: 'hsl(220,15%,50%)' }}>Insights</Link>
+          <Link href="/insights" style={{ fontSize: 12, color: 'hsl(220,15%,50%)' }}>Thought Leadership</Link>
         </div>
       </aside>
 

@@ -31,7 +31,7 @@ export default function InsightsPage() {
   const { data: blogPosts = [], isLoading } = useQuery<BlogPost[]>({ queryKey: ['/api/blog-posts'] });
 
   useEffect(() => {
-    document.title = "Insights — Mujeeb Lawal | Programme Delivery Practitioner's Notes";
+    document.title = "Thought Leadership — Mujeeb Lawal | Programme Delivery";
   }, []);
 
   const categories = ['All', ...Array.from(new Set(blogPosts.map(p => p.category)))];
@@ -60,7 +60,7 @@ export default function InsightsPage() {
         </Link>
 
         <div style={{ marginBottom: 40 }}>
-          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 32, fontWeight: 400, lineHeight: 1.1, color: PAPER, marginBottom: 8 }}>Insights</div>
+          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 32, fontWeight: 400, lineHeight: 1.1, color: PAPER, marginBottom: 8 }}>Thought Leadership</div>
           <div style={{ fontSize: 13, color: 'hsl(220,15%,50%)', lineHeight: 1.6 }}>Thought leadership on programme delivery, governance, and leading complex change at scale.</div>
         </div>
 
@@ -82,8 +82,7 @@ export default function InsightsPage() {
 
         <div style={{ borderTop: '1px solid hsl(220,20%,22%)', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 8 }}>
           <Link href="/" style={{ fontSize: 12, color: 'hsl(220,15%,50%)' }}>← Back to Profile</Link>
-          <Link href="/case-studies" style={{ fontSize: 12, color: 'hsl(220,15%,50%)' }}>Case Studies</Link>
-          <Link href="/projects" style={{ fontSize: 12, color: 'hsl(220,15%,50%)' }}>Built Projects</Link>
+          <Link href="/portfolio" style={{ fontSize: 12, color: 'hsl(220,15%,50%)' }}>Portfolio</Link>
         </div>
       </aside>
 

@@ -8,7 +8,7 @@ const BRASS_LIGHT = 'hsl(35,55%,62%)';
 const PAGES = [
   { href: '/', label: 'Profile' },
   { href: '/portfolio', label: 'Portfolio' },
-  { href: '/insights', label: 'Insights' },
+  { href: '/insights', label: 'Thought Leadership' },
 ];
 
 export default function FloatingNav() {
