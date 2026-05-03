@@ -115,6 +115,17 @@ export default function Home() {
   const linkedIn = settings['contact.linkedin_url'] || 'https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/';
   const copyright = settings['footer.copyright'] || '© 2025 Mujeeb Lawal. All rights reserved.';
 
+  const profileName = settings['profile.name'] || 'Mujeeb Lawal';
+  const profileTitle = settings['profile.title'] || 'Senior Programme Director';
+  const profileQuote = settings['profile.quote'] || '"A programme director who builds institutions, not just outputs — governing at scale, delivering under pressure, and leaving infrastructure behind."';
+  const profileBio = settings['profile.bio'] || '17 years leading complex change across financial services, telecoms, insurance, and sustainability. Comfortable at board level and delivery level simultaneously. PRINCE2 Practitioner, Certified Scrum Master. London and Dubai based.';
+  const pastEmployers = (settings['profile.past_employers'] || 'Mercer,GSMA,Simply Business,6Connex').split(',').map((e: string) => e.trim()).filter(Boolean);
+  const stats = [
+    { val: settings['profile.stat1_val'] || '£50M+', label: settings['profile.stat1_label'] || 'Programmes led' },
+    { val: settings['profile.stat2_val'] || '17 yrs', label: settings['profile.stat2_label'] || 'Experience' },
+    { val: settings['profile.stat3_val'] || '34', label: settings['profile.stat3_label'] || 'Largest team' },
+  ];
+
   const s = (id: string, el: HTMLElement | null) => { sectionRefs.current[id] = el; };
   const P = isMobile ? 24 : 64;
 
@@ -145,11 +156,11 @@ export default function Home() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
                   <rect width="40" height="40" rx="2" fill={BRASS} />
-                  <text x="20" y="27" textAnchor="middle" fontFamily="Cormorant Garamond,serif" fontWeight="600" fontSize="15" fill={PAPER}>ML</text>
+                  <text x="20" y="27" textAnchor="middle" fontFamily="Cormorant Garamond,serif" fontWeight="600" fontSize="15" fill={PAPER}>{profileName.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()}</text>
                 </svg>
                 <div>
-                  <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 17, fontWeight: 400, color: PAPER, lineHeight: 1 }}>Mujeeb Lawal</div>
-                  <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: BRASS_LIGHT, marginTop: 2 }}>Senior Programme Director</div>
+                  <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 17, fontWeight: 400, color: PAPER, lineHeight: 1 }}>{profileName}</div>
+                  <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: BRASS_LIGHT, marginTop: 2 }}>{profileTitle}</div>
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -176,11 +187,13 @@ export default function Home() {
           /* ── DESKTOP LEFT PANEL ── */
           <>
             <div style={{ marginBottom: 40 }}>
-              <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 44, fontWeight: 400, lineHeight: 1.05, color: PAPER, marginBottom: 10 }}>Mujeeb<br />Lawal</div>
-              <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: BRASS_LIGHT }}>Senior Programme Director</div>
+              <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 44, fontWeight: 400, lineHeight: 1.05, color: PAPER, marginBottom: 10 }}>
+                {(() => { const idx = profileName.indexOf(' '); return idx >= 0 ? <>{profileName.slice(0, idx)}<br />{profileName.slice(idx + 1)}</> : profileName; })()}
+              </div>
+              <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: BRASS_LIGHT }}>{profileTitle}</div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', marginBottom: 44, borderTop: '1px solid hsl(220,20%,25%)' }}>
-              {[{ val: '£50M+', label: 'Programmes led' }, { val: '17 yrs', label: 'Experience' }, { val: '34', label: 'Largest team' }].map((stat, i) => (
+              {stats.map((stat, i) => (
                 <div key={i} style={{ padding: '16px 0', borderBottom: '1px solid hsl(220,20%,25%)', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                   <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 28, fontWeight: 500, color: BRASS_LIGHT }}>{stat.val}</div>
                   <div style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'hsl(220,15%,50%)' }}>{stat.label}</div>
@@ -213,7 +226,7 @@ export default function Home() {
         {/* Stats strip on mobile */}
         {isMobile && (
           <div style={{ display: 'flex', borderBottom: `1px solid ${HAIRLINE}` }}>
-            {[{ val: '£50M+', label: 'Led' }, { val: '17 yrs', label: 'Experience' }, { val: '34', label: 'Team' }].map((stat, i) => (
+            {stats.map((stat, i) => (
               <div key={i} style={{ flex: 1, padding: '16px 0', textAlign: 'center', borderRight: i < 2 ? `1px solid ${HAIRLINE}` : 'none' }}>
                 <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 500, color: BRASS }}>{stat.val}</div>
                 <div style={{ fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: MUTED, marginTop: 2 }}>{stat.label}</div>
@@ -227,14 +240,14 @@ export default function Home() {
           <SectionRule label="Profile" isMobile={isMobile} />
           <div style={{ padding: `0 ${P}px` }}>
             <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: isMobile ? 20 : 26, fontWeight: 400, lineHeight: 1.5, color: INK, maxWidth: 620, marginBottom: 24, fontStyle: 'italic' }}>
-              "A programme director who builds institutions, not just outputs — governing at scale, delivering under pressure, and leaving infrastructure behind."
+              {profileQuote}
             </p>
             <p style={{ fontSize: isMobile ? 13 : 14, lineHeight: 1.8, color: 'hsl(220,15%,40%)', maxWidth: 600, marginBottom: 36 }}>
-              17 years leading complex change across financial services, telecoms, insurance, and sustainability. Comfortable at board level and delivery level simultaneously. PRINCE2 Practitioner, Certified Scrum Master. London and Dubai based.
+              {profileBio}
             </p>
             <div style={{ display: 'flex', gap: isMobile ? 16 : 40, alignItems: 'center', flexWrap: 'wrap' }}>
               <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'hsl(220,15%,55%)', flexShrink: 0 }}>Past employers</div>
-              {['Mercer', 'GSMA', 'Simply Business', '6Connex'].map(c => (
+              {pastEmployers.map((c: string) => (
                 <div key={c} style={{ fontSize: isMobile ? 12 : 13, fontWeight: 600, color: 'hsl(220,25%,25%)', letterSpacing: '0.02em' }}>{c}</div>
               ))}
             </div>

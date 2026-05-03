@@ -15,8 +15,8 @@ Professional portfolio for Mujeeb Lawal, Senior Programme Director with 17+ year
 -   **Variant E Layout**: 340px dark sticky left panel (ink `hsl(220,25%,14%)`) + full-height scrollable light right panel (paper `hsl(40,20%,97%)`). Brass accent `hsl(35,45%,45%)`. Scrollspy nav highlights active section.
 -   **Self-Managed Blog / Insights**: ReactQuill WYSIWYG editor, DOMPurify sanitization, hero image support, admin-managed.
 -   **CV Download with Contact Capture**: Name/email/phone modal → immediate blob download + DB lead capture.
--   **Admin Dashboard**: Bearer-auth protected. Tabs: Blog, Case Studies, Built Projects, CV Management, Career, Skills, Certifications, Education, Settings, Appearance.
--   **Admin-Managed Site Content**: All hero copy, flagship wins, skills, certifications, education, career roles editable from admin.
+-   **Admin Dashboard**: Bearer-auth protected. 11 tabs (flex-wrap, 2 rows): Blog, Case Studies, Built Projects, CV, Career, Skills, Certifications, Education, Achievements, Site Content, Appearance.
+-   **Admin-Managed Site Content**: All profile copy (name, title, quote, bio, past employers, stats), hero copy, flagship wins, skills, certifications, education, career roles editable from admin via Site Content tab. Profile Panel settings keys: `profile.name`, `profile.title`, `profile.quote`, `profile.bio`, `profile.past_employers`, `profile.stat{1,2,3}_{val,label}`.
 -   **Theme/Appearance**: CSS variable tokens (`--brand-primary`, `--brand-accent`, `--background`, `--font-sans`, `--font-display`) served via `/api/theme.css` with admin colour/font picker and live preview.
 
 ## Recent Changes (May 2026)

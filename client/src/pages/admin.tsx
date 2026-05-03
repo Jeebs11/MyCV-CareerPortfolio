@@ -894,41 +894,29 @@ export default function AdminPage() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="bg-white/5 border border-white/10 mb-8">
-            <TabsTrigger 
-              value="blog" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--brand-primary))] data-[state=active]:to-[hsl(var(--brand-accent))] data-[state=active]:text-white"
-              data-testid="tab-blog"
-            >
-              Blog Management
-            </TabsTrigger>
-            <TabsTrigger 
-              value="projects" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--brand-primary))] data-[state=active]:to-[hsl(var(--brand-accent))] data-[state=active]:text-white"
-              data-testid="tab-projects"
-            >
-              Case Studies
-            </TabsTrigger>
-            <TabsTrigger 
-              value="built-projects" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--brand-primary))] data-[state=active]:to-[hsl(var(--brand-accent))] data-[state=active]:text-white"
-              data-testid="tab-built-projects"
-            >
-              Built Projects
-            </TabsTrigger>
-            <TabsTrigger 
-              value="cv" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--brand-primary))] data-[state=active]:to-[hsl(var(--brand-accent))] data-[state=active]:text-white"
-              data-testid="tab-cv"
-            >
-              CV Management
-            </TabsTrigger>
-            <TabsTrigger value="career" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--brand-primary))] data-[state=active]:to-[hsl(var(--brand-accent))] data-[state=active]:text-white" data-testid="tab-career">Career Roles</TabsTrigger>
-            <TabsTrigger value="skills" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--brand-primary))] data-[state=active]:to-[hsl(var(--brand-accent))] data-[state=active]:text-white" data-testid="tab-skills">Skills</TabsTrigger>
-            <TabsTrigger value="certifications" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--brand-primary))] data-[state=active]:to-[hsl(var(--brand-accent))] data-[state=active]:text-white" data-testid="tab-certifications">Certifications</TabsTrigger>
-            <TabsTrigger value="education" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--brand-primary))] data-[state=active]:to-[hsl(var(--brand-accent))] data-[state=active]:text-white" data-testid="tab-education">Education</TabsTrigger>
-            <TabsTrigger value="settings" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--brand-primary))] data-[state=active]:to-[hsl(var(--brand-accent))] data-[state=active]:text-white" data-testid="tab-settings">Site Content</TabsTrigger>
-            <TabsTrigger value="appearance" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--brand-primary))] data-[state=active]:to-[hsl(var(--brand-accent))] data-[state=active]:text-white" data-testid="tab-appearance">Appearance</TabsTrigger>
+          <TabsList className="bg-white/5 border border-white/10 mb-8 h-auto flex-wrap gap-1 p-1.5 justify-start">
+            {[
+              { value: 'blog', label: 'Blog' },
+              { value: 'projects', label: 'Case Studies' },
+              { value: 'built-projects', label: 'Built Projects' },
+              { value: 'cv', label: 'CV' },
+              { value: 'career', label: 'Career' },
+              { value: 'skills', label: 'Skills' },
+              { value: 'certifications', label: 'Certifications' },
+              { value: 'education', label: 'Education' },
+              { value: 'flagship', label: 'Achievements' },
+              { value: 'settings', label: 'Site Content' },
+              { value: 'appearance', label: 'Appearance' },
+            ].map(t => (
+              <TabsTrigger
+                key={t.value}
+                value={t.value}
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--brand-primary))] data-[state=active]:to-[hsl(var(--brand-accent))] data-[state=active]:text-white text-white/60 text-sm"
+                data-testid={`tab-${t.value}`}
+              >
+                {t.label}
+              </TabsTrigger>
+            ))}
           </TabsList>
 
           {/* Blog Management Tab */}
@@ -1389,7 +1377,7 @@ export default function AdminPage() {
                   <DialogTitle>{editingProject ? 'Edit Project' : 'New Project'}</DialogTitle>
                 </DialogHeader>
                 <Form {...projectForm}>
-                  <form onSubmit={projectForm.handleSubmit(onProjectSubmit)} className="space-y-4">
+                  <form onSubmit={projectForm.handleSubmit(onProjectSubmit)} className="space-y-4 [&_input:not([type=checkbox])]:bg-white/10 [&_input:not([type=checkbox])]:border-white/20 [&_input:not([type=checkbox])]:text-white [&_input:not([type=checkbox])]:placeholder:text-white/40 [&_textarea]:bg-white/10 [&_textarea]:border-white/20 [&_textarea]:text-white [&_textarea]:placeholder:text-white/40 [&_label:not([class*=checkbox])]:text-white/90 [&_[class~=text-muted-foreground]]:!text-white/50">
                     <FormField
                       control={projectForm.control}
                       name="title"
@@ -2054,11 +2042,11 @@ export default function AdminPage() {
           <TabsContent value="education" className="space-y-6">
             <SiteEducationAdmin adminPassword={adminPassword} />
           </TabsContent>
+          <TabsContent value="flagship" className="space-y-6">
+            <FlagshipWinsAdmin adminPassword={adminPassword} />
+          </TabsContent>
           <TabsContent value="settings" className="space-y-6">
             <SiteSettingsAdmin adminPassword={adminPassword} />
-            <div className="border-t border-white/10 pt-6">
-              <FlagshipWinsAdmin adminPassword={adminPassword} />
-            </div>
           </TabsContent>
           <TabsContent value="appearance" className="space-y-6">
             <AppearanceAdmin adminPassword={adminPassword} />

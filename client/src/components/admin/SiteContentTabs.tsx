@@ -465,6 +465,22 @@ export function SiteSkillsAdmin({ adminPassword }: AdminProps) {
 // ============ SITE SETTINGS TAB ============
 const SETTING_GROUPS: { label: string; keys: { key: string; label: string; multi?: boolean }[] }[] = [
   {
+    label: 'Profile Panel',
+    keys: [
+      { key: 'profile.name', label: 'Full name (shown in left panel)' },
+      { key: 'profile.title', label: 'Job title / tagline' },
+      { key: 'profile.quote', label: 'Profile quote (italic, shown in Profile section)', multi: true },
+      { key: 'profile.bio', label: 'Bio paragraph (shown below quote)', multi: true },
+      { key: 'profile.past_employers', label: 'Past employers — comma-separated (e.g. Mercer,GSMA,Simply Business)' },
+      { key: 'profile.stat1_val', label: 'Stat 1 — value (e.g. £50M+)' },
+      { key: 'profile.stat1_label', label: 'Stat 1 — label (e.g. Programmes led)' },
+      { key: 'profile.stat2_val', label: 'Stat 2 — value (e.g. 17 yrs)' },
+      { key: 'profile.stat2_label', label: 'Stat 2 — label (e.g. Experience)' },
+      { key: 'profile.stat3_val', label: 'Stat 3 — value (e.g. 34)' },
+      { key: 'profile.stat3_label', label: 'Stat 3 — label (e.g. Largest team)' },
+    ],
+  },
+  {
     label: 'Hero Section',
     keys: [
       { key: 'hero.status_badge', label: 'Status badge text' },
