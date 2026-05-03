@@ -21,6 +21,19 @@ Professional portfolio for Mujeeb Lawal, Senior Programme Director with 17+ year
 
 ## Recent Changes (May 2026)
 
+### Mobile Optimisation — All 4 Public Pages
+All four public pages now fully respond to mobile viewports (breakpoint: 768px) using a `useIsMobile()` hook:
+- **Layout**: root `flexDirection` switches `column`; left panel becomes a compact sticky top bar (name + title + CV button + hamburger nav)
+- **Home (`/`)**: hamburger drawer with all section nav links; 3-column stats strip below header; all 2/3-column grids collapse to 1-column; padding `0 24px` (vs `0 64px` desktop)
+- **Case Studies (`/case-studies`)**: mandate selector becomes a horizontal-scroll tab strip below the header
+- **Portfolio (`/portfolio`)**: type filter becomes a horizontal-scroll strip; card grid goes to 1-column; image hover-reveal disabled on mobile
+- **Insights (`/insights`)**: category filter becomes a horizontal-scroll strip; article modal full-width
+- `SectionRule` padding adjusts to 24px on mobile
+- All font sizes, grids, and padding scale appropriately
+
+### Favicon Fix
+Favicon placed in correct Vite publicDir (`client/public/favicon.svg`) — previously was in root `public/` which Vite doesn't serve. Drawn as SVG paths for cross-browser reliability; `?v=3` cache-bust in `client/index.html`.
+
 ### Variant E "Contrast Split" — Full Site Graduation (Option C dividers)
 All public pages have been fully redesigned to Variant E. The user selected **Option C "Full-width Section Dividers"** from a canvas mockup — a centered brass rule (brass `hsl(35,45%,45%)`, 35% opacity) with a small-caps label spanning the full width of the right panel, replacing the old thin hairline `borderBottom` + inline section-label pattern.
 

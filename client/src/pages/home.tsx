@@ -13,7 +13,7 @@ const MUTED = 'hsl(220,12%,52%)';
 
 const NAV_ITEMS = [
   { id: 'profile', label: 'Profile' },
-  { id: 'mandates', label: 'Selected Mandates' },
+  { id: 'mandates', label: 'Achievements' },
   { id: 'career', label: 'Career' },
   { id: 'capability', label: 'Capability' },
   { id: 'education', label: 'Education' },
@@ -23,9 +23,19 @@ const NAV_ITEMS = [
 interface SiteSettings { [key: string]: string }
 interface CVForm { name: string; email: string; phone: string }
 
-function SectionRule({ label }: { label: string }) {
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
+  return isMobile;
+}
+
+function SectionRule({ label, isMobile }: { label: string; isMobile: boolean }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', padding: '0 64px', marginBottom: 40 }}>
+    <div style={{ display: 'flex', alignItems: 'center', padding: `0 ${isMobile ? 24 : 64}px`, marginBottom: 40 }}>
       <div style={{ fontSize: 8.5, fontWeight: 600, letterSpacing: '0.28em', textTransform: 'uppercase', color: BRASS, flexShrink: 0, paddingRight: 20 }}>{label}</div>
       <div style={{ flex: 1, height: 1, background: BRASS, opacity: 0.35 }} />
     </div>
@@ -33,7 +43,9 @@ function SectionRule({ label }: { label: string }) {
 }
 
 export default function Home() {
+  const isMobile = useIsMobile();
   const [activeSection, setActiveSection] = useState('profile');
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [cvModalOpen, setCvModalOpen] = useState(false);
   const [cvForm, setCvForm] = useState<CVForm>({ name: '', email: '', phone: '' });
   const [cvSubmitting, setCvSubmitting] = useState(false);
@@ -52,46 +64,43 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const root = mainRef.current;
-    if (!root) return;
+    const root = isMobile ? null : mainRef.current;
     const observer = new IntersectionObserver(
       (entries) => { entries.forEach(entry => { if (entry.isIntersecting) setActiveSection(entry.target.id); }); },
-      { root, threshold: 0.35 }
+      { root, threshold: 0.25 }
     );
     Object.values(sectionRefs.current).forEach(el => { if (el) observer.observe(el); });
     return () => observer.disconnect();
-  }, []);
+  }, [isMobile]);
 
   const scrollTo = (id: string) => {
     const el = sectionRefs.current[id];
-    const root = mainRef.current;
-    if (el && root) root.scrollTo({ top: el.offsetTop, behavior: 'smooth' });
+    setMobileNavOpen(false);
+    if (!el) return;
+    if (isMobile) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      const root = mainRef.current;
+      if (root) root.scrollTo({ top: el.offsetTop, behavior: 'smooth' });
+    }
   };
 
   const handleCVDownload = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!cvForm.name || !cvForm.email) { setCvError('Name and email are required.'); return; }
-    setCvSubmitting(true);
-    setCvError('');
+    setCvSubmitting(true); setCvError('');
     try {
       const res = await fetch('/api/cv/download', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(cvForm),
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(cvForm),
       });
       if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.error || 'Download failed'); }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = 'Mujeeb_Lawal_CV.pdf'; a.click();
+      const a = document.createElement('a'); a.href = url; a.download = 'Mujeeb_Lawal_CV.pdf'; a.click();
       URL.revokeObjectURL(url);
-      setCvModalOpen(false);
-      setCvForm({ name: '', email: '', phone: '' });
-    } catch (err: any) {
-      setCvError(err.message || 'Something went wrong');
-    } finally {
-      setCvSubmitting(false);
-    }
+      setCvModalOpen(false); setCvForm({ name: '', email: '', phone: '' });
+    } catch (err: any) { setCvError(err.message || 'Something went wrong'); }
+    finally { setCvSubmitting(false); }
   };
 
   const methodologies = skills.filter(s => s.category === 'methodology').map(s => s.name);
@@ -107,9 +116,10 @@ export default function Home() {
   const copyright = settings['footer.copyright'] || '© 2025 Mujeeb Lawal. All rights reserved.';
 
   const s = (id: string, el: HTMLElement | null) => { sectionRefs.current[id] = el; };
+  const P = isMobile ? 24 : 64;
 
   return (
-    <div style={{ fontFamily: 'Inter, sans-serif', display: 'flex', height: '100vh', overflow: 'hidden' }}>
+    <div style={{ fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: isMobile ? 'column' : 'row', height: isMobile ? 'auto' : '100vh', overflow: isMobile ? 'visible' : 'hidden' }}>
       <style>{`
         * { box-sizing: border-box; margin: 0; padding: 0; }
         a { text-decoration: none; }
@@ -117,80 +127,115 @@ export default function Home() {
       `}</style>
       <FloatingNav />
 
-      {/* ── LEFT PANEL ── */}
-      <aside style={{ width: 340, background: INK, color: PAPER, height: '100vh', display: 'flex', flexDirection: 'column', padding: '52px 44px', flexShrink: 0, overflowY: 'auto' }}>
-        <div style={{ marginBottom: 40 }}>
-          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 44, fontWeight: 400, lineHeight: 1.05, color: PAPER, marginBottom: 10 }}>Mujeeb<br />Lawal</div>
-          <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: BRASS_LIGHT }}>Senior Programme Director</div>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', marginBottom: 44, borderTop: '1px solid hsl(220,20%,25%)' }}>
-          {[
-            { val: '£50M+', label: 'Programmes led' },
-            { val: '17 yrs', label: 'Experience' },
-            { val: '34', label: 'Largest team' },
-          ].map((stat, i) => (
-            <div key={i} style={{ padding: '16px 0', borderBottom: '1px solid hsl(220,20%,25%)', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 28, fontWeight: 500, color: BRASS_LIGHT }}>{stat.val}</div>
-              <div style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'hsl(220,15%,50%)' }}>{stat.label}</div>
+      {/* ── LEFT PANEL / MOBILE HEADER ── */}
+      <aside style={{
+        width: isMobile ? '100%' : 340,
+        background: INK, color: PAPER,
+        position: 'sticky', top: 0, zIndex: 100,
+        height: isMobile ? 'auto' : '100vh',
+        display: 'flex', flexDirection: 'column',
+        padding: isMobile ? '0' : '52px 44px',
+        flexShrink: 0,
+        overflowY: isMobile ? 'visible' : 'auto',
+      }}>
+        {isMobile ? (
+          /* ── MOBILE COMPACT HEADER ── */
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', borderBottom: '1px solid hsl(220,20%,22%)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
+                  <rect width="40" height="40" rx="2" fill={BRASS} />
+                  <text x="20" y="27" textAnchor="middle" fontFamily="Cormorant Garamond,serif" fontWeight="600" fontSize="15" fill={PAPER}>ML</text>
+                </svg>
+                <div>
+                  <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 17, fontWeight: 400, color: PAPER, lineHeight: 1 }}>Mujeeb Lawal</div>
+                  <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: BRASS_LIGHT, marginTop: 2 }}>Senior Programme Director</div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <button onClick={() => setCvModalOpen(true)} style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: INK, background: BRASS, padding: '8px 14px', border: 'none', cursor: 'pointer' }}>CV</button>
+                <button onClick={() => setMobileNavOpen(o => !o)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 5, padding: 4 }}>
+                  {[0,1,2].map(i => <span key={i} style={{ display: 'block', width: 22, height: 1.5, background: PAPER }} />)}
+                </button>
+              </div>
             </div>
-          ))}
-        </div>
-
-        <nav style={{ flex: 1 }}>
-          {NAV_ITEMS.map(item => (
-            <button
-              key={item.id}
-              onClick={() => scrollTo(item.id)}
-              data-testid={`nav-${item.id}`}
-              style={{
-                display: 'block', width: '100%', textAlign: 'left',
-                padding: '12px 0 12px 12px', background: 'none', border: 'none', cursor: 'pointer',
-                fontSize: 11, fontWeight: activeSection === item.id ? 600 : 400,
-                letterSpacing: '0.16em', textTransform: 'uppercase',
-                color: activeSection === item.id ? BRASS_LIGHT : 'hsl(220,15%,50%)',
-                borderLeft: activeSection === item.id ? `2px solid ${BRASS_LIGHT}` : '2px solid transparent',
-                transition: 'all 0.15s',
-              }}
-            >{item.label}</button>
-          ))}
-
-          <div style={{ marginTop: 24, paddingTop: 24, borderTop: '1px solid hsl(220,20%,22%)' }}>
-            <Link href="/portfolio" style={{ display: 'block', padding: '10px 0 10px 12px', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'hsl(220,15%,42%)', borderLeft: '2px solid transparent' }}>Portfolio</Link>
-            <Link href="/insights" style={{ display: 'block', padding: '10px 0 10px 12px', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'hsl(220,15%,42%)', borderLeft: '2px solid transparent' }}>Thought Leadership</Link>
-          </div>
-        </nav>
-
-        <div style={{ marginTop: 36, display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <a href={`mailto:${email}`} style={{ fontSize: 12, color: 'hsl(220,15%,55%)', textDecoration: 'none' }}>{email}</a>
-          <a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: 'hsl(220,15%,55%)', textDecoration: 'none' }}>WhatsApp: {phoneUAE}</a>
-          <div style={{ marginTop: 12 }}>
-            <button
-              data-testid="btn-download-cv"
-              onClick={() => setCvModalOpen(true)}
-              style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: INK, background: BRASS, padding: '10px 20px', border: 'none', cursor: 'pointer' }}
-            >Download CV</button>
-          </div>
-        </div>
+            {/* Mobile nav drawer */}
+            {mobileNavOpen && (
+              <div style={{ background: INK, borderBottom: '1px solid hsl(220,20%,22%)', padding: '12px 24px 16px' }}>
+                {NAV_ITEMS.map(item => (
+                  <button key={item.id} onClick={() => scrollTo(item.id)} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 0', background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'hsl(220,15%,60%)', borderBottom: '1px solid hsl(220,20%,20%)' }}>{item.label}</button>
+                ))}
+                <div style={{ display: 'flex', gap: 20, marginTop: 12 }}>
+                  <Link href="/portfolio" onClick={() => setMobileNavOpen(false)} style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'hsl(220,15%,45%)' }}>Portfolio</Link>
+                  <Link href="/insights" onClick={() => setMobileNavOpen(false)} style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'hsl(220,15%,45%)' }}>Thought Leadership</Link>
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
+          /* ── DESKTOP LEFT PANEL ── */
+          <>
+            <div style={{ marginBottom: 40 }}>
+              <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 44, fontWeight: 400, lineHeight: 1.05, color: PAPER, marginBottom: 10 }}>Mujeeb<br />Lawal</div>
+              <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: BRASS_LIGHT }}>Senior Programme Director</div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', marginBottom: 44, borderTop: '1px solid hsl(220,20%,25%)' }}>
+              {[{ val: '£50M+', label: 'Programmes led' }, { val: '17 yrs', label: 'Experience' }, { val: '34', label: 'Largest team' }].map((stat, i) => (
+                <div key={i} style={{ padding: '16px 0', borderBottom: '1px solid hsl(220,20%,25%)', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                  <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 28, fontWeight: 500, color: BRASS_LIGHT }}>{stat.val}</div>
+                  <div style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'hsl(220,15%,50%)' }}>{stat.label}</div>
+                </div>
+              ))}
+            </div>
+            <nav style={{ flex: 1 }}>
+              {NAV_ITEMS.map(item => (
+                <button key={item.id} onClick={() => scrollTo(item.id)} data-testid={`nav-${item.id}`} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '12px 0 12px 12px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: activeSection === item.id ? 600 : 400, letterSpacing: '0.16em', textTransform: 'uppercase', color: activeSection === item.id ? BRASS_LIGHT : 'hsl(220,15%,50%)', borderLeft: activeSection === item.id ? `2px solid ${BRASS_LIGHT}` : '2px solid transparent', transition: 'all 0.15s' }}>{item.label}</button>
+              ))}
+              <div style={{ marginTop: 24, paddingTop: 24, borderTop: '1px solid hsl(220,20%,22%)' }}>
+                <Link href="/portfolio" style={{ display: 'block', padding: '10px 0 10px 12px', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'hsl(220,15%,42%)', borderLeft: '2px solid transparent' }}>Portfolio</Link>
+                <Link href="/insights" style={{ display: 'block', padding: '10px 0 10px 12px', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'hsl(220,15%,42%)', borderLeft: '2px solid transparent' }}>Thought Leadership</Link>
+              </div>
+            </nav>
+            <div style={{ marginTop: 36, display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <a href={`mailto:${email}`} style={{ fontSize: 12, color: 'hsl(220,15%,55%)' }}>{email}</a>
+              <a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: 'hsl(220,15%,55%)' }}>WhatsApp: {phoneUAE}</a>
+              <div style={{ marginTop: 12 }}>
+                <button data-testid="btn-download-cv" onClick={() => setCvModalOpen(true)} style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: INK, background: BRASS, padding: '10px 20px', border: 'none', cursor: 'pointer' }}>Download CV</button>
+              </div>
+            </div>
+          </>
+        )}
       </aside>
 
       {/* ── RIGHT PANEL ── */}
-      <main ref={mainRef} style={{ flex: 1, background: PAPER, overflowY: 'auto', height: '100vh' }}>
+      <main ref={mainRef} style={{ flex: 1, background: PAPER, overflowY: isMobile ? 'visible' : 'auto', height: isMobile ? 'auto' : '100vh' }}>
+
+        {/* Stats strip on mobile */}
+        {isMobile && (
+          <div style={{ display: 'flex', borderBottom: `1px solid ${HAIRLINE}` }}>
+            {[{ val: '£50M+', label: 'Led' }, { val: '17 yrs', label: 'Experience' }, { val: '34', label: 'Team' }].map((stat, i) => (
+              <div key={i} style={{ flex: 1, padding: '16px 0', textAlign: 'center', borderRight: i < 2 ? `1px solid ${HAIRLINE}` : 'none' }}>
+                <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 500, color: BRASS }}>{stat.val}</div>
+                <div style={{ fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: MUTED, marginTop: 2 }}>{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* PROFILE */}
-        <section id="profile" ref={el => s('profile', el)} style={{ paddingTop: 64, paddingBottom: 56 }}>
-          <SectionRule label="Profile" />
-          <div style={{ padding: '0 64px' }}>
-            <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 26, fontWeight: 400, lineHeight: 1.5, color: INK, maxWidth: 620, marginBottom: 32, fontStyle: 'italic' }}>
+        <section id="profile" ref={el => s('profile', el)} style={{ paddingTop: isMobile ? 40 : 64, paddingBottom: 56 }}>
+          <SectionRule label="Profile" isMobile={isMobile} />
+          <div style={{ padding: `0 ${P}px` }}>
+            <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: isMobile ? 20 : 26, fontWeight: 400, lineHeight: 1.5, color: INK, maxWidth: 620, marginBottom: 24, fontStyle: 'italic' }}>
               "A programme director who builds institutions, not just outputs — governing at scale, delivering under pressure, and leaving infrastructure behind."
             </p>
-            <p style={{ fontSize: 14, lineHeight: 1.8, color: 'hsl(220,15%,40%)', maxWidth: 600, marginBottom: 44 }}>
+            <p style={{ fontSize: isMobile ? 13 : 14, lineHeight: 1.8, color: 'hsl(220,15%,40%)', maxWidth: 600, marginBottom: 36 }}>
               17 years leading complex change across financial services, telecoms, insurance, and sustainability. Comfortable at board level and delivery level simultaneously. PRINCE2 Practitioner, Certified Scrum Master. London and Dubai based.
             </p>
-            <div style={{ display: 'flex', gap: 40, alignItems: 'center', flexWrap: 'wrap' }}>
-              <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'hsl(220,15%,55%)' }}>Past employers</div>
+            <div style={{ display: 'flex', gap: isMobile ? 16 : 40, alignItems: 'center', flexWrap: 'wrap' }}>
+              <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'hsl(220,15%,55%)', flexShrink: 0 }}>Past employers</div>
               {['Mercer', 'GSMA', 'Simply Business', '6Connex'].map(c => (
-                <div key={c} style={{ fontSize: 13, fontWeight: 600, color: 'hsl(220,25%,25%)', letterSpacing: '0.02em' }}>{c}</div>
+                <div key={c} style={{ fontSize: isMobile ? 12 : 13, fontWeight: 600, color: 'hsl(220,25%,25%)', letterSpacing: '0.02em' }}>{c}</div>
               ))}
             </div>
           </div>
@@ -198,36 +243,36 @@ export default function Home() {
 
         {/* MANDATES */}
         <section id="mandates" ref={el => s('mandates', el)} style={{ paddingBottom: 56 }}>
-          <SectionRule label="Top Key Achievements" />
-          <div style={{ padding: '0 64px', display: 'flex', flexDirection: 'column', gap: 40 }}>
+          <SectionRule label="Top Key Achievements" isMobile={isMobile} />
+          <div style={{ padding: `0 ${P}px`, display: 'flex', flexDirection: 'column', gap: isMobile ? 32 : 40 }}>
             {flagshipWins.length > 0
               ? flagshipWins.slice(0, 3).map((win, i) => (
-                <div key={win.id} style={{ display: 'grid', gridTemplateColumns: '56px 1fr', gap: 0 }}>
-                  <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 300, color: 'hsl(40,15%,82%)', lineHeight: 1 }}>0{i + 1}</div>
+                <div key={win.id} style={{ display: 'grid', gridTemplateColumns: isMobile ? '40px 1fr' : '56px 1fr', gap: 0 }}>
+                  <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: isMobile ? 28 : 36, fontWeight: 300, color: 'hsl(40,15%,82%)', lineHeight: 1 }}>0{i + 1}</div>
                   <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
-                      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 500, color: INK }}>{win.title}</div>
-                      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 20, fontWeight: 500, color: BRASS }}>{(win.metrics as string[])?.[0] || ''}</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4, flexWrap: 'wrap', gap: 8 }}>
+                      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: isMobile ? 18 : 22, fontWeight: 500, color: INK }}>{win.title}</div>
+                      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: isMobile ? 17 : 20, fontWeight: 500, color: BRASS }}>{(win.metrics as string[])?.[0] || ''}</div>
                     </div>
-                    <div style={{ fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'hsl(220,15%,55%)', marginBottom: 12 }}>{win.company} · {win.period}</div>
-                    <div style={{ fontSize: 13, lineHeight: 1.75, color: 'hsl(220,15%,40%)' }}>{(win.metrics as string[])?.slice(1).join(' · ')}</div>
+                    <div style={{ fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'hsl(220,15%,55%)', marginBottom: 10 }}>{win.company} · {win.period}</div>
+                    <div style={{ fontSize: isMobile ? 12 : 13, lineHeight: 1.75, color: 'hsl(220,15%,40%)' }}>{(win.metrics as string[])?.slice(1).join(' · ')}</div>
                   </div>
                 </div>
               ))
               : [
-                { num: '01', title: 'PMO Build — Mercer', metric: '+36% efficiency', sub: 'Financial Services · 2022–24', body: 'Built PMO governance, tooling, and reporting framework from scratch for a 34-person cross-functional team. Board-level Power BI dashboard delivered in week six.' },
-                { num: '02', title: 'FCA Regulatory Programme — Simply Business', metric: '£1.2M on time', sub: 'Insurance · 2020–22', body: 'Led FCA-mandated change across underwriting and claims. Zero compliance breaches. Coordinated 12-person team across two time-zones with full audit trail.' },
-                { num: '03', title: 'UN SDG Energy Mandate — 6Connex', metric: '−35% energy', sub: 'SaaS / Sustainability · 2018–20', body: 'Infrastructure rationalisation aligned to UN SDG targets. Quarterly board reporting against measurable reduction milestones. Recognised by the UN Global Compact.' },
+                { num: '01', title: 'PMO Build — Mercer', metric: '+36% efficiency', sub: 'Financial Services · 2022–24', body: 'Built PMO governance, tooling, and reporting framework from scratch for a 34-person cross-functional team.' },
+                { num: '02', title: 'FCA Regulatory Programme — Simply Business', metric: '£1.2M on time', sub: 'Insurance · 2020–22', body: 'Led FCA-mandated change across underwriting and claims. Zero compliance breaches.' },
+                { num: '03', title: 'UN SDG Energy Mandate — 6Connex', metric: '−35% energy', sub: 'SaaS / Sustainability · 2018–20', body: 'Infrastructure rationalisation aligned to UN SDG targets. Recognised by the UN Global Compact.' },
               ].map((m, i) => (
-                <div key={i} style={{ display: 'grid', gridTemplateColumns: '56px 1fr', gap: 0 }}>
-                  <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 300, color: 'hsl(40,15%,82%)', lineHeight: 1 }}>{m.num}</div>
+                <div key={i} style={{ display: 'grid', gridTemplateColumns: isMobile ? '40px 1fr' : '56px 1fr', gap: 0 }}>
+                  <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: isMobile ? 28 : 36, fontWeight: 300, color: 'hsl(40,15%,82%)', lineHeight: 1 }}>{m.num}</div>
                   <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
-                      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 500, color: INK }}>{m.title}</div>
-                      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 20, fontWeight: 500, color: BRASS }}>{m.metric}</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4, flexWrap: 'wrap', gap: 8 }}>
+                      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: isMobile ? 18 : 22, fontWeight: 500, color: INK }}>{m.title}</div>
+                      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: isMobile ? 17 : 20, fontWeight: 500, color: BRASS }}>{m.metric}</div>
                     </div>
-                    <div style={{ fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'hsl(220,15%,55%)', marginBottom: 12 }}>{m.sub}</div>
-                    <div style={{ fontSize: 13, lineHeight: 1.75, color: 'hsl(220,15%,40%)' }}>{m.body}</div>
+                    <div style={{ fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'hsl(220,15%,55%)', marginBottom: 10 }}>{m.sub}</div>
+                    <div style={{ fontSize: isMobile ? 12 : 13, lineHeight: 1.75, color: 'hsl(220,15%,40%)' }}>{m.body}</div>
                   </div>
                 </div>
               ))
@@ -237,8 +282,8 @@ export default function Home() {
 
         {/* CAREER */}
         <section id="career" ref={el => s('career', el)} style={{ paddingBottom: 56 }}>
-          <SectionRule label="Career" />
-          <div style={{ padding: '0 64px' }}>
+          <SectionRule label="Career" isMobile={isMobile} />
+          <div style={{ padding: `0 ${P}px` }}>
             {(careerRoles.length > 0 ? careerRoles : [
               { id: 1, role: 'Head of Projects & PMO Lead', company: 'Novocycle Technology', period: 'Apr 2024 – Present', employmentType: 'Permanent', description: 'Built PMO from scratch; EU-funded battery recycling programmes; 36% reporting efficiency gain' },
               { id: 2, role: 'Senior Technical Project Manager', company: 'Caravan and Motorhome Club', period: 'Oct 2022 – Nov 2023', employmentType: 'Contract', description: 'Mutual agreement insurance product transformation; vendor negotiation' },
@@ -251,16 +296,29 @@ export default function Home() {
               { id: 9, role: 'Technical Project Manager', company: 'BSS Industrial', period: 'Nov 2013 – Aug 2014', employmentType: 'Permanent', description: 'High-profile construction; Hilton Brighton, commercial fit-outs' },
               { id: 10, role: 'Project Support Engineer', company: 'Alfa Laval', period: 'Sep 2008 – Nov 2013', employmentType: 'Permanent', description: 'The Shard, London 2012 Olympic Aquatic Centre, 20 Fenchurch Street' },
             ] as any[]).map((role: any, i: number) => (
-              <div key={role.id || i} style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr 148px', alignItems: 'start', padding: '18px 0', borderBottom: `1px solid ${HAIRLINE}`, gap: 24 }}>
-                <div>
-                  <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 18, fontWeight: 500, color: INK, marginBottom: 2 }}>{role.role}</div>
-                  <div style={{ fontSize: 12, color: MUTED }}>{role.company}</div>
-                </div>
-                <div style={{ fontSize: 12, color: 'hsl(220,15%,45%)', paddingTop: 3 }}>{role.description || (Array.isArray(role.keyAchievements) ? role.keyAchievements[0] : '')}</div>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: 11, color: MUTED, marginBottom: 4, whiteSpace: 'nowrap' }}>{role.period}</div>
-                  <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: role.employmentType === 'Permanent' ? BRASS : 'hsl(200,55%,45%)' }}>{role.employmentType}</div>
-                </div>
+              <div key={role.id || i} style={{ padding: '16px 0', borderBottom: `1px solid ${HAIRLINE}` }}>
+                {isMobile ? (
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4, gap: 8 }}>
+                      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 17, fontWeight: 500, color: INK, lineHeight: 1.2 }}>{role.role}</div>
+                      <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: role.employmentType === 'Permanent' ? BRASS : 'hsl(200,55%,45%)', flexShrink: 0 }}>{role.employmentType}</div>
+                    </div>
+                    <div style={{ fontSize: 12, color: MUTED, marginBottom: 4 }}>{role.company} · {role.period}</div>
+                    <div style={{ fontSize: 12, color: 'hsl(220,15%,48%)', lineHeight: 1.6 }}>{role.description || (Array.isArray(role.keyAchievements) ? role.keyAchievements[0] : '')}</div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr 148px', alignItems: 'start', gap: 24 }}>
+                    <div>
+                      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 18, fontWeight: 500, color: INK, marginBottom: 2 }}>{role.role}</div>
+                      <div style={{ fontSize: 12, color: MUTED }}>{role.company}</div>
+                    </div>
+                    <div style={{ fontSize: 12, color: 'hsl(220,15%,45%)', paddingTop: 3 }}>{role.description || (Array.isArray(role.keyAchievements) ? role.keyAchievements[0] : '')}</div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: 11, color: MUTED, marginBottom: 4, whiteSpace: 'nowrap' }}>{role.period}</div>
+                      <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: role.employmentType === 'Permanent' ? BRASS : 'hsl(200,55%,45%)' }}>{role.employmentType}</div>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -268,9 +326,9 @@ export default function Home() {
 
         {/* CAPABILITY */}
         <section id="capability" ref={el => s('capability', el)} style={{ paddingBottom: 56 }}>
-          <SectionRule label="Capability" />
-          <div style={{ padding: '0 64px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
+          <SectionRule label="Capability" isMobile={isMobile} />
+          <div style={{ padding: `0 ${P}px` }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 32 : 40 }}>
               {[
                 { label: 'Methodology', items: methodologies.length > 0 ? methodologies : ['Agile / SAFe', 'PRINCE2 Practitioner', 'Waterfall', 'Scrum Master', 'MSP'] },
                 { label: 'Tooling', items: tools.length > 0 ? tools : ['Jira · Confluence', 'Power BI · Tableau', 'MS Project', 'ServiceNow', 'Smartsheet'] },
@@ -290,15 +348,15 @@ export default function Home() {
 
         {/* EDUCATION */}
         <section id="education" ref={el => s('education', el)} style={{ paddingBottom: 56 }}>
-          <SectionRule label="Education" />
-          <div style={{ padding: '0 64px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
+          <SectionRule label="Education" isMobile={isMobile} />
+          <div style={{ padding: `0 ${P}px` }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 16 : 40 }}>
               {(education.length > 0 ? education : [
                 { id: 1, degree: 'MSc Project Management', institution: 'University of Westminster', period: '2010', location: 'London, UK' },
                 { id: 2, degree: 'BSc Business Administration', institution: 'Lagos State University', period: '2006', location: 'Lagos, Nigeria' },
               ] as any[]).map((edu: any) => (
-                <div key={edu.id} style={{ padding: '28px', border: `1px solid ${HAIRLINE}` }}>
-                  <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 500, color: INK, marginBottom: 8 }}>{edu.degree}</div>
+                <div key={edu.id} style={{ padding: '24px', border: `1px solid ${HAIRLINE}` }}>
+                  <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: isMobile ? 20 : 22, fontWeight: 500, color: INK, marginBottom: 8 }}>{edu.degree}</div>
                   <div style={{ fontSize: 12, color: MUTED, marginBottom: 4 }}>{edu.institution}</div>
                   <div style={{ fontSize: 11, color: BRASS_LIGHT, fontWeight: 600, letterSpacing: '0.1em' }}>{edu.period} {edu.location ? `· ${edu.location}` : ''}</div>
                 </div>
@@ -309,9 +367,9 @@ export default function Home() {
 
         {/* CONTACT */}
         <section id="contact" ref={el => s('contact', el)} style={{ paddingBottom: 64 }}>
-          <SectionRule label="Contact" />
-          <div style={{ padding: '0 64px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40, marginBottom: 40 }}>
+          <SectionRule label="Contact" isMobile={isMobile} />
+          <div style={{ padding: `0 ${P}px` }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 12 : 40, marginBottom: 40 }}>
               {[
                 { label: 'Email', value: email, href: `mailto:${email}` },
                 { label: 'LinkedIn', value: 'linkedin.com/in/mujeeb-lawal', href: linkedIn },
@@ -319,20 +377,16 @@ export default function Home() {
                 { label: 'Phone (UK)', value: phoneUK, href: `tel:${phoneUK.replace(/\s/g, '')}` },
               ].map((c, i) => (
                 <a key={i} href={c.href} target={c.href.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer"
-                  style={{ display: 'block', padding: '28px', border: `1px solid ${HAIRLINE}`, textDecoration: 'none' }}>
-                  <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: BRASS, marginBottom: 8 }}>{c.label}</div>
-                  <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 20, fontWeight: 500, color: INK }}>{c.value}</div>
+                  style={{ display: 'block', padding: '20px', border: `1px solid ${HAIRLINE}`, textDecoration: 'none' }}>
+                  <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: BRASS, marginBottom: 6 }}>{c.label}</div>
+                  <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: isMobile ? 17 : 20, fontWeight: 500, color: INK }}>{c.value}</div>
                 </a>
               ))}
             </div>
-            <button
-              data-testid="btn-download-cv-contact"
-              onClick={() => setCvModalOpen(true)}
-              style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: PAPER, background: INK, padding: '14px 28px', border: 'none', cursor: 'pointer' }}
-            >Download CV</button>
-            <div style={{ marginTop: 64, paddingTop: 24, borderTop: `1px solid ${HAIRLINE}`, fontSize: 11, color: 'hsl(220,15%,65%)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+            <button data-testid="btn-download-cv-contact" onClick={() => setCvModalOpen(true)} style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: PAPER, background: INK, padding: '14px 28px', border: 'none', cursor: 'pointer', width: isMobile ? '100%' : 'auto' }}>Download CV</button>
+            <div style={{ marginTop: 48, paddingTop: 24, borderTop: `1px solid ${HAIRLINE}`, fontSize: 11, color: 'hsl(220,15%,65%)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
               <span>{copyright}</span>
-              <a href="/privacy" style={{ color: 'hsl(220,15%,55%)', textDecoration: 'none', borderBottom: '1px solid hsl(220,15%,35%)' }}>Privacy Policy</a>
+              <a href="/privacy" style={{ color: 'hsl(220,15%,55%)', borderBottom: '1px solid hsl(220,15%,35%)' }}>Privacy Policy</a>
             </div>
           </div>
         </section>
@@ -340,11 +394,9 @@ export default function Home() {
 
       {/* ── CV DOWNLOAD MODAL ── */}
       {cvModalOpen && (
-        <div
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
-          onClick={(e) => { if (e.target === e.currentTarget) setCvModalOpen(false); }}
-        >
-          <div style={{ background: PAPER, maxWidth: 480, width: '100%', padding: '48px 44px' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
+          onClick={(e) => { if (e.target === e.currentTarget) setCvModalOpen(false); }}>
+          <div style={{ background: PAPER, maxWidth: 480, width: '100%', padding: isMobile ? '36px 28px' : '48px 44px' }}>
             <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: BRASS, marginBottom: 16 }}>Download CV</div>
             <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 28, fontWeight: 400, color: INK, marginBottom: 8 }}>Just one quick step</div>
             <div style={{ fontSize: 13, color: MUTED, marginBottom: 32, lineHeight: 1.6 }}>Leave your details and the CV will download immediately.</div>
@@ -356,32 +408,14 @@ export default function Home() {
               ].map((field) => (
                 <div key={field.key} style={{ marginBottom: 20 }}>
                   <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: INK, marginBottom: 8 }}>{field.label}</div>
-                  <input
-                    data-testid={`input-cv-${field.key}`}
-                    type={field.type}
-                    placeholder={field.placeholder}
-                    value={cvForm[field.key]}
-                    onChange={e => setCvForm(f => ({ ...f, [field.key]: e.target.value }))}
-                    style={{ width: '100%', padding: '12px 16px', border: `1px solid ${HAIRLINE}`, background: 'transparent', fontSize: 14, color: INK, outline: 'none', fontFamily: 'Inter, sans-serif' }}
-                  />
+                  <input data-testid={`input-cv-${field.key}`} type={field.type} placeholder={field.placeholder} value={cvForm[field.key]} onChange={e => setCvForm(f => ({ ...f, [field.key]: e.target.value }))} style={{ width: '100%', padding: '12px 16px', border: `1px solid ${HAIRLINE}`, background: 'transparent', fontSize: 14, color: INK, outline: 'none', fontFamily: 'Inter, sans-serif' }} />
                 </div>
               ))}
               {cvError && <div style={{ fontSize: 12, color: 'hsl(0,60%,50%)', marginBottom: 16 }}>{cvError}</div>}
-              <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.6, marginBottom: 16 }}>
-                By downloading you consent to your details being stored so I can follow up on opportunities. See the <a href="/privacy" target="_blank" style={{ color: BRASS, textDecoration: 'underline' }}>Privacy Policy</a>. You can request deletion at any time.
-              </div>
+              <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.6, marginBottom: 16 }}>By downloading you consent to your details being stored. See the <a href="/privacy" target="_blank" style={{ color: BRASS, textDecoration: 'underline' }}>Privacy Policy</a>.</div>
               <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
-                <button
-                  type="submit"
-                  data-testid="btn-cv-submit"
-                  disabled={cvSubmitting}
-                  style={{ flex: 1, padding: '14px', background: INK, color: PAPER, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' }}
-                >{cvSubmitting ? 'Downloading…' : 'Download CV'}</button>
-                <button
-                  type="button"
-                  onClick={() => setCvModalOpen(false)}
-                  style={{ padding: '14px 20px', background: 'transparent', color: MUTED, border: `1px solid ${HAIRLINE}`, cursor: 'pointer', fontSize: 11 }}
-                >Cancel</button>
+                <button type="submit" data-testid="btn-cv-submit" disabled={cvSubmitting} style={{ flex: 1, padding: '14px', background: INK, color: PAPER, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' }}>{cvSubmitting ? 'Downloading…' : 'Download CV'}</button>
+                <button type="button" onClick={() => setCvModalOpen(false)} style={{ padding: '14px 20px', background: 'transparent', color: MUTED, border: `1px solid ${HAIRLINE}`, cursor: 'pointer', fontSize: 11 }}>Cancel</button>
               </div>
             </form>
           </div>
