@@ -19,6 +19,7 @@ export default function FloatingNav() {
 
   return (
     <nav
+      className="fnav-root"
       style={{
         position: 'fixed',
         top: 24,
@@ -35,6 +36,9 @@ export default function FloatingNav() {
       }}
     >
       <style>{`
+        @media (max-width: 768px) {
+          .fnav-root { display: none !important; }
+        }
         .fnav-link {
           font-family: Inter, sans-serif;
           font-size: 10px;
