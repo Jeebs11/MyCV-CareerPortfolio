@@ -357,7 +357,7 @@ export default function AdminPage() {
 
   // ── BUILT PROJECTS helpers ────────────────────────────────────────────────
 
-  const BUILT_TYPES = ['Web App', 'Mobile App', 'Automation', 'Dashboard', 'Tool'];
+  const BUILT_TYPES = ['Web App', 'Mobile App', 'Work Project'];
   const BUILT_STATUSES = ['Live', 'Beta'];
 
   const openNewBuiltProject = () => {

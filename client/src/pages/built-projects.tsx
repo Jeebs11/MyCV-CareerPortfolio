@@ -11,7 +11,7 @@ const BRASS_LIGHT = 'hsl(35,55%,62%)';
 const HAIRLINE = 'hsl(40,15%,87%)';
 const MUTED = 'hsl(220,12%,52%)';
 
-const FILTERS = ['All', 'Web App', 'Mobile App', 'Automation', 'Dashboard', 'Tool'];
+const FILTERS = ['All', 'Web App', 'Mobile App', 'Work Project'];
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
@@ -93,7 +93,7 @@ export default function BuiltProjectsPage() {
             </Link>
             <div style={{ marginBottom: 36 }}>
               <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 32, fontWeight: 400, lineHeight: 1.1, color: PAPER, marginBottom: 8 }}>Portfolio</div>
-              <div style={{ fontSize: 13, color: 'hsl(220,15%,50%)', lineHeight: 1.65 }}>Things I've built — web apps, tools, automations, and dashboards. All live on Replit.</div>
+              <div style={{ fontSize: 13, color: 'hsl(220,15%,50%)', lineHeight: 1.65 }}>Things I've built — web apps, mobile apps, and work projects. All live on Replit.</div>
             </div>
             <div style={{ padding: '16px 0', borderTop: '1px solid hsl(220,20%,22%)', borderBottom: '1px solid hsl(220,20%,22%)', marginBottom: 32 }}>
               <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 400, color: BRASS_LIGHT }}>{filtered.length}</span>
