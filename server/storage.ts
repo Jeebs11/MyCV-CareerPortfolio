@@ -12,6 +12,10 @@ import {
   cvFileTable,
   type InsertCVFile,
   type CVFileRow,
+  profileVariantsTable,
+  type InsertProfileVariant,
+  type UpdateProfileVariant,
+  type ProfileVariantRow,
   projectsTable,
   type InsertProject,
   type UpdateProject,
@@ -73,6 +77,17 @@ export interface IStorage {
   // CV File methods
   createCVFile(file: InsertCVFile): Promise<CVFileRow>;
   getLatestCVFile(): Promise<CVFileRow | undefined>;
+  getCVFileById(id: number): Promise<CVFileRow | undefined>;
+  getAllCVFiles(): Promise<CVFileRow[]>;
+  deleteCVFile(id: number): Promise<boolean>;
+
+  // Profile Variants
+  listVariants(): Promise<ProfileVariantRow[]>;
+  getVariantBySlug(slug: string): Promise<ProfileVariantRow | undefined>;
+  getVariantById(id: number): Promise<ProfileVariantRow | undefined>;
+  createVariant(data: InsertProfileVariant): Promise<ProfileVariantRow>;
+  updateVariant(id: number, data: UpdateProfileVariant): Promise<ProfileVariantRow | undefined>;
+  deleteVariant(id: number): Promise<boolean>;
 
   // Project methods
   getAllProjects(): Promise<ProjectRow[]>;
@@ -197,6 +212,63 @@ export class DatabaseStorage implements IStorage {
   async getLatestCVFile(): Promise<CVFileRow | undefined> {
     const results = await db.select().from(cvFileTable).orderBy(desc(cvFileTable.uploadedAt)).limit(1);
     return results[0];
+  }
+
+  async getCVFileById(id: number): Promise<CVFileRow | undefined> {
+    const results = await db.select().from(cvFileTable).where(eq(cvFileTable.id, id)).limit(1);
+    return results[0];
+  }
+
+  async getAllCVFiles(): Promise<CVFileRow[]> {
+    return await db.select().from(cvFileTable).orderBy(desc(cvFileTable.uploadedAt));
+  }
+
+  async deleteCVFile(id: number): Promise<boolean> {
+    const results = await db.delete(cvFileTable).where(eq(cvFileTable.id, id)).returning();
+    return results.length > 0;
+  }
+
+  // Profile Variants
+  async listVariants(): Promise<ProfileVariantRow[]> {
+    try {
+      return await db.select().from(profileVariantsTable).orderBy(asc(profileVariantsTable.sortOrder), asc(profileVariantsTable.id));
+    } catch (err) {
+      if (isNeonEmptyResultError(err)) return [];
+      throw err;
+    }
+  }
+
+  async getVariantBySlug(slug: string): Promise<ProfileVariantRow | undefined> {
+    try {
+      const results = await db.select().from(profileVariantsTable).where(eq(profileVariantsTable.slug, slug));
+      return results[0];
+    } catch (err) {
+      if (isNeonEmptyResultError(err)) return undefined;
+      throw err;
+    }
+  }
+
+  async getVariantById(id: number): Promise<ProfileVariantRow | undefined> {
+    const results = await db.select().from(profileVariantsTable).where(eq(profileVariantsTable.id, id));
+    return results[0];
+  }
+
+  async createVariant(data: InsertProfileVariant): Promise<ProfileVariantRow> {
+    const results = await db.insert(profileVariantsTable).values(data).returning();
+    return results[0];
+  }
+
+  async updateVariant(id: number, data: UpdateProfileVariant): Promise<ProfileVariantRow | undefined> {
+    const results = await db.update(profileVariantsTable)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(profileVariantsTable.id, id))
+      .returning();
+    return results[0];
+  }
+
+  async deleteVariant(id: number): Promise<boolean> {
+    const results = await db.delete(profileVariantsTable).where(eq(profileVariantsTable.id, id)).returning();
+    return results.length > 0;
   }
 
   // Project CRUD operations

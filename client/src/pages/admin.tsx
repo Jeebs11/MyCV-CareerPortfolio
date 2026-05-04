@@ -56,6 +56,7 @@ import { Link } from 'wouter';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CareerRolesAdmin, FlagshipWinsAdmin, SiteSkillsAdmin, SiteCertificationsAdmin, SiteEducationAdmin, SiteSettingsAdmin } from '@/components/admin/SiteContentTabs';
 import { AppearanceAdmin } from '@/components/admin/AppearanceAdmin';
+import { VariantsAdmin } from '@/components/admin/VariantsAdmin';
 
 interface BlogPost {
   id: string;
@@ -124,6 +125,7 @@ interface CVContact {
 interface CVFile {
   id: number;
   filename: string;
+  label: string | null;
   uploadedAt: string;
 }
 
@@ -136,6 +138,7 @@ export default function AdminPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('blog');
   const [cvFile, setCVFile] = useState<File | null>(null);
+  const [cvLabel, setCvLabel] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [editingProject, setEditingProject] = useState<ProjectRow | null>(null);
   const [isProjectDialogOpen, setIsProjectDialogOpen] = useState(false);
@@ -180,6 +183,36 @@ export default function AdminPage() {
       return res.json();
     },
     enabled: isAuthenticated && activeTab === 'cv',
+  });
+
+  // Fetch all CV files
+  const { data: allCVFiles = [] } = useQuery<CVFile[]>({
+    queryKey: ['/api/cv/files'],
+    queryFn: async () => {
+      const res = await fetch('/api/cv/files', {
+        headers: { 'Authorization': `Bearer ${adminPassword}` }
+      });
+      if (!res.ok) throw new Error('Failed to fetch CV files');
+      return res.json();
+    },
+    enabled: isAuthenticated && activeTab === 'cv',
+  });
+
+  const deleteCVFileMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await fetch(`/api/cv/files/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${adminPassword}` },
+      });
+      if (!res.ok) throw new Error('Failed to delete CV file');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/cv/files'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/cv/latest'] });
+      toast({ title: 'Success', description: 'CV file deleted' });
+    },
+    onError: () => toast({ title: 'Error', description: 'Failed to delete CV file', variant: 'destructive' }),
   });
 
   // Projects queries & mutations
@@ -692,6 +725,7 @@ export default function AdminPage() {
     try {
       const formData = new FormData();
       formData.append('cv', cvFile);
+      if (cvLabel.trim()) formData.append('label', cvLabel.trim());
 
       const res = await fetch('/api/cv/upload', {
         method: 'POST',
@@ -711,7 +745,9 @@ export default function AdminPage() {
       });
 
       setCVFile(null);
+      setCvLabel('');
       queryClient.invalidateQueries({ queryKey: ['/api/cv/latest'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/cv/files'] });
     } catch (error) {
       toast({
         title: "Error",
@@ -906,6 +942,7 @@ export default function AdminPage() {
               { value: 'education', label: 'Education' },
               { value: 'flagship', label: 'Achievements' },
               { value: 'settings', label: 'Site Content' },
+              { value: 'variants', label: 'Variants' },
               { value: 'appearance', label: 'Appearance' },
             ].map(t => (
               <TabsTrigger
@@ -1903,18 +1940,20 @@ export default function AdminPage() {
                 <Upload className="w-5 h-5" />
                 Upload CV
               </h2>
-              {latestCV && (
-                <div className="mb-4 p-3 bg-white/5 rounded-md">
-                  <p className="text-sm text-white/60">
-                    Current CV: <span className="text-white font-mono">{latestCV.filename}</span>
-                  </p>
-                  <p className="text-xs text-white/40 mt-1">
-                    Uploaded: {new Date(latestCV.uploadedAt).toLocaleString()}
-                  </p>
-                </div>
-              )}
               <form onSubmit={handleCVUpload} className="space-y-4">
                 <div>
+                  <label className="text-sm text-white/70 block mb-1">Label (e.g. "Programme Management CV") *</label>
+                  <Input
+                    type="text"
+                    placeholder="Programme Management CV"
+                    value={cvLabel}
+                    onChange={(e) => setCvLabel(e.target.value)}
+                    className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                    data-testid="input-cv-label"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-white/70 block mb-1">File *</label>
                   <Input
                     type="file"
                     accept=".pdf,.doc,.docx"
@@ -1928,7 +1967,7 @@ export default function AdminPage() {
                 </div>
                 <Button
                   type="submit"
-                  disabled={!cvFile || isUploading}
+                  disabled={!cvFile || !cvLabel.trim() || isUploading}
                   className="bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-accent))] text-white"
                   data-testid="button-upload-cv"
                 >
@@ -1936,6 +1975,42 @@ export default function AdminPage() {
                   {isUploading ? 'Uploading...' : 'Upload CV'}
                 </Button>
               </form>
+            </Card>
+
+            {/* All CV Files */}
+            <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6">
+              <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                CV Library ({allCVFiles.length})
+              </h2>
+              {allCVFiles.length === 0 ? (
+                <p className="text-white/50 text-sm">No CV files uploaded yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {allCVFiles.map(f => (
+                    <div key={f.id} className="flex items-center justify-between gap-4 p-3 bg-white/5 rounded-md" data-testid={`row-cv-file-${f.id}`}>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium text-white truncate">{f.label || '(no label)'}</div>
+                        <div className="text-xs text-white/40 font-mono truncate">{f.filename}</div>
+                        <div className="text-xs text-white/40 mt-0.5">{new Date(f.uploadedAt).toLocaleString()}</div>
+                      </div>
+                      {latestCV?.id === f.id && (
+                        <Badge variant="outline" className="border-green-500/40 text-green-400 text-xs flex-shrink-0">Default</Badge>
+                      )}
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => { if (confirm(`Delete CV file "${f.label || f.filename}"?`)) deleteCVFileMutation.mutate(f.id); }}
+                        className="text-red-400 flex-shrink-0"
+                        disabled={deleteCVFileMutation.isPending}
+                        data-testid={`btn-delete-cv-${f.id}`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </Card>
 
             {/* CV Contacts Section */}
@@ -2047,6 +2122,9 @@ export default function AdminPage() {
           </TabsContent>
           <TabsContent value="settings" className="space-y-6">
             <SiteSettingsAdmin adminPassword={adminPassword} />
+          </TabsContent>
+          <TabsContent value="variants" className="space-y-6">
+            <VariantsAdmin adminPassword={adminPassword} />
           </TabsContent>
           <TabsContent value="appearance" className="space-y-6">
             <AppearanceAdmin adminPassword={adminPassword} />

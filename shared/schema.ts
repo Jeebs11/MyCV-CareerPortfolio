@@ -54,6 +54,7 @@ export type InsertCVContact = z.infer<typeof insertCVContactSchema>;
 export const cvFileTable = pgTable('cv_file', {
   id: serial('id').primaryKey(),
   filename: varchar('filename', { length: 300 }).notNull(),
+  label: varchar('label', { length: 200 }),
   uploadedAt: timestamp('uploaded_at').defaultNow().notNull(),
 });
 
@@ -64,6 +65,46 @@ export const insertCVFileSchema = createInsertSchema(cvFileTable).omit({
 
 export type CVFileRow = typeof cvFileTable.$inferSelect;
 export type InsertCVFile = z.infer<typeof insertCVFileSchema>;
+
+// Profile Variants Table
+export const profileVariantsTable = pgTable('profile_variants', {
+  id: serial('id').primaryKey(),
+  slug: varchar('slug', { length: 200 }).notNull().unique(),
+  label: varchar('label', { length: 300 }).notNull(),
+  isActive: boolean('is_active').default(true).notNull(),
+  sortOrder: integer('sort_order').default(0).notNull(),
+  content: jsonb('content').$type<{
+    tagline?: string;
+    bio?: string;
+    careerRoles?: Array<{ id: number; description: string }>;
+    skillsList?: Array<{ id: number; name: string; category: string }>;
+    highlightedAchievements?: Array<{ id: number; overrideText?: string }>;
+    cvFileId?: number | null;
+  }>().notNull().default({}),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+const variantContentSchema = z.object({
+  tagline: z.string().optional(),
+  bio: z.string().optional(),
+  careerRoles: z.array(z.object({ id: z.number(), description: z.string() })).optional(),
+  skillsList: z.array(z.object({ id: z.number(), name: z.string(), category: z.string() })).optional(),
+  highlightedAchievements: z.array(z.object({ id: z.number(), overrideText: z.string().optional() })).optional(),
+  cvFileId: z.number().nullable().optional(),
+}).optional();
+
+export const insertProfileVariantSchema = createInsertSchema(profileVariantsTable).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend({ content: variantContentSchema });
+
+export const updateProfileVariantSchema = insertProfileVariantSchema.partial();
+
+export type ProfileVariantRow = typeof profileVariantsTable.$inferSelect;
+export type InsertProfileVariant = z.infer<typeof insertProfileVariantSchema>;
+export type UpdateProfileVariant = z.infer<typeof updateProfileVariantSchema>;
 
 // Projects Table (Portfolio)
 export const projectsTable = pgTable('projects', {

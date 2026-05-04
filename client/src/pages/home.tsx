@@ -53,11 +53,38 @@ export default function Home() {
   const mainRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
+  // Read ?v= query param for variant slug
+  const variantSlug = new URLSearchParams(window.location.search).get('v') || null;
+
   const { data: settings = {} } = useQuery<SiteSettings>({ queryKey: ['/api/site/settings'] });
   const { data: flagshipWins = [] } = useQuery<FlagshipWinRow[]>({ queryKey: ['/api/site/flagship-wins'] });
   const { data: skills = [] } = useQuery<SiteSkillRow[]>({ queryKey: ['/api/site/skills'] });
   const { data: careerRoles = [] } = useQuery<CareerRoleRow[]>({ queryKey: ['/api/site/career-roles'] });
   const { data: education = [] } = useQuery<SiteEducationRow[]>({ queryKey: ['/api/site/education'] });
+
+  // Load variant if ?v= param is present
+  type VariantContent = {
+    tagline?: string;
+    bio?: string;
+    careerRoles?: Array<{ id: number; description: string }>;
+    skillsList?: Array<{ id: number; name: string; category: string }>;
+    highlightedAchievements?: Array<{ id: number; overrideText?: string }>;
+    cvFileId?: number | null;
+  };
+  type VariantRow = { id: number; slug: string; label: string; isActive: boolean; content: VariantContent };
+  const { data: variantData } = useQuery<VariantRow>({
+    queryKey: ['/api/variants', variantSlug],
+    queryFn: async () => {
+      const res = await fetch(`/api/variants/${variantSlug}`);
+      if (!res.ok) throw new Error('Variant not found');
+      return res.json();
+    },
+    enabled: !!variantSlug,
+    retry: false,
+  });
+
+  // Merge variant content over base content
+  const variantContent: VariantContent = variantData?.content || {};
 
   useEffect(() => {
     document.title = 'Mujeeb Lawal — Senior Programme Director | £50M+ Delivery';
@@ -90,8 +117,11 @@ export default function Home() {
     if (!cvForm.name || !cvForm.email) { setCvError('Name and email are required.'); return; }
     setCvSubmitting(true); setCvError('');
     try {
+      const body: Record<string, unknown> = { ...cvForm };
+      // If variant specifies a specific CV file, pass it
+      if (variantContent.cvFileId) body.cvFileId = variantContent.cvFileId;
       const res = await fetch('/api/cv/download', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(cvForm),
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
       });
       if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.error || 'Download failed'); }
       const blob = await res.blob();
@@ -103,10 +133,16 @@ export default function Home() {
     finally { setCvSubmitting(false); }
   };
 
-  const methodologies = skills.filter(s => s.category === 'methodology').map(s => s.name);
-  const tools = skills.filter(s => s.category === 'tool').map(s => s.name);
-  const certifications = skills.filter(s => s.category === 'certification').map(s => s.name);
-  const industries = skills.filter(s => s.category === 'industry').map(s => s.name);
+  // Apply variant skill overrides if present.
+  // Use Array.isArray check so an intentionally empty skillsList is respected (not fallen back to base).
+  const effectiveSkills = Array.isArray(variantContent.skillsList)
+    ? variantContent.skillsList
+    : skills;
+
+  const methodologies = effectiveSkills.filter(s => s.category === 'methodology').map(s => s.name);
+  const tools = effectiveSkills.filter(s => s.category === 'tool').map(s => s.name);
+  const certifications = effectiveSkills.filter(s => s.category === 'certification').map(s => s.name);
+  const industries = effectiveSkills.filter(s => s.category === 'industry').map(s => s.name);
 
   const email = settings['contact.email'] || 'odmlawal@gmail.com';
   const phoneUK = settings['contact.phone_uk'] || '+44 7908226038';
@@ -117,9 +153,41 @@ export default function Home() {
 
   const profileName = settings['profile.name'] || 'Mujeeb Lawal';
   const profileTitle = settings['profile.title'] || 'Senior Programme Director';
-  const profileQuote = settings['profile.quote'] || '"A programme director who builds institutions, not just outputs — governing at scale, delivering under pressure, and leaving infrastructure behind."';
-  const profileBio = settings['profile.bio'] || '17 years leading complex change across financial services, telecoms, insurance, and sustainability. Comfortable at board level and delivery level simultaneously. PRINCE2 Practitioner, Certified Scrum Master. London and Dubai based.';
+  const baseQuote = settings['profile.quote'] || '"A programme director who builds institutions, not just outputs — governing at scale, delivering under pressure, and leaving infrastructure behind."';
+  const baseBio = settings['profile.bio'] || '17 years leading complex change across financial services, telecoms, insurance, and sustainability. Comfortable at board level and delivery level simultaneously. PRINCE2 Practitioner, Certified Scrum Master. London and Dubai based.';
+  // Override quote/bio with variant content if present
+  const profileQuote = variantContent.tagline || baseQuote;
+  const profileBio = variantContent.bio || baseBio;
   const pastEmployers = (settings['profile.past_employers'] || 'Mercer,GSMA,Simply Business,6Connex').split(',').map((e: string) => e.trim()).filter(Boolean);
+
+  // Apply variant career role description overrides
+  const effectiveCareerRoles = careerRoles.map(role => {
+    if (variantContent.careerRoles) {
+      const override = variantContent.careerRoles.find(r => r.id === role.id);
+      if (override && override.description) {
+        return { ...role, description: override.description };
+      }
+    }
+    return role;
+  });
+
+  // Apply variant achievement overrides/selection.
+  // Array.isArray check ensures an intentionally empty list is respected (not fallen back to base).
+  const effectiveFlagshipWins = (() => {
+    if (!Array.isArray(variantContent.highlightedAchievements)) {
+      return flagshipWins;
+    }
+    return variantContent.highlightedAchievements
+      .map(a => {
+        const win = flagshipWins.find(w => w.id === a.id);
+        if (!win) return null;
+        if (a.overrideText) {
+          return { ...win, metrics: [a.overrideText, ...(Array.isArray(win.metrics) ? win.metrics.slice(1) : [])] };
+        }
+        return win;
+      })
+      .filter(Boolean) as typeof flagshipWins;
+  })();
   const stats = [
     { val: settings['profile.stat1_val'] || '£50M+', label: settings['profile.stat1_label'] || 'Programmes led' },
     { val: settings['profile.stat2_val'] || '17 yrs', label: settings['profile.stat2_label'] || 'Experience' },
@@ -258,8 +326,8 @@ export default function Home() {
         <section id="mandates" ref={el => s('mandates', el)} style={{ paddingBottom: 56 }}>
           <SectionRule label="Top Key Achievements" isMobile={isMobile} />
           <div style={{ padding: `0 ${P}px`, display: 'flex', flexDirection: 'column', gap: isMobile ? 32 : 40 }}>
-            {flagshipWins.length > 0
-              ? flagshipWins.slice(0, 3).map((win, i) => (
+            {effectiveFlagshipWins.length > 0
+              ? effectiveFlagshipWins.slice(0, 3).map((win, i) => (
                 <div key={win.id} style={{ display: 'grid', gridTemplateColumns: isMobile ? '40px 1fr' : '56px 1fr', gap: 0 }}>
                   <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: isMobile ? 28 : 36, fontWeight: 300, color: 'hsl(40,15%,82%)', lineHeight: 1 }}>0{i + 1}</div>
                   <div>
@@ -297,7 +365,7 @@ export default function Home() {
         <section id="career" ref={el => s('career', el)} style={{ paddingBottom: 56 }}>
           <SectionRule label="Career" isMobile={isMobile} />
           <div style={{ padding: `0 ${P}px` }}>
-            {(careerRoles.length > 0 ? careerRoles : [
+            {(effectiveCareerRoles.length > 0 ? effectiveCareerRoles : [
               { id: 1, role: 'Head of Projects & PMO Lead', company: 'Novocycle Technology', period: 'Apr 2024 – Present', employmentType: 'Permanent', description: 'Built PMO from scratch; EU-funded battery recycling programmes; 36% reporting efficiency gain' },
               { id: 2, role: 'Senior Technical Project Manager', company: 'Caravan and Motorhome Club', period: 'Oct 2022 – Nov 2023', employmentType: 'Contract', description: 'Mutual agreement insurance product transformation; vendor negotiation' },
               { id: 3, role: 'Programme Manager', company: 'Simply Business', period: 'Aug 2022 – Mar 2023', employmentType: 'Contract', description: '£1.2M FCA-regulated product; 34-person team; two FCA compliance programmes' },

@@ -12,6 +12,7 @@ import {
   insertSiteCertificationSchema, updateSiteCertificationSchema,
   insertSiteEducationSchema, updateSiteEducationSchema,
   upsertSiteSettingSchema,
+  insertProfileVariantSchema, updateProfileVariantSchema,
 } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 import { z } from "zod";
@@ -269,9 +270,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Save contact to database
       await storage.createCVContact(validation.data);
 
-      // Get latest CV file
-      const cvFile = await storage.getLatestCVFile();
-      
+      // Get CV file — use variant-specified file if provided, otherwise fall back to latest.
+      // If the variant's file has been deleted, also fall back to latest.
+      const cvFileId = typeof req.body.cvFileId === 'number' ? req.body.cvFileId : null;
+      let cvFile = cvFileId ? await storage.getCVFileById(cvFileId) : undefined;
+      if (!cvFile) {
+        cvFile = await storage.getLatestCVFile();
+      }
+
       if (!cvFile) {
         return res.status(404).json({ error: "CV file not found. Please contact the administrator." });
       }
@@ -331,9 +337,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "No file uploaded" });
       }
 
+      const label = req.body?.label?.trim() || null;
+      if (!label) {
+        return res.status(400).json({ error: "Label is required for CV uploads" });
+      }
+
       // Save file metadata to database
       const cvFile = await storage.createCVFile({
         filename: req.file.filename,
+        label,
       });
 
       res.status(201).json({ 
@@ -359,6 +371,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching latest CV:", error);
       res.status(500).json({ error: "Failed to fetch latest CV" });
+    }
+  });
+
+  // Get all CV files (admin only)
+  app.get("/api/cv/files", adminAuth, async (req, res) => {
+    try {
+      const files = await storage.getAllCVFiles();
+      res.json(files);
+    } catch (error) {
+      console.error("Error fetching CV files:", error);
+      res.status(500).json({ error: "Failed to fetch CV files" });
+    }
+  });
+
+  // Delete CV file (admin only) — removes DB row and physical file
+  app.delete("/api/cv/files/:id", adminAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+      // Fetch metadata before deletion so we have the filename
+      const cvFile = await storage.getCVFileById(id);
+      if (!cvFile) return res.status(404).json({ error: "File not found" });
+      const ok = await storage.deleteCVFile(id);
+      if (!ok) return res.status(404).json({ error: "File not found" });
+      // Remove physical file if it exists (best-effort, non-fatal)
+      try {
+        const filePath = path.join(process.cwd(), 'uploads', 'cv', cvFile.filename);
+        await fs.unlink(filePath);
+      } catch {
+        // File may already be missing — safe to ignore
+      }
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting CV file:", error);
+      res.status(500).json({ error: "Failed to delete CV file" });
     }
   });
 
@@ -803,6 +850,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     try { await storage.upsertSiteSettings(v.data); res.json({ success: true }); }
     catch (e) { console.error(e); res.status(500).json({ error: "Failed to save" }); }
+  });
+
+  // ============ PROFILE VARIANTS ROUTES ============
+
+  // List all variants (admin only)
+  app.get("/api/variants", adminAuth, async (req, res) => {
+    try { res.json(await storage.listVariants()); }
+    catch (e) { console.error(e); res.status(500).json({ error: "Failed to fetch variants" }); }
+  });
+
+  // Get variant by slug (public — for home page)
+  app.get("/api/variants/:slug", async (req, res) => {
+    try {
+      const variant = await storage.getVariantBySlug(req.params.slug);
+      if (!variant || !variant.isActive) return res.status(404).json({ error: "Variant not found" });
+      res.json(variant);
+    } catch (e) { console.error(e); res.status(500).json({ error: "Failed to fetch variant" }); }
+  });
+
+  // Create variant (admin only)
+  app.post("/api/variants", adminAuth, async (req, res) => {
+    const v = insertProfileVariantSchema.safeParse(req.body);
+    if (!v.success) return res.status(400).json({ error: fromZodError(v.error).toString() });
+    try { res.status(201).json(await storage.createVariant(v.data)); }
+    catch (e) { console.error(e); res.status(500).json({ error: "Failed to create variant" }); }
+  });
+
+  // Update variant (admin only)
+  app.patch("/api/variants/:id", adminAuth, async (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+    const v = updateProfileVariantSchema.safeParse(req.body);
+    if (!v.success) return res.status(400).json({ error: fromZodError(v.error).toString() });
+    try {
+      const r = await storage.updateVariant(id, v.data);
+      if (!r) return res.status(404).json({ error: "Not found" });
+      res.json(r);
+    } catch (e) { console.error(e); res.status(500).json({ error: "Failed to update variant" }); }
+  });
+
+  // Delete variant (admin only)
+  app.delete("/api/variants/:id", adminAuth, async (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+    try {
+      const ok = await storage.deleteVariant(id);
+      if (!ok) return res.status(404).json({ error: "Not found" });
+      res.json({ success: true });
+    } catch (e) { console.error(e); res.status(500).json({ error: "Failed to delete variant" }); }
   });
 
   // Generic site image upload (logos, etc.) — reuses project image multer
