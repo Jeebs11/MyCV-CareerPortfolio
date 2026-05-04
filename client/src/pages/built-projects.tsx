@@ -11,7 +11,7 @@ const BRASS_LIGHT = 'hsl(35,55%,62%)';
 const HAIRLINE = 'hsl(40,15%,87%)';
 const MUTED = 'hsl(220,12%,52%)';
 
-const FILTERS = ['All', 'Web App', 'Automation', 'Dashboard', 'Tool'];
+const FILTERS = ['All', 'Web App', 'Mobile App', 'Automation', 'Dashboard', 'Tool'];
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
