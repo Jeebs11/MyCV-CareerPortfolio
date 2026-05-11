@@ -385,60 +385,75 @@ export default function Home() {
             ] as any[]).map((role: any, i: number) => {
               const roleKey = role.id ?? i;
               const isExpanded = expandedRoles.has(roleKey);
-              const hasDetail = role.description || (Array.isArray(role.keyAchievements) && role.keyAchievements.length > 0);
+              const hasImpacts = Array.isArray(role.keyAchievements) && role.keyAchievements.length > 0;
               return (
-                <div key={roleKey} style={{ borderBottom: `1px solid ${HAIRLINE}` }}>
-                  {/* Clickable header row */}
-                  <div
-                    onClick={() => hasDetail && toggleRole(roleKey)}
-                    style={{ padding: '14px 0', cursor: hasDetail ? 'pointer' : 'default' }}
-                  >
-                    {isMobile ? (
-                      <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
-                          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 17, fontWeight: 500, color: INK, lineHeight: 1.2 }}>{role.role}</div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                            <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: role.employmentType === 'Permanent' ? BRASS : 'hsl(200,55%,45%)' }}>{role.employmentType}</div>
-                            {hasDetail && <span style={{ fontSize: 14, color: BRASS, lineHeight: 1 }}>{isExpanded ? '−' : '+'}</span>}
-                          </div>
-                        </div>
-                        <div style={{ fontSize: 12, color: MUTED, marginTop: 3 }}>{role.company} · {role.period}</div>
-                        {!isExpanded && hasDetail && (
-                          <div style={{ fontSize: 10, color: BRASS, letterSpacing: '0.06em', marginTop: 5 }}>View key impacts ▸</div>
-                        )}
+                <div key={roleKey} style={{ padding: '14px 0', borderBottom: `1px solid ${HAIRLINE}` }}>
+                  {isMobile ? (
+                    <div>
+                      {/* Role header */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8, marginBottom: 3 }}>
+                        <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 17, fontWeight: 500, color: INK, lineHeight: 1.2 }}>{role.role}</div>
+                        <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: role.employmentType === 'Permanent' ? BRASS : 'hsl(200,55%,45%)', flexShrink: 0 }}>{role.employmentType}</div>
                       </div>
-                    ) : (
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr 148px', alignItems: 'center', gap: 24 }}>
+                      <div style={{ fontSize: 12, color: MUTED, marginBottom: 6 }}>{role.company} · {role.period}</div>
+                      {/* Description — always visible */}
+                      {role.description && (
+                        <div style={{ fontSize: 12, color: 'hsl(220,15%,45%)', lineHeight: 1.65, marginBottom: 8 }}>{role.description}</div>
+                      )}
+                      {/* Key impacts toggle */}
+                      {hasImpacts && (
+                        <>
+                          <button
+                            onClick={() => toggleRole(roleKey)}
+                            style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 10, color: BRASS, letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: 4, marginBottom: isExpanded ? 8 : 0 }}
+                          >
+                            <span style={{ fontSize: 13, lineHeight: 1 }}>{isExpanded ? '−' : '+'}</span>
+                            {isExpanded ? 'Hide key impacts' : 'Key impacts'}
+                          </button>
+                          {isExpanded && role.keyAchievements.map((a: string, k: number) => (
+                            <div key={k} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, color: 'hsl(220,15%,42%)', lineHeight: 1.6, padding: '4px 0', borderBottom: `1px solid ${HAIRLINE}` }}>
+                              <span style={{ color: BRASS, fontSize: 9, marginTop: 4, flexShrink: 0 }}>—</span>{a}
+                            </div>
+                          ))}
+                        </>
+                      )}
+                    </div>
+                  ) : (
+                    <div>
+                      {/* Desktop 3-column header row */}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr 148px', alignItems: 'start', gap: 24 }}>
                         <div>
                           <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 18, fontWeight: 500, color: INK, marginBottom: 2 }}>{role.role}</div>
                           <div style={{ fontSize: 12, color: MUTED }}>{role.company}</div>
                         </div>
-                        <div style={{ fontSize: 11, color: BRASS, letterSpacing: '0.06em' }}>
-                          {hasDetail ? (isExpanded ? '▾ Hide details' : '▸ View key impacts') : ''}
+                        {/* Description — always visible in middle column */}
+                        <div style={{ fontSize: 12, color: 'hsl(220,15%,45%)', lineHeight: 1.65, paddingTop: 2 }}>
+                          {role.description}
                         </div>
                         <div style={{ textAlign: 'right' }}>
                           <div style={{ fontSize: 11, color: MUTED, marginBottom: 4, whiteSpace: 'nowrap' }}>{role.period}</div>
                           <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: role.employmentType === 'Permanent' ? BRASS : 'hsl(200,55%,45%)' }}>{role.employmentType}</div>
                         </div>
                       </div>
-                    )}
-                  </div>
-                  {/* Expandable detail */}
-                  {isExpanded && hasDetail && (
-                    <div style={{ paddingBottom: 16, paddingLeft: isMobile ? 0 : 0 }}>
-                      {role.description && (
-                        <div style={{ fontSize: 12, color: 'hsl(220,15%,45%)', lineHeight: 1.7, marginBottom: Array.isArray(role.keyAchievements) && role.keyAchievements.length > 0 ? 10 : 0 }}>
-                          {role.description}
-                        </div>
-                      )}
-                      {Array.isArray(role.keyAchievements) && role.keyAchievements.length > 0 && (
-                        <div>
-                          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: MUTED, marginBottom: 6 }}>Key Impacts</div>
-                          {role.keyAchievements.map((a: string, k: number) => (
-                            <div key={k} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, color: 'hsl(220,15%,42%)', lineHeight: 1.6, padding: '3px 0', borderBottom: `1px solid ${HAIRLINE}` }}>
-                              <span style={{ color: BRASS, fontSize: 9, marginTop: 4, flexShrink: 0 }}>—</span>{a}
+                      {/* Key impacts toggle — below the 3-col row, indented to middle column */}
+                      {hasImpacts && (
+                        <div style={{ marginTop: 8, paddingLeft: `calc((100% - 148px - 48px) * (1 / 2.4) + 24px)` }}>
+                          <button
+                            onClick={() => toggleRole(roleKey)}
+                            style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 10, color: BRASS, letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: 5, marginBottom: isExpanded ? 8 : 0 }}
+                          >
+                            <span style={{ fontSize: 13, lineHeight: 1 }}>{isExpanded ? '▾' : '▸'}</span>
+                            {isExpanded ? 'Hide key impacts' : 'Key impacts'}
+                          </button>
+                          {isExpanded && (
+                            <div>
+                              {role.keyAchievements.map((a: string, k: number) => (
+                                <div key={k} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, color: 'hsl(220,15%,42%)', lineHeight: 1.6, padding: '4px 0', borderBottom: `1px solid ${HAIRLINE}` }}>
+                                  <span style={{ color: BRASS, fontSize: 9, marginTop: 4, flexShrink: 0 }}>—</span>{a}
+                                </div>
+                              ))}
                             </div>
-                          ))}
+                          )}
                         </div>
                       )}
                     </div>
