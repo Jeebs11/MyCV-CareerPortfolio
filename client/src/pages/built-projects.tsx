@@ -48,7 +48,6 @@ export default function BuiltProjectsPage() {
   const [filter, setFilter] = useState('All');
   const [page, setPage] = useState(1);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
-  const [tappedCard, setTappedCard] = useState<number | null>(null);
   const { data: dbProjects = [] } = useQuery<BuiltProjectRow[]>({ queryKey: ['/api/built-projects'] });
 
   useEffect(() => { document.title = 'Portfolio — Mujeeb Lawal | Built on Replit'; }, []);
@@ -129,8 +128,6 @@ export default function BuiltProjectsPage() {
           <div style={{ padding: `0 ${P}px`, display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 16 : 2 }}>
             {paginated.map((p, i) => {
               const isHovered = hoveredCard === i;
-              const isTapped = tappedCard === i;
-              const imageRevealed = isMobile ? isTapped : isHovered;
               const cardBg = p.highlight ? INK : 'transparent';
               const cardTextColor = p.highlight ? PAPER : INK;
               const stack = Array.isArray(p.stack) ? p.stack : [];
@@ -139,15 +136,21 @@ export default function BuiltProjectsPage() {
                 <div key={p.id} data-testid={`card-project-${p.id}`}
                   onMouseEnter={() => !isMobile && setHoveredCard(i)}
                   onMouseLeave={() => !isMobile && setHoveredCard(null)}
-                  onClick={() => isMobile && p.image && setTappedCard(isTapped ? null : i)}
-                  style={{ background: cardBg, border: `1px solid ${p.highlight ? 'transparent' : HAIRLINE}`, padding: isMobile ? '24px 20px' : '36px 32px', display: 'flex', flexDirection: 'column', color: cardTextColor, cursor: isMobile && p.image ? 'pointer' : 'default' }}>
+                  style={{ background: cardBg, border: `1px solid ${p.highlight ? 'transparent' : HAIRLINE}`, padding: isMobile ? '24px 20px' : '36px 32px', display: 'flex', flexDirection: 'column', color: cardTextColor, cursor: 'default' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                     <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: p.highlight ? BRASS_LIGHT : BRASS, border: `1px solid ${p.highlight ? 'hsl(220,20%,28%)' : 'hsl(35,45%,72%)'}`, padding: '4px 10px' }}>{p.type}</span>
                     <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: p.status === 'Live' ? 'hsl(145,45%,48%)' : 'hsl(35,65%,58%)' }}>{p.status}</span>
                   </div>
                   <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: isMobile ? 22 : 24, fontWeight: 500, lineHeight: 1.15, marginBottom: 10, color: cardTextColor }}>{p.title}</div>
                   <p style={{ fontSize: 13, lineHeight: 1.7, marginBottom: 16, color: p.highlight ? 'hsl(220,15%,68%)' : 'hsl(220,15%,42%)' }}>{p.description}</p>
-                  <div style={{ position: 'relative', flex: 1, minHeight: p.image ? (isMobile ? 180 : 0) : 0 }}>
+                  {/* Mobile: image shown as block above details */}
+                  {isMobile && p.image && (
+                    <div style={{ marginBottom: 16, overflow: 'hidden', height: 180 }}>
+                      <img src={p.image} alt={p.title} onError={e => { (e.currentTarget.parentElement as HTMLElement).style.display = 'none'; }} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }} />
+                    </div>
+                  )}
+                  {/* Desktop: hover-reveal overlay */}
+                  <div style={{ position: 'relative', flex: 1 }}>
                     <div>
                       <div style={{ marginBottom: 16 }}>
                         {lines.map((l, j) => (
@@ -160,13 +163,11 @@ export default function BuiltProjectsPage() {
                         {stack.map((s, j) => (<span key={j} style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: p.highlight ? 'hsl(220,15%,55%)' : MUTED, background: p.highlight ? 'hsl(220,20%,20%)' : 'hsl(40,15%,92%)', padding: '4px 10px' }}>{s}</span>))}
                       </div>
                     </div>
-                    {p.image && (
-                      <div style={{ position: 'absolute', inset: 0, opacity: imageRevealed ? 0 : 1, transition: 'opacity 0.45s cubic-bezier(0.4,0,0.2,1)', pointerEvents: imageRevealed ? 'none' : 'auto', overflow: 'hidden' }}>
+                    {!isMobile && p.image && (
+                      <div style={{ position: 'absolute', inset: 0, opacity: isHovered ? 0 : 1, transition: 'opacity 0.45s cubic-bezier(0.4,0,0.2,1)', pointerEvents: isHovered ? 'none' : 'auto', overflow: 'hidden' }}>
                         <img src={p.image} alt={p.title} onError={e => { (e.currentTarget.parentElement as HTMLElement).style.display = 'none'; }} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }} />
                         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%', background: `linear-gradient(to bottom, transparent, ${cardBg === 'transparent' ? PAPER : cardBg})` }} />
-                        <div style={{ position: 'absolute', bottom: 10, right: 12, fontSize: 9, fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: p.highlight ? 'hsl(220,15%,55%)' : MUTED }}>
-                          {isMobile ? 'Tap to explore →' : 'Hover to explore →'}
-                        </div>
+                        <div style={{ position: 'absolute', bottom: 10, right: 12, fontSize: 9, fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: p.highlight ? 'hsl(220,15%,55%)' : MUTED }}>Hover to explore →</div>
                       </div>
                     )}
                   </div>
