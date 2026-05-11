@@ -539,6 +539,17 @@ const SETTING_GROUPS: { label: string; keys: { key: string; label: string; multi
     ],
   },
   {
+    label: 'Section Labels',
+    keys: [
+      { key: 'section.profile_label', label: 'Profile — section header & nav label' },
+      { key: 'section.achievements_label', label: 'Achievements — section header & nav label' },
+      { key: 'section.career_label', label: 'Career — section header & nav label' },
+      { key: 'section.capability_label', label: 'Capability — section header & nav label' },
+      { key: 'section.education_label', label: 'Education — section header & nav label' },
+      { key: 'section.contact_label', label: 'Contact — section header & nav label' },
+    ],
+  },
+  {
     label: 'Footer',
     keys: [
       { key: 'footer.copyright', label: 'Copyright line' },

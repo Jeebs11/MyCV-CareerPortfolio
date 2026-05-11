@@ -11,14 +11,6 @@ const BRASS_LIGHT = 'hsl(35,55%,62%)';
 const HAIRLINE = 'hsl(40,15%,87%)';
 const MUTED = 'hsl(220,12%,52%)';
 
-const NAV_ITEMS = [
-  { id: 'profile', label: 'Profile' },
-  { id: 'mandates', label: 'Achievements' },
-  { id: 'career', label: 'Career' },
-  { id: 'capability', label: 'Capability' },
-  { id: 'education', label: 'Education' },
-  { id: 'contact', label: 'Contact' },
-];
 
 interface SiteSettings { [key: string]: string }
 interface CVForm { name: string; email: string; phone: string }
@@ -157,6 +149,23 @@ export default function Home() {
   const linkedIn = settings['contact.linkedin_url'] || 'https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/';
   const copyright = settings['footer.copyright'] || '© 2025 Mujeeb Lawal. All rights reserved.';
 
+  const sectionLabels = {
+    profile:      settings['section.profile_label']      || 'Profile',
+    achievements: settings['section.achievements_label'] || 'Top Key Achievements',
+    career:       settings['section.career_label']       || 'Career',
+    capability:   settings['section.capability_label']   || 'Capability',
+    education:    settings['section.education_label']    || 'Education',
+    contact:      settings['section.contact_label']      || 'Contact',
+  };
+  const navItems = [
+    { id: 'profile',    label: sectionLabels.profile },
+    { id: 'mandates',   label: sectionLabels.achievements },
+    { id: 'career',     label: sectionLabels.career },
+    { id: 'capability', label: sectionLabels.capability },
+    { id: 'education',  label: sectionLabels.education },
+    { id: 'contact',    label: sectionLabels.contact },
+  ];
+
   const profileName = settings['profile.name'] || 'Mujeeb Lawal';
   const profileTitle = settings['profile.title'] || 'Senior Programme Director';
   const baseQuote = settings['profile.quote'] || '"A programme director who builds institutions, not just outputs — governing at scale, delivering under pressure, and leaving infrastructure behind."';
@@ -247,7 +256,7 @@ export default function Home() {
             {/* Mobile nav drawer */}
             {mobileNavOpen && (
               <div style={{ background: INK, borderBottom: '1px solid hsl(220,20%,22%)', padding: '12px 24px 16px' }}>
-                {NAV_ITEMS.map(item => (
+                {navItems.map(item => (
                   <button key={item.id} onClick={() => scrollTo(item.id)} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 0', background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'hsl(220,15%,60%)', borderBottom: '1px solid hsl(220,20%,20%)' }}>{item.label}</button>
                 ))}
                 <div style={{ display: 'flex', gap: 20, marginTop: 12 }}>
@@ -275,7 +284,7 @@ export default function Home() {
               ))}
             </div>
             <nav style={{ flex: 1 }}>
-              {NAV_ITEMS.map(item => (
+              {navItems.map(item => (
                 <button key={item.id} onClick={() => scrollTo(item.id)} data-testid={`nav-${item.id}`} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '12px 0 12px 12px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: activeSection === item.id ? 600 : 400, letterSpacing: '0.16em', textTransform: 'uppercase', color: activeSection === item.id ? BRASS_LIGHT : 'hsl(220,15%,50%)', borderLeft: activeSection === item.id ? `2px solid ${BRASS_LIGHT}` : '2px solid transparent', transition: 'all 0.15s' }}>{item.label}</button>
               ))}
               <div style={{ marginTop: 24, paddingTop: 24, borderTop: '1px solid hsl(220,20%,22%)' }}>
@@ -311,7 +320,7 @@ export default function Home() {
 
         {/* PROFILE */}
         <section id="profile" ref={el => s('profile', el)} style={{ paddingTop: isMobile ? 40 : 64, paddingBottom: 56 }}>
-          <SectionRule label="Profile" isMobile={isMobile} />
+          <SectionRule label={sectionLabels.profile} isMobile={isMobile} />
           <div style={{ padding: `0 ${P}px` }}>
             <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: isMobile ? 20 : 26, fontWeight: 400, lineHeight: 1.5, color: INK, maxWidth: 620, marginBottom: 24, fontStyle: 'italic' }}>
               {profileQuote}
@@ -330,7 +339,7 @@ export default function Home() {
 
         {/* MANDATES */}
         <section id="mandates" ref={el => s('mandates', el)} style={{ paddingBottom: 56 }}>
-          <SectionRule label="Top Key Achievements" isMobile={isMobile} />
+          <SectionRule label={sectionLabels.achievements} isMobile={isMobile} />
           <div style={{ padding: `0 ${P}px`, display: 'flex', flexDirection: 'column', gap: isMobile ? 32 : 40 }}>
             {effectiveFlagshipWins.length > 0
               ? effectiveFlagshipWins.slice(0, 3).map((win, i) => (
@@ -369,7 +378,7 @@ export default function Home() {
 
         {/* CAREER */}
         <section id="career" ref={el => s('career', el)} style={{ paddingBottom: 56 }}>
-          <SectionRule label="Career" isMobile={isMobile} />
+          <SectionRule label={sectionLabels.career} isMobile={isMobile} />
           <div style={{ padding: `0 ${P}px` }}>
             {(effectiveCareerRoles.length > 0 ? effectiveCareerRoles : [
               { id: 1, role: 'Head of Projects & PMO Lead', company: 'Novocycle Technology', period: 'Apr 2024 – Present', employmentType: 'Permanent', description: 'Built PMO from scratch; EU-funded battery recycling programmes; 36% reporting efficiency gain' },
@@ -466,7 +475,7 @@ export default function Home() {
 
         {/* CAPABILITY */}
         <section id="capability" ref={el => s('capability', el)} style={{ paddingBottom: 56 }}>
-          <SectionRule label="Capability" isMobile={isMobile} />
+          <SectionRule label={sectionLabels.capability} isMobile={isMobile} />
           <div style={{ padding: `0 ${P}px` }}>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 32 : 40 }}>
               {[
@@ -488,7 +497,7 @@ export default function Home() {
 
         {/* EDUCATION */}
         <section id="education" ref={el => s('education', el)} style={{ paddingBottom: 56 }}>
-          <SectionRule label="Education" isMobile={isMobile} />
+          <SectionRule label={sectionLabels.education} isMobile={isMobile} />
           <div style={{ padding: `0 ${P}px` }}>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 16 : 40 }}>
               {(education.length > 0 ? education : [
@@ -507,7 +516,7 @@ export default function Home() {
 
         {/* CONTACT */}
         <section id="contact" ref={el => s('contact', el)} style={{ paddingBottom: 64 }}>
-          <SectionRule label="Contact" isMobile={isMobile} />
+          <SectionRule label={sectionLabels.contact} isMobile={isMobile} />
           <div style={{ padding: `0 ${P}px` }}>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 12 : 40, marginBottom: 40 }}>
               {[
