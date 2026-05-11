@@ -154,7 +154,7 @@ function reorderCaseUpdate<T extends { id: unknown; sortOrder: unknown }>(
 ) {
   const ids = orders.map(o => o.id);
   const cases = orders.map(
-    o => sql`WHEN ${(table as unknown as { id: unknown }).id} = ${o.id} THEN ${o.sortOrder}`
+    o => sql`WHEN ${(table as unknown as { id: unknown }).id} = ${o.id} THEN ${o.sortOrder}::integer`
   );
   const joined = sql.join(cases, sql.raw(' '));
   return { ids, joined };

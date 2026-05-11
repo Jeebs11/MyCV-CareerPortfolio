@@ -278,6 +278,12 @@ export default function Home() {
                 {(() => { const idx = profileName.indexOf(' '); return idx >= 0 ? <>{profileName.slice(0, idx)}<br />{profileName.slice(idx + 1)}</> : profileName; })()}
               </div>
               <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: BRASS_LIGHT }}>{profileTitle}</div>
+              {settings['hero.status_badge'] && (
+                <div style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 6, background: 'hsl(220,20%,20%)', border: '1px solid hsl(220,20%,28%)', padding: '5px 10px' }}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'hsl(140,60%,50%)', flexShrink: 0 }} />
+                  <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'hsl(140,50%,65%)' }}>{settings['hero.status_badge']}</span>
+                </div>
+              )}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', marginBottom: 44, borderTop: '1px solid hsl(220,20%,25%)' }}>
               {stats.map((stat, i) => (
