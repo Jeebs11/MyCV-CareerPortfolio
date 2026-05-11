@@ -496,7 +496,7 @@ export default function Home() {
               ].map((col, i) => (
                 <div key={i}>
                   <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: INK, marginBottom: 16 }}>{col.label}</div>
-                  {col.items.slice(0, 7).map((item, j) => (
+                  {col.items.map((item, j) => (
                     <div key={j} style={{ fontSize: 13, color: 'hsl(220,15%,38%)', padding: '9px 0', borderBottom: `1px solid ${HAIRLINE}` }}>{item}</div>
                   ))}
                 </div>
