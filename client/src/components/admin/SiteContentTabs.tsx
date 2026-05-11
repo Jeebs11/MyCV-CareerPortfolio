@@ -222,9 +222,12 @@ type FlagshipFormState = Partial<InsertFlagshipWin> & { metricsText?: string };
 export function FlagshipWinsAdmin({ adminPassword }: AdminProps) {
   const { toast } = useToast();
   const { data: wins = [], isLoading } = useQuery<FlagshipWinRow[]>({ queryKey: ['/api/site/flagship-wins'] });
+  const [localWins, setLocalWins] = useState<FlagshipWinRow[]>([]);
   const [editing, setEditing] = useState<FlagshipWinRow | null>(null);
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState<FlagshipFormState>({});
+
+  useEffect(() => { setLocalWins(wins); }, [wins]);
 
   const openCreate = () => { setEditing(null); setForm({ icon: 'Target', colorGradient: FLAGSHIP_GRADIENTS[0].value, metricsText: '' }); setCreating(true); };
   const openEdit = (w: FlagshipWinRow) => { setEditing(w); setForm({ ...w, metricsText: arrayToText(w.metrics) }); setCreating(true); };
@@ -260,13 +263,18 @@ export function FlagshipWinsAdmin({ adminPassword }: AdminProps) {
     mutationFn: async (orders: { id: number; sortOrder: number }[]) =>
       authedFetch('/api/site/flagship-wins/reorder', 'POST', adminPassword, { orders }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['/api/site/flagship-wins'] }),
+    onError: (err: Error) => {
+      setLocalWins(wins);
+      toast({ title: 'Reorder failed', description: err.message, variant: 'destructive' });
+    },
   });
 
   const move = (idx: number, dir: -1 | 1) => {
     const target = idx + dir;
-    if (target < 0 || target >= wins.length) return;
-    const arr = [...wins];
+    if (target < 0 || target >= localWins.length) return;
+    const arr = [...localWins];
     [arr[idx], arr[target]] = [arr[target], arr[idx]];
+    setLocalWins(arr);
     reorderMutation.mutate(arr.map((r, i) => ({ id: r.id, sortOrder: i })));
   };
 
@@ -284,11 +292,11 @@ export function FlagshipWinsAdmin({ adminPassword }: AdminProps) {
       </div>
       {isLoading ? <p className="text-white/60">Loading...</p> : (
         <div className="space-y-2">
-          {wins.map((w, idx) => (
+          {localWins.map((w, idx) => (
             <Card key={w.id} className="bg-white/5 border-white/10 p-4 flex items-center gap-3" data-testid={`card-flagship-${w.id}`}>
               <div className="flex flex-col gap-1">
-                <Button size="icon" variant="ghost" onClick={() => move(idx, -1)} disabled={idx === 0} className="text-white/60 h-7 w-7"><ArrowUp className="w-3 h-3" /></Button>
-                <Button size="icon" variant="ghost" onClick={() => move(idx, 1)} disabled={idx === wins.length - 1} className="text-white/60 h-7 w-7"><ArrowDown className="w-3 h-3" /></Button>
+                <Button size="icon" variant="ghost" onClick={() => move(idx, -1)} disabled={idx === 0 || reorderMutation.isPending} className="text-white/60 h-7 w-7"><ArrowUp className="w-3 h-3" /></Button>
+                <Button size="icon" variant="ghost" onClick={() => move(idx, 1)} disabled={idx === localWins.length - 1 || reorderMutation.isPending} className="text-white/60 h-7 w-7"><ArrowDown className="w-3 h-3" /></Button>
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-medium text-white truncate">{w.title}</div>
