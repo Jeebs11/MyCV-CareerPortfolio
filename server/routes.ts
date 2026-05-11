@@ -909,6 +909,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (e) { console.error(e); res.status(500).json({ error: "Failed to upload" }); }
   });
 
+  // OG image upload — saves as /uploads/og-image.jpg (fixed filename for meta tag)
+  const ogImageStorage = multer.diskStorage({
+    destination: async (req, file, cb) => {
+      const dir = path.join(process.cwd(), 'uploads');
+      await fs.mkdir(dir, { recursive: true });
+      cb(null, dir);
+    },
+    filename: (req, file, cb) => cb(null, 'og-image.jpg'),
+  });
+  const ogImageUpload = multer({
+    storage: ogImageStorage,
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: (req, file, cb) => cb(null, /image\/(jpeg|jpg|png|webp)/.test(file.mimetype)),
+  });
+  app.post("/api/site/upload-og-image", adminAuth, ogImageUpload.single('image'), async (req, res) => {
+    try {
+      if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+      res.json({ success: true, url: '/uploads/og-image.jpg' });
+    } catch (e) { console.error(e); res.status(500).json({ error: "Failed to upload OG image" }); }
+  });
+
+  // Sitemap
+  app.get('/sitemap.xml', (req, res) => {
+    const base = 'https://mujeeblawal.replit.app';
+    const pages = [
+      { path: '/', priority: '1.0', freq: 'weekly' },
+      { path: '/case-studies', priority: '0.8', freq: 'monthly' },
+      { path: '/portfolio', priority: '0.8', freq: 'weekly' },
+      { path: '/insights', priority: '0.8', freq: 'weekly' },
+    ];
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${pages.map(p => `  <url>
+    <loc>${base}${p.path}</loc>
+    <changefreq>${p.freq}</changefreq>
+    <priority>${p.priority}</priority>
+  </url>`).join('\n')}
+</urlset>`;
+    res.set('Content-Type', 'application/xml');
+    res.send(xml);
+  });
+
+  // Robots.txt
+  app.get('/robots.txt', (req, res) => {
+    res.type('text/plain');
+    res.send(`User-agent: *\nAllow: /\nSitemap: https://mujeeblawal.replit.app/sitemap.xml\n`);
+  });
+
   // Seed defaults from constants if tables are empty
   try { await storage.seedSiteContentIfEmpty(); }
   catch (e) { console.error("Seed error:", e); }

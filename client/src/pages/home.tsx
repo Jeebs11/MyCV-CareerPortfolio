@@ -50,6 +50,12 @@ export default function Home() {
   const [cvForm, setCvForm] = useState<CVForm>({ name: '', email: '', phone: '' });
   const [cvSubmitting, setCvSubmitting] = useState(false);
   const [cvError, setCvError] = useState('');
+  const [expandedRoles, setExpandedRoles] = useState<Set<number | string>>(new Set());
+  const toggleRole = (id: number | string) => setExpandedRoles(prev => {
+    const next = new Set(prev);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
   const mainRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
@@ -376,52 +382,70 @@ export default function Home() {
               { id: 8, role: 'Senior Implementation Consultant', company: 'Dictate.IT', period: 'Sep 2014 – May 2016', employmentType: 'Permanent', description: "NHS digital dictation deployment; St George's, Royal Free, Nuffield Health" },
               { id: 9, role: 'Technical Project Manager', company: 'BSS Industrial', period: 'Nov 2013 – Aug 2014', employmentType: 'Permanent', description: 'High-profile construction; Hilton Brighton, commercial fit-outs' },
               { id: 10, role: 'Project Support Engineer', company: 'Alfa Laval', period: 'Sep 2008 – Nov 2013', employmentType: 'Permanent', description: 'The Shard, London 2012 Olympic Aquatic Centre, 20 Fenchurch Street' },
-            ] as any[]).map((role: any, i: number) => (
-              <div key={role.id || i} style={{ padding: '16px 0', borderBottom: `1px solid ${HAIRLINE}` }}>
-                {isMobile ? (
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4, gap: 8 }}>
-                      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 17, fontWeight: 500, color: INK, lineHeight: 1.2 }}>{role.role}</div>
-                      <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: role.employmentType === 'Permanent' ? BRASS : 'hsl(200,55%,45%)', flexShrink: 0 }}>{role.employmentType}</div>
-                    </div>
-                    <div style={{ fontSize: 12, color: MUTED, marginBottom: 4 }}>{role.company} · {role.period}</div>
-                    <div style={{ fontSize: 12, color: 'hsl(220,15%,48%)', lineHeight: 1.6 }}>{role.description}</div>
-                    {Array.isArray(role.keyAchievements) && role.keyAchievements.length > 0 && (
-                      <div style={{ marginTop: 6 }}>
-                        {role.keyAchievements.slice(0, 4).map((a: string, k: number) => (
-                          <div key={k} style={{ display: 'flex', alignItems: 'flex-start', gap: 7, fontSize: 11, color: 'hsl(220,15%,48%)', lineHeight: 1.5, padding: '2px 0' }}>
-                            <span style={{ color: BRASS, fontSize: 9, marginTop: 2, flexShrink: 0 }}>—</span>{a}
+            ] as any[]).map((role: any, i: number) => {
+              const roleKey = role.id ?? i;
+              const isExpanded = expandedRoles.has(roleKey);
+              const hasDetail = role.description || (Array.isArray(role.keyAchievements) && role.keyAchievements.length > 0);
+              return (
+                <div key={roleKey} style={{ borderBottom: `1px solid ${HAIRLINE}` }}>
+                  {/* Clickable header row */}
+                  <div
+                    onClick={() => hasDetail && toggleRole(roleKey)}
+                    style={{ padding: '14px 0', cursor: hasDetail ? 'pointer' : 'default' }}
+                  >
+                    {isMobile ? (
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 17, fontWeight: 500, color: INK, lineHeight: 1.2 }}>{role.role}</div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                            <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: role.employmentType === 'Permanent' ? BRASS : 'hsl(200,55%,45%)' }}>{role.employmentType}</div>
+                            {hasDetail && <span style={{ fontSize: 14, color: BRASS, lineHeight: 1 }}>{isExpanded ? '−' : '+'}</span>}
                           </div>
-                        ))}
+                        </div>
+                        <div style={{ fontSize: 12, color: MUTED, marginTop: 3 }}>{role.company} · {role.period}</div>
+                        {!isExpanded && hasDetail && (
+                          <div style={{ fontSize: 10, color: BRASS, letterSpacing: '0.06em', marginTop: 5 }}>View key impacts ▸</div>
+                        )}
+                      </div>
+                    ) : (
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr 148px', alignItems: 'center', gap: 24 }}>
+                        <div>
+                          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 18, fontWeight: 500, color: INK, marginBottom: 2 }}>{role.role}</div>
+                          <div style={{ fontSize: 12, color: MUTED }}>{role.company}</div>
+                        </div>
+                        <div style={{ fontSize: 11, color: BRASS, letterSpacing: '0.06em' }}>
+                          {hasDetail ? (isExpanded ? '▾ Hide details' : '▸ View key impacts') : ''}
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ fontSize: 11, color: MUTED, marginBottom: 4, whiteSpace: 'nowrap' }}>{role.period}</div>
+                          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: role.employmentType === 'Permanent' ? BRASS : 'hsl(200,55%,45%)' }}>{role.employmentType}</div>
+                        </div>
                       </div>
                     )}
                   </div>
-                ) : (
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr 148px', alignItems: 'start', gap: 24 }}>
-                    <div>
-                      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 18, fontWeight: 500, color: INK, marginBottom: 2 }}>{role.role}</div>
-                      <div style={{ fontSize: 12, color: MUTED }}>{role.company}</div>
-                    </div>
-                    <div style={{ fontSize: 12, color: 'hsl(220,15%,45%)', paddingTop: 3 }}>
-                      <div style={{ lineHeight: 1.6, marginBottom: Array.isArray(role.keyAchievements) && role.keyAchievements.length > 0 ? 6 : 0 }}>{role.description}</div>
+                  {/* Expandable detail */}
+                  {isExpanded && hasDetail && (
+                    <div style={{ paddingBottom: 16, paddingLeft: isMobile ? 0 : 0 }}>
+                      {role.description && (
+                        <div style={{ fontSize: 12, color: 'hsl(220,15%,45%)', lineHeight: 1.7, marginBottom: Array.isArray(role.keyAchievements) && role.keyAchievements.length > 0 ? 10 : 0 }}>
+                          {role.description}
+                        </div>
+                      )}
                       {Array.isArray(role.keyAchievements) && role.keyAchievements.length > 0 && (
                         <div>
-                          {role.keyAchievements.slice(0, 4).map((a: string, k: number) => (
-                            <div key={k} style={{ display: 'flex', alignItems: 'flex-start', gap: 7, fontSize: 11, color: 'hsl(220,15%,48%)', lineHeight: 1.55, padding: '2px 0' }}>
-                              <span style={{ color: BRASS, fontSize: 9, marginTop: 2, flexShrink: 0 }}>—</span>{a}
+                          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: MUTED, marginBottom: 6 }}>Key Impacts</div>
+                          {role.keyAchievements.map((a: string, k: number) => (
+                            <div key={k} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, color: 'hsl(220,15%,42%)', lineHeight: 1.6, padding: '3px 0', borderBottom: `1px solid ${HAIRLINE}` }}>
+                              <span style={{ color: BRASS, fontSize: 9, marginTop: 4, flexShrink: 0 }}>—</span>{a}
                             </div>
                           ))}
                         </div>
                       )}
                     </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: 11, color: MUTED, marginBottom: 4, whiteSpace: 'nowrap' }}>{role.period}</div>
-                      <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: role.employmentType === 'Permanent' ? BRASS : 'hsl(200,55%,45%)' }}>{role.employmentType}</div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
+                  )}
+                </div>
+              );
+            })}
           </div>
         </section>
 

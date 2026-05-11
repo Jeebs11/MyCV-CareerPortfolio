@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, RotateCcw, Save } from 'lucide-react';
+import { Loader2, RotateCcw, Save, Upload, ImageIcon } from 'lucide-react';
 
 interface Props { adminPassword: string }
 
@@ -211,6 +211,7 @@ export function AppearanceAdmin({ adminPassword }: Props) {
   };
 
   return (
+    <>
     <Card className="p-6 space-y-6" data-testid="card-appearance">
       <div>
         <h2 className="text-xl font-semibold mb-1">Appearance</h2>
@@ -291,6 +292,84 @@ export function AppearanceAdmin({ adminPassword }: Props) {
           <RotateCcw className="h-4 w-4 mr-2" />
           Restore Defaults
         </Button>
+      </div>
+    </Card>
+
+    {/* OG / Share Preview Image */}
+    <OGImageUpload adminPassword={adminPassword} />
+    </>
+  );
+}
+
+function OGImageUpload({ adminPassword }: { adminPassword: string }) {
+  const { toast } = useToast();
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [preview, setPreview] = useState<string | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setFile(f);
+    setPreview(URL.createObjectURL(f));
+  };
+
+  const handleUpload = async () => {
+    if (!file) return;
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('image', file);
+      const res = await fetch('/api/site/upload-og-image', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${adminPassword}` },
+        body: fd,
+      });
+      if (!res.ok) throw new Error('Upload failed');
+      toast({ title: 'Share image saved', description: 'og-image.jpg updated. Redeploy to apply in production.' });
+      setFile(null);
+    } catch {
+      toast({ title: 'Upload failed', variant: 'destructive' });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <Card className="p-6 space-y-4">
+      <div>
+        <h3 className="font-semibold text-base mb-1">Share Preview Image (OG Image)</h3>
+        <p className="text-sm text-muted-foreground">
+          This image appears when your site URL is shared on LinkedIn, WhatsApp, Twitter, etc.
+          Recommended size: <strong>1200 × 630 px</strong> (JPG or PNG).
+        </p>
+      </div>
+      {preview && (
+        <img src={preview} alt="OG preview" className="rounded-md w-full max-w-sm object-cover border border-border" style={{ aspectRatio: '1200/630' }} />
+      )}
+      {!preview && (
+        <div className="flex items-center justify-center w-full max-w-sm rounded-md border border-dashed border-border bg-muted/40 text-muted-foreground" style={{ aspectRatio: '1200/630' }}>
+          <div className="text-center p-4">
+            <ImageIcon className="w-8 h-8 mx-auto mb-2 opacity-40" />
+            <p className="text-xs">No image uploaded yet</p>
+            <p className="text-xs opacity-60">Current: /uploads/og-image.jpg</p>
+          </div>
+        </div>
+      )}
+      <div className="flex items-center gap-3">
+        <label className="cursor-pointer">
+          <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleFileChange} data-testid="input-og-image" />
+          <Button variant="outline" asChild>
+            <span><Upload className="w-4 h-4 mr-2" />Choose image</span>
+          </Button>
+        </label>
+        {file && (
+          <Button onClick={handleUpload} disabled={uploading} data-testid="button-upload-og-image">
+            {uploading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
+            Upload &amp; Save
+          </Button>
+        )}
+        {file && <span className="text-sm text-muted-foreground truncate max-w-[200px]">{file.name}</span>}
       </div>
     </Card>
   );
