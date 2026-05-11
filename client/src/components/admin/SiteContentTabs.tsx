@@ -355,12 +355,15 @@ const SKILL_CATEGORIES = [
 export function SiteSkillsAdmin({ adminPassword }: AdminProps) {
   const { toast } = useToast();
   const { data: skills = [], isLoading } = useQuery<SiteSkillRow[]>({ queryKey: ['/api/site/skills'] });
+  const [localSkills, setLocalSkills] = useState<SiteSkillRow[]>([]);
   const [editing, setEditing] = useState<SiteSkillRow | null>(null);
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState<Partial<InsertSiteSkill>>({});
   const [filter, setFilter] = useState<string>('all');
 
-  const filtered = useMemo(() => filter === 'all' ? skills : skills.filter(s => s.category === filter), [skills, filter]);
+  useEffect(() => { setLocalSkills(skills); }, [skills]);
+
+  const filtered = useMemo(() => filter === 'all' ? localSkills : localSkills.filter(s => s.category === filter), [localSkills, filter]);
 
   const openCreate = () => { setEditing(null); setForm({ category: 'methodology' }); setCreating(true); };
   const openEdit = (s: SiteSkillRow) => { setEditing(s); setForm({ ...s }); setCreating(true); };
@@ -393,15 +396,21 @@ export function SiteSkillsAdmin({ adminPassword }: AdminProps) {
     mutationFn: async (orders: { id: number; sortOrder: number }[]) =>
       authedFetch('/api/site/skills/reorder', 'POST', adminPassword, { orders }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['/api/site/skills'] }),
+    onError: (err: Error) => {
+      setLocalSkills(skills);
+      toast({ title: 'Reorder failed', description: err.message, variant: 'destructive' });
+    },
   });
 
   const move = (skill: SiteSkillRow, dir: -1 | 1) => {
-    const sameCat = skills.filter(s => s.category === skill.category);
+    const sameCat = localSkills.filter(s => s.category === skill.category);
     const idx = sameCat.findIndex(s => s.id === skill.id);
     const target = idx + dir;
     if (target < 0 || target >= sameCat.length) return;
     const arr = [...sameCat];
     [arr[idx], arr[target]] = [arr[target], arr[idx]];
+    const others = localSkills.filter(s => s.category !== skill.category);
+    setLocalSkills([...others, ...arr]);
     reorderMutation.mutate(arr.map((r, i) => ({ id: r.id, sortOrder: i })));
   };
 
@@ -432,8 +441,8 @@ export function SiteSkillsAdmin({ adminPassword }: AdminProps) {
           {filtered.map(s => (
             <Card key={s.id} className="bg-white/5 border-white/10 p-3 flex items-center gap-2" data-testid={`card-skill-${s.id}`}>
               <div className="flex flex-col">
-                <Button size="icon" variant="ghost" onClick={() => move(s, -1)} className="text-white/60 h-6 w-6" data-testid={`button-skill-up-${s.id}`}><ArrowUp className="w-3 h-3" /></Button>
-                <Button size="icon" variant="ghost" onClick={() => move(s, 1)} className="text-white/60 h-6 w-6" data-testid={`button-skill-down-${s.id}`}><ArrowDown className="w-3 h-3" /></Button>
+                <Button size="icon" variant="ghost" onClick={() => move(s, -1)} disabled={reorderMutation.isPending} className="text-white/60 h-6 w-6" data-testid={`button-skill-up-${s.id}`}><ArrowUp className="w-3 h-3" /></Button>
+                <Button size="icon" variant="ghost" onClick={() => move(s, 1)} disabled={reorderMutation.isPending} className="text-white/60 h-6 w-6" data-testid={`button-skill-down-${s.id}`}><ArrowDown className="w-3 h-3" /></Button>
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-medium text-white truncate">{s.name}</div>
@@ -692,9 +701,12 @@ type CertFormState = Partial<InsertSiteCertification> & { skillsText?: string };
 export function SiteCertificationsAdmin({ adminPassword }: AdminProps) {
   const { toast } = useToast();
   const { data: certs = [], isLoading } = useQuery<SiteCertificationRow[]>({ queryKey: ['/api/site/certifications'] });
+  const [localCerts, setLocalCerts] = useState<SiteCertificationRow[]>([]);
   const [editing, setEditing] = useState<SiteCertificationRow | null>(null);
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState<CertFormState>({});
+
+  useEffect(() => { setLocalCerts(certs); }, [certs]);
 
   const openCreate = () => { setEditing(null); setForm({ skillsText: '' }); setCreating(true); };
   const openEdit = (c: SiteCertificationRow) => { setEditing(c); setForm({ ...c, skillsText: arrayToText(c.skills ?? []) }); setCreating(true); };
@@ -729,13 +741,18 @@ export function SiteCertificationsAdmin({ adminPassword }: AdminProps) {
     mutationFn: async (orders: { id: number; sortOrder: number }[]) =>
       authedFetch('/api/site/certifications/reorder', 'POST', adminPassword, { orders }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['/api/site/certifications'] }),
+    onError: (err: Error) => {
+      setLocalCerts(certs);
+      toast({ title: 'Reorder failed', description: err.message, variant: 'destructive' });
+    },
   });
 
   const move = (idx: number, dir: -1 | 1) => {
     const target = idx + dir;
-    if (target < 0 || target >= certs.length) return;
-    const arr = [...certs];
+    if (target < 0 || target >= localCerts.length) return;
+    const arr = [...localCerts];
     [arr[idx], arr[target]] = [arr[target], arr[idx]];
+    setLocalCerts(arr);
     reorderMutation.mutate(arr.map((r, i) => ({ id: r.id, sortOrder: i })));
   };
 
@@ -753,11 +770,11 @@ export function SiteCertificationsAdmin({ adminPassword }: AdminProps) {
       </div>
       {isLoading ? <p className="text-white/60">Loading...</p> : (
         <div className="space-y-2">
-          {certs.map((c, idx) => (
+          {localCerts.map((c, idx) => (
             <Card key={c.id} className="bg-white/5 border-white/10 p-4 flex items-center gap-3" data-testid={`card-cert-${c.id}`}>
               <div className="flex flex-col gap-1">
-                <Button size="icon" variant="ghost" onClick={() => move(idx, -1)} disabled={idx === 0} className="text-white/60 h-7 w-7"><ArrowUp className="w-3 h-3" /></Button>
-                <Button size="icon" variant="ghost" onClick={() => move(idx, 1)} disabled={idx === certs.length - 1} className="text-white/60 h-7 w-7"><ArrowDown className="w-3 h-3" /></Button>
+                <Button size="icon" variant="ghost" onClick={() => move(idx, -1)} disabled={idx === 0 || reorderMutation.isPending} className="text-white/60 h-7 w-7"><ArrowUp className="w-3 h-3" /></Button>
+                <Button size="icon" variant="ghost" onClick={() => move(idx, 1)} disabled={idx === localCerts.length - 1 || reorderMutation.isPending} className="text-white/60 h-7 w-7"><ArrowDown className="w-3 h-3" /></Button>
               </div>
               {c.badgeImage && <img src={c.badgeImage} alt="" className="w-10 h-10 rounded object-contain bg-white/10" />}
               <div className="flex-1 min-w-0">
@@ -808,9 +825,12 @@ type EduFormState = Partial<InsertSiteEducation> & { achievementsText?: string }
 export function SiteEducationAdmin({ adminPassword }: AdminProps) {
   const { toast } = useToast();
   const { data: items = [], isLoading } = useQuery<SiteEducationRow[]>({ queryKey: ['/api/site/education'] });
+  const [localItems, setLocalItems] = useState<SiteEducationRow[]>([]);
   const [editing, setEditing] = useState<SiteEducationRow | null>(null);
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState<EduFormState>({});
+
+  useEffect(() => { setLocalItems(items); }, [items]);
 
   const openCreate = () => { setEditing(null); setForm({ achievementsText: '' }); setCreating(true); };
   const openEdit = (e: SiteEducationRow) => { setEditing(e); setForm({ ...e, achievementsText: arrayToText(e.achievements ?? []) }); setCreating(true); };
@@ -843,13 +863,18 @@ export function SiteEducationAdmin({ adminPassword }: AdminProps) {
     mutationFn: async (orders: { id: number; sortOrder: number }[]) =>
       authedFetch('/api/site/education/reorder', 'POST', adminPassword, { orders }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['/api/site/education'] }),
+    onError: (err: Error) => {
+      setLocalItems(items);
+      toast({ title: 'Reorder failed', description: err.message, variant: 'destructive' });
+    },
   });
 
   const move = (idx: number, dir: -1 | 1) => {
     const target = idx + dir;
-    if (target < 0 || target >= items.length) return;
-    const arr = [...items];
+    if (target < 0 || target >= localItems.length) return;
+    const arr = [...localItems];
     [arr[idx], arr[target]] = [arr[target], arr[idx]];
+    setLocalItems(arr);
     reorderMutation.mutate(arr.map((r, i) => ({ id: r.id, sortOrder: i })));
   };
 
@@ -867,11 +892,11 @@ export function SiteEducationAdmin({ adminPassword }: AdminProps) {
       </div>
       {isLoading ? <p className="text-white/60">Loading...</p> : (
         <div className="space-y-2">
-          {items.map((e, idx) => (
+          {localItems.map((e, idx) => (
             <Card key={e.id} className="bg-white/5 border-white/10 p-4 flex items-center gap-3" data-testid={`card-edu-${e.id}`}>
               <div className="flex flex-col gap-1">
-                <Button size="icon" variant="ghost" onClick={() => move(idx, -1)} disabled={idx === 0} className="text-white/60 h-7 w-7"><ArrowUp className="w-3 h-3" /></Button>
-                <Button size="icon" variant="ghost" onClick={() => move(idx, 1)} disabled={idx === items.length - 1} className="text-white/60 h-7 w-7"><ArrowDown className="w-3 h-3" /></Button>
+                <Button size="icon" variant="ghost" onClick={() => move(idx, -1)} disabled={idx === 0 || reorderMutation.isPending} className="text-white/60 h-7 w-7"><ArrowUp className="w-3 h-3" /></Button>
+                <Button size="icon" variant="ghost" onClick={() => move(idx, 1)} disabled={idx === localItems.length - 1 || reorderMutation.isPending} className="text-white/60 h-7 w-7"><ArrowDown className="w-3 h-3" /></Button>
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-medium text-white truncate">{e.degree}</div>

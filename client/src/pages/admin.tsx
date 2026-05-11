@@ -220,6 +220,8 @@ export default function AdminPage() {
     queryKey: ['/api/projects'],
     enabled: isAuthenticated && activeTab === 'projects',
   });
+  const [localProjects, setLocalProjects] = useState<ProjectRow[]>([]);
+  useEffect(() => { setLocalProjects(projects); }, [projects]);
 
   // Built Projects query
   const { data: builtProjects = [], isLoading: isLoadingBuiltProjects } = useQuery<BuiltProjectRow[]>({
@@ -353,6 +355,10 @@ export default function AdminPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
     },
+    onError: () => {
+      setLocalProjects(projects);
+      toast({ title: 'Reorder failed', description: 'Could not save new order', variant: 'destructive' });
+    },
   });
 
   // ── BUILT PROJECTS helpers ────────────────────────────────────────────────
@@ -481,9 +487,10 @@ export default function AdminPage() {
 
   const handleProjectMove = (index: number, direction: 'up' | 'down') => {
     const target = direction === 'up' ? index - 1 : index + 1;
-    if (target < 0 || target >= projects.length) return;
-    const next = [...projects];
+    if (target < 0 || target >= localProjects.length) return;
+    const next = [...localProjects];
     [next[index], next[target]] = [next[target], next[index]];
+    setLocalProjects(next);
     const orders = next.map((p, i) => ({ id: p.id, sortOrder: i }));
     reorderProjectsMutation.mutate(orders);
   };
@@ -1318,7 +1325,7 @@ export default function AdminPage() {
               </Card>
             ) : (
               <div className="space-y-3">
-                {projects.map((project, index) => (
+                {localProjects.map((project, index) => (
                   <Card
                     key={project.id}
                     className="bg-white/5 backdrop-blur-xl border-white/10 p-4"
@@ -1341,7 +1348,7 @@ export default function AdminPage() {
                           variant="ghost"
                           className="h-7 w-7 text-white/60 hover:text-white"
                           onClick={() => handleProjectMove(index, 'down')}
-                          disabled={index === projects.length - 1 || reorderProjectsMutation.isPending}
+                          disabled={index === localProjects.length - 1 || reorderProjectsMutation.isPending}
                           data-testid={`button-move-down-${project.id}`}
                         >
                           <ArrowDown className="w-4 h-4" />
