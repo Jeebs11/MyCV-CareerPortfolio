@@ -270,6 +270,10 @@ export default function Home() {
           /* ── DESKTOP LEFT PANEL ── */
           <>
             <div style={{ marginBottom: 40 }}>
+              <svg width="36" height="36" viewBox="0 0 40 40" fill="none" style={{ marginBottom: 20 }}>
+                <rect width="40" height="40" rx="2" fill={BRASS} />
+                <text x="20" y="27" textAnchor="middle" fontFamily="Cormorant Garamond,serif" fontWeight="600" fontSize="15" fill={PAPER}>{profileName.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()}</text>
+              </svg>
               <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 44, fontWeight: 400, lineHeight: 1.05, color: PAPER, marginBottom: 10 }}>
                 {(() => { const idx = profileName.indexOf(' '); return idx >= 0 ? <>{profileName.slice(0, idx)}<br />{profileName.slice(idx + 1)}</> : profileName; })()}
               </div>
