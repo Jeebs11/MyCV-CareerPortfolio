@@ -352,7 +352,7 @@ export default function Home() {
           <SectionRule label={sectionLabels.achievements} isMobile={isMobile} />
           <div style={{ padding: `0 ${P}px`, display: 'flex', flexDirection: 'column', gap: isMobile ? 32 : 40 }}>
             {effectiveFlagshipWins.length > 0
-              ? effectiveFlagshipWins.slice(0, 3).map((win, i) => (
+              ? effectiveFlagshipWins.map((win, i) => (
                 <div key={win.id} style={{ display: 'grid', gridTemplateColumns: isMobile ? '40px 1fr' : '56px 1fr', gap: 0 }}>
                   <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: isMobile ? 28 : 36, fontWeight: 300, color: 'hsl(40,15%,82%)', lineHeight: 1 }}>0{i + 1}</div>
                   <div>
