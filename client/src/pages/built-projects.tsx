@@ -162,7 +162,7 @@ export default function BuiltProjectsPage() {
                     </div>
                     {p.image && (
                       <div style={{ position: 'absolute', inset: 0, opacity: imageRevealed ? 0 : 1, transition: 'opacity 0.45s cubic-bezier(0.4,0,0.2,1)', pointerEvents: imageRevealed ? 'none' : 'auto', overflow: 'hidden' }}>
-                        <img src={p.image} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }} />
+                        <img src={p.image} alt={p.title} onError={e => { (e.currentTarget.parentElement as HTMLElement).style.display = 'none'; }} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }} />
                         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%', background: `linear-gradient(to bottom, transparent, ${cardBg === 'transparent' ? PAPER : cardBg})` }} />
                         <div style={{ position: 'absolute', bottom: 10, right: 12, fontSize: 9, fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: p.highlight ? 'hsl(220,15%,55%)' : MUTED }}>
                           {isMobile ? 'Tap to explore →' : 'Hover to explore →'}

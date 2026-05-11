@@ -385,7 +385,16 @@ export default function Home() {
                       <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: role.employmentType === 'Permanent' ? BRASS : 'hsl(200,55%,45%)', flexShrink: 0 }}>{role.employmentType}</div>
                     </div>
                     <div style={{ fontSize: 12, color: MUTED, marginBottom: 4 }}>{role.company} · {role.period}</div>
-                    <div style={{ fontSize: 12, color: 'hsl(220,15%,48%)', lineHeight: 1.6 }}>{role.description || (Array.isArray(role.keyAchievements) ? role.keyAchievements[0] : '')}</div>
+                    <div style={{ fontSize: 12, color: 'hsl(220,15%,48%)', lineHeight: 1.6 }}>{role.description}</div>
+                    {Array.isArray(role.keyAchievements) && role.keyAchievements.length > 0 && (
+                      <div style={{ marginTop: 6 }}>
+                        {role.keyAchievements.slice(0, 4).map((a: string, k: number) => (
+                          <div key={k} style={{ display: 'flex', alignItems: 'flex-start', gap: 7, fontSize: 11, color: 'hsl(220,15%,48%)', lineHeight: 1.5, padding: '2px 0' }}>
+                            <span style={{ color: BRASS, fontSize: 9, marginTop: 2, flexShrink: 0 }}>—</span>{a}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr 148px', alignItems: 'start', gap: 24 }}>
@@ -393,7 +402,18 @@ export default function Home() {
                       <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 18, fontWeight: 500, color: INK, marginBottom: 2 }}>{role.role}</div>
                       <div style={{ fontSize: 12, color: MUTED }}>{role.company}</div>
                     </div>
-                    <div style={{ fontSize: 12, color: 'hsl(220,15%,45%)', paddingTop: 3 }}>{role.description || (Array.isArray(role.keyAchievements) ? role.keyAchievements[0] : '')}</div>
+                    <div style={{ fontSize: 12, color: 'hsl(220,15%,45%)', paddingTop: 3 }}>
+                      <div style={{ lineHeight: 1.6, marginBottom: Array.isArray(role.keyAchievements) && role.keyAchievements.length > 0 ? 6 : 0 }}>{role.description}</div>
+                      {Array.isArray(role.keyAchievements) && role.keyAchievements.length > 0 && (
+                        <div>
+                          {role.keyAchievements.slice(0, 4).map((a: string, k: number) => (
+                            <div key={k} style={{ display: 'flex', alignItems: 'flex-start', gap: 7, fontSize: 11, color: 'hsl(220,15%,48%)', lineHeight: 1.55, padding: '2px 0' }}>
+                              <span style={{ color: BRASS, fontSize: 9, marginTop: 2, flexShrink: 0 }}>—</span>{a}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                     <div style={{ textAlign: 'right' }}>
                       <div style={{ fontSize: 11, color: MUTED, marginBottom: 4, whiteSpace: 'nowrap' }}>{role.period}</div>
                       <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: role.employmentType === 'Permanent' ? BRASS : 'hsl(200,55%,45%)' }}>{role.employmentType}</div>
