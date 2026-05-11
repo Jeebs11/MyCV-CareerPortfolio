@@ -361,7 +361,7 @@ export class DatabaseStorage implements IStorage {
   // Career Roles
   async getAllCareerRoles(): Promise<CareerRoleRow[]> {
     try {
-      return await db.select().from(careerRolesTable).orderBy(asc(careerRolesTable.sortOrder), asc(careerRolesTable.id));
+      return await db.select().from(careerRolesTable).orderBy(asc(careerRolesTable.sortOrder), desc(careerRolesTable.id));
     } catch (err) {
       if (isNeonEmptyResultError(err)) return [];
       throw err;

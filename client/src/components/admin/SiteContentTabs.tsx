@@ -46,9 +46,12 @@ type CareerFormState = Partial<InsertCareerRole> & { keyAchievementsText?: strin
 export function CareerRolesAdmin({ adminPassword }: AdminProps) {
   const { toast } = useToast();
   const { data: roles = [], isLoading } = useQuery<CareerRoleRow[]>({ queryKey: ['/api/site/career-roles'] });
+  const [localRoles, setLocalRoles] = useState<CareerRoleRow[]>([]);
   const [editing, setEditing] = useState<CareerRoleRow | null>(null);
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState<CareerFormState>({});
+
+  useEffect(() => { setLocalRoles(roles); }, [roles]);
 
   const openCreate = () => {
     setEditing(null);
@@ -106,13 +109,18 @@ export function CareerRolesAdmin({ adminPassword }: AdminProps) {
     mutationFn: async (orders: { id: number; sortOrder: number }[]) =>
       authedFetch('/api/site/career-roles/reorder', 'POST', adminPassword, { orders }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['/api/site/career-roles'] }),
+    onError: (err: Error) => {
+      setLocalRoles(roles); // revert optimistic update
+      toast({ title: 'Reorder failed', description: err.message, variant: 'destructive' });
+    },
   });
 
   const move = (idx: number, dir: -1 | 1) => {
     const target = idx + dir;
-    if (target < 0 || target >= roles.length) return;
-    const reordered = [...roles];
+    if (target < 0 || target >= localRoles.length) return;
+    const reordered = [...localRoles];
     [reordered[idx], reordered[target]] = [reordered[target], reordered[idx]];
+    setLocalRoles(reordered); // instant visual update
     reorderMutation.mutate(reordered.map((r, i) => ({ id: r.id, sortOrder: i })));
   };
 
@@ -130,12 +138,12 @@ export function CareerRolesAdmin({ adminPassword }: AdminProps) {
       </div>
       {isLoading ? <p className="text-white/60">Loading...</p> : (
         <div className="space-y-2">
-          {roles.map((r, idx) => (
+          {localRoles.map((r, idx) => (
             <Card key={r.id} className="bg-white/5 border-white/10 p-4 flex items-center gap-3" data-testid={`card-career-role-${r.id}`}>
               <div className="flex flex-col gap-1">
-                <Button size="icon" variant="ghost" onClick={() => move(idx, -1)} disabled={idx === 0}
+                <Button size="icon" variant="ghost" onClick={() => move(idx, -1)} disabled={idx === 0 || reorderMutation.isPending}
                   className="text-white/60 h-7 w-7" data-testid={`button-up-${r.id}`}><ArrowUp className="w-3 h-3" /></Button>
-                <Button size="icon" variant="ghost" onClick={() => move(idx, 1)} disabled={idx === roles.length - 1}
+                <Button size="icon" variant="ghost" onClick={() => move(idx, 1)} disabled={idx === localRoles.length - 1 || reorderMutation.isPending}
                   className="text-white/60 h-7 w-7" data-testid={`button-down-${r.id}`}><ArrowDown className="w-3 h-3" /></Button>
               </div>
               <div className="flex-1 min-w-0">
