@@ -1,7 +1,39 @@
 import express, { type Request, Response, NextFunction } from "express";
 import path from "path";
+import fs from "fs";
+import { execSync } from "child_process";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+
+// Ensure a default OG image always exists so social crawlers never hit a 404
+(function ensureDefaultOgImage() {
+  const ogPath = path.join(process.cwd(), "uploads", "og-image.jpg");
+  if (!fs.existsSync(ogPath)) {
+    try {
+      fs.mkdirSync(path.join(process.cwd(), "uploads"), { recursive: true });
+      execSync(
+        `magick -size 1200x630 gradient:"#1a1f2e-#0d1119" ` +
+        `-fill "#a67c52" -draw "rectangle 0,0 7,630" ` +
+        `-fill "#a67c52" -draw "rectangle 0,608 1200,614" ` +
+        `\\( -background none -fill "#a67c52" -font DejaVu-Sans -pointsize 16 -kerning 8 label:"MUJEEB LAWAL" \\) ` +
+        `-gravity NorthWest -geometry +68+220 -composite ` +
+        `\\( -background none -fill "#f5f0e8" -font DejaVu-Sans-Bold -pointsize 54 label:"Senior Programme Director" \\) ` +
+        `-gravity NorthWest -geometry +68+248 -composite ` +
+        `\\( -background none -fill "#c8bfb0" -font DejaVu-Sans -pointsize 24 label:"17+ years · 4 continents · Multi-million-pound programmes" \\) ` +
+        `-gravity NorthWest -geometry +68+318 -composite ` +
+        `\\( -background none -fill "#a67c52" -font DejaVu-Sans-Bold -pointsize 13 -kerning 5 label:"STRATEGY · TRANSFORMATION · DELIVERY" \\) ` +
+        `-gravity NorthWest -geometry +68+370 -composite ` +
+        `\\( -background none -fill "#f5f0e8" -font DejaVu-Sans-Bold -pointsize 11 -kerning 3 label:"mujeeb-lawal.replit.app" \\) ` +
+        `-gravity SouthWest -geometry +68+26 -composite ` +
+        `-quality 92 "${ogPath}"`,
+        { stdio: "pipe" }
+      );
+      log("Generated default og-image.jpg");
+    } catch (e) {
+      log("Warning: could not generate default og-image.jpg");
+    }
+  }
+})();
 
 const app = express();
 app.use(express.json());
