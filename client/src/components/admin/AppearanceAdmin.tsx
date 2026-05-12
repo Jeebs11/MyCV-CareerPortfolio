@@ -307,6 +307,15 @@ function OGImageUpload({ adminPassword }: { adminPassword: string }) {
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
 
+  const [serverImageTs, setServerImageTs] = useState<number>(() => Date.now());
+
+  // Try to detect if a saved OG image already exists on the server
+  useEffect(() => {
+    fetch(`/uploads/og-image.jpg?check=${Date.now()}`, { method: 'HEAD' })
+      .then(r => { if (r.ok) setServerImageTs(Date.now()); })
+      .catch(() => {});
+  }, []);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
@@ -326,14 +335,19 @@ function OGImageUpload({ adminPassword }: { adminPassword: string }) {
         body: fd,
       });
       if (!res.ok) throw new Error('Upload failed');
-      toast({ title: 'Share image saved', description: 'og-image.jpg updated. Redeploy to apply in production.' });
+      const ts = Date.now();
+      setServerImageTs(ts);
+      setPreview(null);
       setFile(null);
+      toast({ title: 'Share image saved', description: 'OG image updated — visible immediately on the live site.' });
     } catch {
       toast({ title: 'Upload failed', variant: 'destructive' });
     } finally {
       setUploading(false);
     }
   };
+
+  const serverImageUrl = `/uploads/og-image.jpg?v=${serverImageTs}`;
 
   return (
     <Card className="p-6 space-y-4">
@@ -344,19 +358,27 @@ function OGImageUpload({ adminPassword }: { adminPassword: string }) {
           Recommended size: <strong>1200 × 630 px</strong> (JPG or PNG).
         </p>
       </div>
-      {preview && (
-        <img src={preview} alt="OG preview" className="rounded-md w-full max-w-sm object-cover border border-border" style={{ aspectRatio: '1200/630' }} />
-      )}
-      {!preview && (
-        <div className="flex items-center justify-center w-full max-w-sm rounded-md border border-dashed border-border bg-muted/40 text-muted-foreground" style={{ aspectRatio: '1200/630' }}>
-          <div className="text-center p-4">
-            <ImageIcon className="w-8 h-8 mx-auto mb-2 opacity-40" />
-            <p className="text-xs">No image uploaded yet</p>
-            <p className="text-xs opacity-60">Current: /uploads/og-image.jpg</p>
-          </div>
+      {preview ? (
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground">New image (not yet saved):</p>
+          <img src={preview} alt="OG preview" className="rounded-md w-full max-w-sm object-cover border border-border" style={{ aspectRatio: '1200/630' }} />
+        </div>
+      ) : (
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground">Current saved image:</p>
+          <img
+            src={serverImageUrl}
+            alt="Current OG image"
+            className="rounded-md w-full max-w-sm object-cover border border-border"
+            style={{ aspectRatio: '1200/630' }}
+            onError={e => {
+              const parent = (e.currentTarget as HTMLImageElement).parentElement!;
+              parent.innerHTML = `<div class="flex items-center justify-center w-full max-w-sm rounded-md border border-dashed border-border bg-muted/40 text-muted-foreground" style="aspect-ratio:1200/630"><div class="text-center p-4"><p class="text-xs">No image uploaded yet</p></div></div>`;
+            }}
+          />
         </div>
       )}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
         <label className="cursor-pointer">
           <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleFileChange} data-testid="input-og-image" />
           <Button variant="outline" asChild>
@@ -371,6 +393,7 @@ function OGImageUpload({ adminPassword }: { adminPassword: string }) {
         )}
         {file && <span className="text-sm text-muted-foreground truncate max-w-[200px]">{file.name}</span>}
       </div>
+      <p className="text-xs text-muted-foreground">Live URL: <code className="bg-muted px-1 py-0.5 rounded text-xs">/uploads/og-image.jpg</code></p>
     </Card>
   );
 }
