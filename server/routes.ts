@@ -932,7 +932,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Sitemap
   app.get('/sitemap.xml', (req, res) => {
-    const base = 'https://mujeeblawal.replit.app';
+    const base = 'https://mujeeb-lawal.replit.app';
     const pages = [
       { path: '/', priority: '1.0', freq: 'weekly' },
       { path: '/case-studies', priority: '0.8', freq: 'monthly' },
@@ -954,7 +954,7 @@ ${pages.map(p => `  <url>
   // Robots.txt
   app.get('/robots.txt', (req, res) => {
     res.type('text/plain');
-    res.send(`User-agent: *\nAllow: /\nSitemap: https://mujeeblawal.replit.app/sitemap.xml\n`);
+    res.send(`User-agent: *\nAllow: /\nSitemap: https://mujeeb-lawal.replit.app/sitemap.xml\n`);
   });
 
   // Seed defaults from constants if tables are empty
