@@ -213,7 +213,9 @@ function VariantForm({ adminPassword, editingVariant, onClose }: VariantFormProp
       if (!res.ok) throw new Error(await res.text());
       const data = await res.json();
       await queryClient.invalidateQueries({ queryKey: ['/api/cv/files'] });
-      if (data.id) setCvFileId(data.id);
+      // Upload response shape: { success: true, file: { id, filename, label, ... } }
+      const newId = data.file?.id ?? data.id ?? null;
+      if (newId) setCvFileId(newId);
     } catch (e: any) {
       alert(`CV upload failed: ${e.message}`);
     } finally {

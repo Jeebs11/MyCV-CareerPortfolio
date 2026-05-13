@@ -272,7 +272,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Get CV file — use variant-specified file if provided, otherwise fall back to latest.
       // If the variant's file has been deleted, also fall back to latest.
-      const cvFileId = typeof req.body.cvFileId === 'number' ? req.body.cvFileId : null;
+      // Accept both number and numeric string (JSONB can return either depending on driver)
+      const cvFileIdRaw = req.body.cvFileId;
+      const cvFileId = cvFileIdRaw != null ? (parseInt(String(cvFileIdRaw), 10) || null) : null;
       let cvFile = cvFileId ? await storage.getCVFileById(cvFileId) : undefined;
       if (!cvFile) {
         cvFile = await storage.getLatestCVFile();
