@@ -80,7 +80,7 @@ export const profileVariantsTable = pgTable('profile_variants', {
     stat1Val?: string; stat1Label?: string;
     stat2Val?: string; stat2Label?: string;
     stat3Val?: string; stat3Label?: string;
-    careerRoles?: Array<{ id: number; description: string }>;
+    careerRoles?: Array<{ id: number; description: string; keyAchievements?: string[] }>;
     skillsList?: Array<{ id: number; name: string; category: string }>;
     highlightedAchievements?: Array<{ id: number; overrideText?: string }>;
     cvFileId?: number | null;

@@ -19,7 +19,7 @@ type VariantContent = {
   stat1Val?: string; stat1Label?: string;
   stat2Val?: string; stat2Label?: string;
   stat3Val?: string; stat3Label?: string;
-  careerRoles?: Array<{ id: number; description: string }>;
+  careerRoles?: Array<{ id: number; description: string; keyAchievements?: string[] }>;
   skillsList?: Array<{ id: number; name: string; category: string }>;
   highlightedAchievements?: Array<{ id: number; overrideText?: string }>;
   cvFileId?: number | null;
@@ -102,6 +102,7 @@ function VariantForm({ adminPassword, editingVariant, onClose }: VariantFormProp
   const [cvUploading, setCvUploading] = useState(false);
   const cvFileRef = useRef<HTMLInputElement>(null);
   const [careerOverrides, setCareerOverrides] = useState<Record<number, string>>({});
+  const [careerKeyAchievements, setCareerKeyAchievements] = useState<Record<number, string[]>>({});
   // Ordered skills list with per-variant editable labels
   const [skillsList, setSkillsList] = useState<VariantSkill[]>([]);
   const [selectedAchievements, setSelectedAchievements] = useState<Set<number>>(new Set());
@@ -125,7 +126,9 @@ function VariantForm({ adminPassword, editingVariant, onClose }: VariantFormProp
       setStat3Val(c.stat3Val || ''); setStat3Label(c.stat3Label || '');
       setCvFileId(c.cvFileId ?? null);
       const co: Record<number, string> = {};
-      (c.careerRoles || []).forEach(r => { co[r.id] = r.description; });
+      const ka: Record<number, string[]> = {};
+      (c.careerRoles || []).forEach(r => { co[r.id] = r.description; if (r.keyAchievements) ka[r.id] = [...r.keyAchievements]; });
+      setCareerKeyAchievements(ka);
       setCareerOverrides(co);
       // Restore ordered skills list from variant content; fall back to base skills for any missing
       if (c.skillsList && c.skillsList.length > 0) {
@@ -149,7 +152,9 @@ function VariantForm({ adminPassword, editingVariant, onClose }: VariantFormProp
       setStat2Val(siteSettings['profile.stat2_val'] || ''); setStat2Label(siteSettings['profile.stat2_label'] || '');
       setStat3Val(siteSettings['profile.stat3_val'] || ''); setStat3Label(siteSettings['profile.stat3_label'] || '');
       const co: Record<number, string> = {};
-      careerRoles.forEach(r => { co[r.id] = r.description || ''; });
+      const ka: Record<number, string[]> = {};
+      careerRoles.forEach(r => { co[r.id] = r.description || ''; ka[r.id] = [...(r.keyAchievements || [])]; });
+      setCareerKeyAchievements(ka);
       setCareerOverrides(co);
       // Clone all skills in base order with their current names
       setSkillsList(skills.map(s => ({ id: s.id, name: s.name, category: s.category })));
@@ -179,7 +184,7 @@ function VariantForm({ adminPassword, editingVariant, onClose }: VariantFormProp
         stat2Val: stat2Val || undefined, stat2Label: stat2Label || undefined,
         stat3Val: stat3Val || undefined, stat3Label: stat3Label || undefined,
         cvFileId,
-        careerRoles: careerRoles.map(r => ({ id: r.id, description: careerOverrides[r.id] || r.description || '' })),
+        careerRoles: careerRoles.map(r => ({ id: r.id, description: careerOverrides[r.id] || r.description || '', keyAchievements: careerKeyAchievements[r.id] ?? r.keyAchievements ?? [] })),
         skillsList: skillsList,
         highlightedAchievements: flagshipWins.filter(w => selectedAchievements.has(w.id)).map(w => ({ id: w.id, overrideText: achievementOverrides[w.id] || undefined })),
       };
@@ -415,15 +420,67 @@ function VariantForm({ adminPassword, editingVariant, onClose }: VariantFormProp
                   {expandedCareer.has(role.id) ? <ChevronUp className="w-4 h-4 text-white/40 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-white/40 flex-shrink-0" />}
                 </button>
                 {expandedCareer.has(role.id) && (
-                  <div className="px-3 pb-3 pt-2 bg-white/[0.02]">
-                    <Textarea
-                      value={careerOverrides[role.id] ?? ''}
-                      onChange={e => setCareerOverrides(prev => ({ ...prev, [role.id]: e.target.value }))}
-                      className={inputCls}
-                      rows={3}
-                      placeholder={role.description || 'Enter description for this role in this variant…'}
-                      data-testid={`input-career-desc-${role.id}`}
-                    />
+                  <div className="px-3 pb-3 pt-2 bg-white/[0.02] space-y-3">
+                    <div>
+                      <label className="text-xs text-white/50 mb-1 block">Description</label>
+                      <Textarea
+                        value={careerOverrides[role.id] ?? ''}
+                        onChange={e => setCareerOverrides(prev => ({ ...prev, [role.id]: e.target.value }))}
+                        className={inputCls}
+                        rows={3}
+                        placeholder={role.description || 'Enter description for this role in this variant…'}
+                        data-testid={`input-career-desc-${role.id}`}
+                      />
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-xs text-white/50">Key Impacts</label>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          className="h-6 text-xs text-white/50 px-2"
+                          onClick={() => setCareerKeyAchievements(prev => ({ ...prev, [role.id]: [...(prev[role.id] || []), ''] }))}
+                          data-testid={`btn-add-impact-${role.id}`}
+                        >
+                          <Plus className="w-3 h-3 mr-1" /> Add bullet
+                        </Button>
+                      </div>
+                      <div className="space-y-1.5">
+                        {(careerKeyAchievements[role.id] || []).map((bullet, idx) => (
+                          <div key={idx} className="flex items-center gap-1.5">
+                            <span className="text-white/30 text-xs flex-shrink-0">·</span>
+                            <Input
+                              value={bullet}
+                              onChange={e => setCareerKeyAchievements(prev => {
+                                const arr = [...(prev[role.id] || [])];
+                                arr[idx] = e.target.value;
+                                return { ...prev, [role.id]: arr };
+                              })}
+                              className={`${inputCls} text-sm`}
+                              placeholder="Key impact bullet point…"
+                              data-testid={`input-impact-${role.id}-${idx}`}
+                            />
+                            <Button
+                              type="button"
+                              size="icon"
+                              variant="ghost"
+                              className="h-7 w-7 flex-shrink-0 text-white/30 hover:text-red-400"
+                              onClick={() => setCareerKeyAchievements(prev => {
+                                const arr = (prev[role.id] || []).filter((_, i) => i !== idx);
+                                return { ...prev, [role.id]: arr };
+                              })}
+                              data-testid={`btn-remove-impact-${role.id}-${idx}`}
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        ))}
+                        {(careerKeyAchievements[role.id] || []).length === 0 && (
+                          <p className="text-xs text-white/30 italic">No key impacts yet — click "Add bullet" to add one, or leave empty to use the base role's impacts.</p>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>

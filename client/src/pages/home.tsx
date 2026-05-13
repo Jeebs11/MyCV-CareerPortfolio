@@ -68,7 +68,7 @@ export default function Home() {
     stat1Val?: string; stat1Label?: string;
     stat2Val?: string; stat2Label?: string;
     stat3Val?: string; stat3Label?: string;
-    careerRoles?: Array<{ id: number; description: string }>;
+    careerRoles?: Array<{ id: number; description: string; keyAchievements?: string[] }>;
     skillsList?: Array<{ id: number; name: string; category: string }>;
     highlightedAchievements?: Array<{ id: number; overrideText?: string }>;
     cvFileId?: number | null;
@@ -183,8 +183,14 @@ export default function Home() {
   const effectiveCareerRoles = careerRoles.map(role => {
     if (variantContent.careerRoles) {
       const override = variantContent.careerRoles.find(r => r.id === role.id);
-      if (override && override.description) {
-        return { ...role, description: override.description };
+      if (override) {
+        return {
+          ...role,
+          ...(override.description ? { description: override.description } : {}),
+          ...(Array.isArray(override.keyAchievements) && override.keyAchievements.length > 0
+            ? { keyAchievements: override.keyAchievements }
+            : {}),
+        };
       }
     }
     return role;
