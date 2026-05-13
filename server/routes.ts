@@ -291,8 +291,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "CV file not found on server. Please contact the administrator." });
       }
 
-      // Send file
-      res.download(filePath, 'Mujeeb_Lawal_CV.pdf');
+      // Send file — use the CV file's label as the download filename if available
+      const downloadName = cvFile.label
+        ? `${cvFile.label.replace(/[^a-zA-Z0-9_\- ]/g, '').trim()}.pdf`
+        : 'Mujeeb_Lawal_CV.pdf';
+      res.download(filePath, downloadName);
     } catch (error) {
       console.error("Error processing CV download:", error);
       res.status(500).json({ error: "Failed to process CV download" });

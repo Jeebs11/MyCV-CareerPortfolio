@@ -363,13 +363,27 @@ function VariantForm({ adminPassword, editingVariant, onClose }: VariantFormProp
       {/* CV Selection + inline upload */}
       <Card className="bg-white/5 border-white/10 p-4 space-y-3">
         <div className="text-sm font-semibold text-white/80 uppercase tracking-wider">CV File</div>
+        {!cvFileId && (
+          <div className="flex items-start gap-2 bg-amber-500/10 border border-amber-500/30 rounded-md px-3 py-2">
+            <span className="text-amber-400 text-sm flex-shrink-0 mt-0.5">⚠</span>
+            <p className="text-xs text-amber-300/80">
+              No variant-specific CV assigned. Downloads from this variant's link will serve the <strong>main site's latest CV</strong>. Upload or select a unique CV below to make this variant fully independent.
+            </p>
+          </div>
+        )}
+        {cvFileId && (
+          <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-md px-3 py-2">
+            <span className="text-green-400 text-sm flex-shrink-0">✓</span>
+            <p className="text-xs text-green-300/80">This variant has its own CV assigned. Downloads from this link will serve that file independently.</p>
+          </div>
+        )}
         <select
           value={cvFileId ?? ''}
           onChange={e => setCvFileId(e.target.value ? parseInt(e.target.value) : null)}
           className="w-full bg-white/5 border border-white/20 text-white rounded-md px-3 py-2 text-sm"
           data-testid="select-variant-cv"
         >
-          <option value="">— Use default CV —</option>
+          <option value="">— Use main site CV (not recommended) —</option>
           {cvFiles.map(f => (
             <option key={f.id} value={f.id}>{f.label || f.filename} ({new Date(f.uploadedAt).toLocaleDateString()})</option>
           ))}

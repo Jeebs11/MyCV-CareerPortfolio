@@ -96,7 +96,7 @@ const variantContentSchema = z.object({
   stat1Val: z.string().optional(), stat1Label: z.string().optional(),
   stat2Val: z.string().optional(), stat2Label: z.string().optional(),
   stat3Val: z.string().optional(), stat3Label: z.string().optional(),
-  careerRoles: z.array(z.object({ id: z.number(), description: z.string() })).optional(),
+  careerRoles: z.array(z.object({ id: z.number(), description: z.string(), keyAchievements: z.array(z.string()).optional() })).optional(),
   skillsList: z.array(z.object({ id: z.number(), name: z.string(), category: z.string() })).optional(),
   highlightedAchievements: z.array(z.object({ id: z.number(), overrideText: z.string().optional() })).optional(),
   cvFileId: z.number().nullable().optional(),
