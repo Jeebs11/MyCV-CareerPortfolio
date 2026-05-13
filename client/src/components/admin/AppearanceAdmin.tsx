@@ -306,15 +306,16 @@ function OGImageUpload({ adminPassword }: { adminPassword: string }) {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
+  const [savedUrl, setSavedUrl] = useState<string | null>(null);
 
-  const [serverImageTs, setServerImageTs] = useState<number>(() => Date.now());
+  // Load the saved OG image URL from site settings
+  const { data: settings } = useQuery<Record<string, string>>({
+    queryKey: ['/api/site/settings'],
+  });
 
-  // Try to detect if a saved OG image already exists on the server
   useEffect(() => {
-    fetch(`/uploads/og-image.jpg?check=${Date.now()}`, { method: 'HEAD' })
-      .then(r => { if (r.ok) setServerImageTs(Date.now()); })
-      .catch(() => {});
-  }, []);
+    if (settings?.['og.imageUrl']) setSavedUrl(settings['og.imageUrl']);
+  }, [settings]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -334,20 +335,22 @@ function OGImageUpload({ adminPassword }: { adminPassword: string }) {
         headers: { Authorization: `Bearer ${adminPassword}` },
         body: fd,
       });
-      if (!res.ok) throw new Error('Upload failed');
-      const ts = Date.now();
-      setServerImageTs(ts);
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || 'Upload failed');
+      }
+      const { url } = await res.json();
+      setSavedUrl(url);
+      queryClient.invalidateQueries({ queryKey: ['/api/site/settings'] });
       setPreview(null);
       setFile(null);
       toast({ title: 'Share image saved', description: 'OG image updated — visible immediately on the live site.' });
-    } catch {
-      toast({ title: 'Upload failed', variant: 'destructive' });
+    } catch (err: any) {
+      toast({ title: 'Upload failed', description: err.message || 'Unknown error', variant: 'destructive' });
     } finally {
       setUploading(false);
     }
   };
-
-  const serverImageUrl = `/uploads/og-image.jpg?v=${serverImageTs}`;
 
   return (
     <Card className="p-6 space-y-4">
@@ -363,11 +366,11 @@ function OGImageUpload({ adminPassword }: { adminPassword: string }) {
           <p className="text-xs text-muted-foreground">New image (not yet saved):</p>
           <img src={preview} alt="OG preview" className="rounded-md w-full max-w-sm object-cover border border-border" style={{ aspectRatio: '1200/630' }} />
         </div>
-      ) : (
+      ) : savedUrl ? (
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground">Current saved image:</p>
           <img
-            src={serverImageUrl}
+            src={savedUrl}
             alt="Current OG image"
             className="rounded-md w-full max-w-sm object-cover border border-border"
             style={{ aspectRatio: '1200/630' }}
@@ -376,6 +379,10 @@ function OGImageUpload({ adminPassword }: { adminPassword: string }) {
               parent.innerHTML = `<div class="flex items-center justify-center w-full max-w-sm rounded-md border border-dashed border-border bg-muted/40 text-muted-foreground" style="aspect-ratio:1200/630"><div class="text-center p-4"><p class="text-xs">No image uploaded yet</p></div></div>`;
             }}
           />
+        </div>
+      ) : (
+        <div className="flex items-center justify-center w-full max-w-sm rounded-md border border-dashed border-border bg-muted/40 text-muted-foreground" style={{ aspectRatio: '1200/630' }}>
+          <div className="text-center p-4"><p className="text-xs">No image uploaded yet</p></div>
         </div>
       )}
       <div className="flex items-center gap-3 flex-wrap">
@@ -393,7 +400,9 @@ function OGImageUpload({ adminPassword }: { adminPassword: string }) {
         )}
         {file && <span className="text-sm text-muted-foreground truncate max-w-[200px]">{file.name}</span>}
       </div>
-      <p className="text-xs text-muted-foreground">Live URL: <code className="bg-muted px-1 py-0.5 rounded text-xs">/uploads/og-image.jpg</code></p>
+      {savedUrl && (
+        <p className="text-xs text-muted-foreground">Live URL: <code className="bg-muted px-1 py-0.5 rounded text-xs">{savedUrl}</code></p>
+      )}
     </Card>
   );
 }

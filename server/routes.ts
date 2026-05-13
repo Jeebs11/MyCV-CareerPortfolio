@@ -1023,7 +1023,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!req.file) return res.status(400).json({ error: "No file uploaded" });
       const url = await uploadToAppStorage(req.file.buffer, 'og-image.jpg', req.file.mimetype, 'og');
       // Persist URL in site settings so meta tags can reference it
-      await storage.upsertSiteSetting({ key: 'og.imageUrl', value: url });
+      await storage.upsertSiteSettings([{ key: 'og.imageUrl', value: url }]);
       res.json({ success: true, url });
     } catch (e) { console.error(e); res.status(500).json({ error: "Failed to upload OG image" }); }
   });
