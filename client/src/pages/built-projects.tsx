@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
 import type { BuiltProjectRow } from '@shared/schema';
 import FloatingNav from '@/components/FloatingNav';
+import { getVariantHomeHref } from '@/hooks/useVariantHomeHref';
 
 const INK = 'hsl(220,25%,14%)';
 const PAPER = 'hsl(40,20%,97%)';
@@ -75,7 +76,7 @@ export default function BuiltProjectsPage() {
                 <svg width="26" height="26" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="2" fill={BRASS} /><text x="20" y="27" textAnchor="middle" fontFamily="Cormorant Garamond,serif" fontWeight="600" fontSize="15" fill={PAPER}>ML</text></svg>
                 <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 16, fontWeight: 400, color: PAPER }}>Portfolio</div>
               </div>
-              <Link href="/" style={{ fontSize: 11, color: 'hsl(220,15%,50%)', letterSpacing: '0.1em' }}>← Home</Link>
+              <Link href={getVariantHomeHref()} style={{ fontSize: 11, color: 'hsl(220,15%,50%)', letterSpacing: '0.1em' }}>← Home</Link>
             </div>
             {/* Mobile filter strip */}
             <div style={{ display: 'flex', overflowX: 'auto', padding: '0 8px', borderBottom: '1px solid hsl(220,20%,22%)', scrollbarWidth: 'none' }}>
@@ -86,7 +87,7 @@ export default function BuiltProjectsPage() {
           </div>
         ) : (
           <>
-            <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 52, textDecoration: 'none' }}>
+            <Link href={getVariantHomeHref()} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 52, textDecoration: 'none' }}>
               <svg width="32" height="32" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="2" fill={BRASS} /><text x="20" y="27" textAnchor="middle" fontFamily="Cormorant Garamond,serif" fontWeight="600" fontSize="15" fill={PAPER}>ML</text></svg>
               <span style={{ fontSize: 11, color: 'hsl(220,15%,50%)', letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 500 }}>Mujeeb Lawal</span>
             </Link>
@@ -106,7 +107,7 @@ export default function BuiltProjectsPage() {
             </div>
             <div style={{ flex: 1 }} />
             <div style={{ borderTop: '1px solid hsl(220,20%,22%)', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <Link href="/" style={{ fontSize: 12, color: 'hsl(220,15%,50%)' }}>← Back to Profile</Link>
+              <Link href={getVariantHomeHref()} style={{ fontSize: 12, color: 'hsl(220,15%,50%)' }}>← Back to Profile</Link>
               <Link href="/insights" style={{ fontSize: 12, color: 'hsl(220,15%,50%)' }}>Thought Leadership</Link>
             </div>
           </>

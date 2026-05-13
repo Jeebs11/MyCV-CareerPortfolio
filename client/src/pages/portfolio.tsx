@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
+import { getVariantHomeHref } from '@/hooks/useVariantHomeHref';
 import {
   ArrowUpRight,
   Briefcase,
@@ -186,7 +187,7 @@ export default function PortfolioPage() {
       {/* Top Nav */}
       <div className="sticky top-0 z-40 bg-[#050505]/80 backdrop-blur-xl border-b border-slate-800/50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/">
+          <Link href={getVariantHomeHref()}>
             <Button
               variant="ghost"
               size="sm"

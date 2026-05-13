@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
 import type { CareerRoleRow, FlagshipWinRow, SiteSkillRow, SiteEducationRow } from '@shared/schema';
 import FloatingNav from '@/components/FloatingNav';
+import { getVariantHomeHref } from '@/hooks/useVariantHomeHref';
 
 const INK = 'hsl(220,25%,14%)';
 const PAPER = 'hsl(40,20%,97%)';
@@ -53,6 +54,13 @@ export default function Home() {
 
   // Read ?v= query param for variant slug
   const variantSlug = new URLSearchParams(window.location.search).get('v') || null;
+
+  // Persist variant slug in sessionStorage so other pages can link back to it
+  useEffect(() => {
+    if (variantSlug) {
+      sessionStorage.setItem('variantSlug', variantSlug);
+    }
+  }, [variantSlug]);
 
   const { data: settings = {} } = useQuery<SiteSettings>({ queryKey: ['/api/site/settings'] });
   const { data: flagshipWins = [] } = useQuery<FlagshipWinRow[]>({ queryKey: ['/api/site/flagship-wins'] });

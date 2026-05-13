@@ -24,29 +24,44 @@ import { ObjectStorageService } from "./replit_integrations/object_storage";
 
 const objectStorage = new ObjectStorageService();
 
-// Helper: upload a buffer/stream to App Storage public bucket, return public URL
+// Helper: resolve a GCS File object from a /api/files/ proxy URL
+async function getStorageFile(storageUrl: string) {
+  const privateDir = process.env.PRIVATE_OBJECT_DIR || '';
+  if (!privateDir) throw new Error('PRIVATE_OBJECT_DIR not set');
+  // storageUrl: /api/files/cv/timestamp_uuid_name.pdf
+  const relativePath = storageUrl.replace(/^\/api\/files\//, '');
+  const objectPath = `${privateDir}/${relativePath}`;
+  const parts = objectPath.replace(/^\//, '').split('/');
+  const bucketName = parts[0];
+  const objectName = parts.slice(1).join('/');
+  const { objectStorageClient } = await import('./replit_integrations/object_storage/objectStorage');
+  return objectStorageClient.bucket(bucketName).file(objectName);
+}
+
+// Helper: upload a buffer to App Storage private dir, return a stable proxy URL
 async function uploadToAppStorage(
   buffer: Buffer,
   filename: string,
   contentType: string,
   folder: 'cv' | 'projects' | 'og'
 ): Promise<string> {
-  const searchPaths = objectStorage.getPublicObjectSearchPaths();
-  // searchPaths[0] = "/<bucket>/public"
-  const basePath = searchPaths[0]; // e.g. /repl-default-bucket-xxx/public
-  const objectName = `${folder}/${Date.now()}_${randomUUID()}_${filename}`;
-  // basePath format: /bucketName/prefix — strip leading slash
-  const parts = basePath.replace(/^\//, '').split('/');
+  const privateDir = process.env.PRIVATE_OBJECT_DIR || '';
+  if (!privateDir) throw new Error('PRIVATE_OBJECT_DIR not set');
+
+  const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const uniqueName = `${Date.now()}_${randomUUID()}_${safeName}`;
+  // objectPath: /bucket-name/.private/cv/uniqueName
+  const objectPath = `${privateDir}/${folder}/${uniqueName}`;
+  const parts = objectPath.replace(/^\//, '').split('/');
   const bucketName = parts[0];
-  const prefix = parts.slice(1).join('/');
-  const fullObjectName = prefix ? `${prefix}/${objectName}` : objectName;
+  const objectName = parts.slice(1).join('/');
 
   const { objectStorageClient } = await import('./replit_integrations/object_storage/objectStorage');
   const bucket = objectStorageClient.bucket(bucketName);
-  const file = bucket.file(fullObjectName);
+  const file = bucket.file(objectName);
   await file.save(buffer, { contentType, resumable: false });
-  await file.makePublic();
-  return `https://storage.googleapis.com/${bucketName}/${fullObjectName}`;
+  // No makePublic() — served via /api/files proxy route
+  return `/api/files/${folder}/${uniqueName}`;
 }
 
 // Multer using memory storage — files land in req.file.buffer, then we push to App Storage
@@ -255,6 +270,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ============ FILE PROXY ============
+  // Serve App Storage private files via a stable URL (no makePublic needed)
+  app.get("/api/files/:folder/:filename", async (req, res) => {
+    try {
+      const storageUrl = `/api/files/${req.params.folder}/${req.params.filename}`;
+      const file = await getStorageFile(storageUrl);
+      const [exists] = await file.exists();
+      if (!exists) return res.status(404).json({ error: 'File not found' });
+      const [metadata] = await file.getMetadata();
+      res.set({
+        'Content-Type': (metadata.contentType as string) || 'application/octet-stream',
+        'Cache-Control': 'public, max-age=86400',
+      });
+      file.createReadStream().pipe(res);
+    } catch (e) {
+      console.error('Error serving stored file:', e);
+      res.status(500).json({ error: 'Failed to serve file' });
+    }
+  });
+
   // ============ CV ROUTES ============
   
   // Download CV and save contact (public)
@@ -289,14 +324,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ? `${cvFile.label.replace(/[^a-zA-Z0-9_\- ]/g, '').trim()}.pdf`
         : 'Mujeeb_Lawal_CV.pdf';
 
-      // Prefer App Storage URL (survives redeploys); fall back to local disk for legacy rows
+      // Prefer App Storage (survives redeploys); fall back to local disk for legacy rows
       if (cvFile.storageUrl) {
-        // Redirect to the permanent GCS public URL — browser downloads directly from CDN
-        res.setHeader('Content-Disposition', `attachment; filename="${downloadName}"`);
+        if (cvFile.storageUrl.startsWith('/api/files/')) {
+          // New proxy-backed URL — stream directly from GCS without circular HTTP call
+          const file = await getStorageFile(cvFile.storageUrl);
+          const [exists] = await file.exists();
+          if (!exists) {
+            return res.status(404).json({ error: "CV file not found in storage. Please re-upload via the admin panel." });
+          }
+          const [metadata] = await file.getMetadata();
+          res.set({
+            'Content-Disposition': `attachment; filename="${downloadName}"`,
+            'Content-Type': (metadata.contentType as string) || 'application/pdf',
+            'Cache-Control': 'private, no-cache',
+          });
+          return file.createReadStream().pipe(res);
+        }
+        // Legacy: old public GCS URL — fetch and forward
         const response = await fetch(cvFile.storageUrl);
         if (!response.ok) {
-          return res.status(404).json({ error: "CV file not found in storage. Please contact the administrator." });
+          return res.status(404).json({ error: "CV file not found in storage. Please re-upload via the admin panel." });
         }
+        res.setHeader('Content-Disposition', `attachment; filename="${downloadName}"`);
         res.setHeader('Content-Type', response.headers.get('content-type') || 'application/pdf');
         const arrayBuffer = await response.arrayBuffer();
         return res.send(Buffer.from(arrayBuffer));
