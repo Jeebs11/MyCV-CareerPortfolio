@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
@@ -7,14 +7,18 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, Copy, Check, ChevronDown, ChevronUp, Save, X, Edit, ArrowUp, ArrowDown } from 'lucide-react';
+import { Plus, Trash2, Copy, Check, ChevronDown, ChevronUp, Save, X, Edit, ArrowUp, ArrowDown, Upload, Loader2 } from 'lucide-react';
 import type { CareerRoleRow, FlagshipWinRow, SiteSkillRow, CVFileRow, ProfileVariantRow } from '@shared/schema';
 
 interface AdminProps { adminPassword: string; }
 
 type VariantContent = {
+  title?: string;
   tagline?: string;
   bio?: string;
+  stat1Val?: string; stat1Label?: string;
+  stat2Val?: string; stat2Label?: string;
+  stat3Val?: string; stat3Label?: string;
   careerRoles?: Array<{ id: number; description: string }>;
   skillsList?: Array<{ id: number; name: string; category: string }>;
   highlightedAchievements?: Array<{ id: number; overrideText?: string }>;
@@ -85,9 +89,18 @@ function VariantForm({ adminPassword, editingVariant, onClose }: VariantFormProp
   const [label, setLabel] = useState(editingVariant?.label || '');
   const [slug, setSlug] = useState(editingVariant?.slug || '');
   const [isActive, setIsActive] = useState(editingVariant?.isActive ?? true);
+  const [title, setTitle] = useState('');
   const [tagline, setTagline] = useState('');
   const [bio, setBio] = useState('');
+  const [stat1Val, setStat1Val] = useState('');
+  const [stat1Label, setStat1Label] = useState('');
+  const [stat2Val, setStat2Val] = useState('');
+  const [stat2Label, setStat2Label] = useState('');
+  const [stat3Val, setStat3Val] = useState('');
+  const [stat3Label, setStat3Label] = useState('');
   const [cvFileId, setCvFileId] = useState<number | null>(null);
+  const [cvUploading, setCvUploading] = useState(false);
+  const cvFileRef = useRef<HTMLInputElement>(null);
   const [careerOverrides, setCareerOverrides] = useState<Record<number, string>>({});
   // Ordered skills list with per-variant editable labels
   const [skillsList, setSkillsList] = useState<VariantSkill[]>([]);
@@ -104,8 +117,12 @@ function VariantForm({ adminPassword, editingVariant, onClose }: VariantFormProp
       // For edit mode: only need skills loaded to fill in fallback gaps — skills may be empty if none configured
       if (loadingSkills) return;
       const c = editingVariant.content || {};
+      setTitle(c.title || '');
       setTagline(c.tagline || '');
       setBio(c.bio || '');
+      setStat1Val(c.stat1Val || ''); setStat1Label(c.stat1Label || '');
+      setStat2Val(c.stat2Val || ''); setStat2Label(c.stat2Label || '');
+      setStat3Val(c.stat3Val || ''); setStat3Label(c.stat3Label || '');
       setCvFileId(c.cvFileId ?? null);
       const co: Record<number, string> = {};
       (c.careerRoles || []).forEach(r => { co[r.id] = r.description; });
@@ -125,8 +142,12 @@ function VariantForm({ adminPassword, editingVariant, onClose }: VariantFormProp
     } else {
       // For create mode: wait until ALL base datasets have loaded so clone is complete
       if (!allBaseDataLoaded) return;
+      setTitle(siteSettings['profile.title'] || '');
       setTagline(siteSettings['profile.quote'] || '');
       setBio(siteSettings['profile.bio'] || '');
+      setStat1Val(siteSettings['profile.stat1_val'] || ''); setStat1Label(siteSettings['profile.stat1_label'] || '');
+      setStat2Val(siteSettings['profile.stat2_val'] || ''); setStat2Label(siteSettings['profile.stat2_label'] || '');
+      setStat3Val(siteSettings['profile.stat3_val'] || ''); setStat3Label(siteSettings['profile.stat3_label'] || '');
       const co: Record<number, string> = {};
       careerRoles.forEach(r => { co[r.id] = r.description || ''; });
       setCareerOverrides(co);
@@ -151,8 +172,12 @@ function VariantForm({ adminPassword, editingVariant, onClose }: VariantFormProp
   const saveMutation = useMutation({
     mutationFn: async () => {
       const content: VariantContent = {
+        title: title || undefined,
         tagline,
         bio,
+        stat1Val: stat1Val || undefined, stat1Label: stat1Label || undefined,
+        stat2Val: stat2Val || undefined, stat2Label: stat2Label || undefined,
+        stat3Val: stat3Val || undefined, stat3Label: stat3Label || undefined,
         cvFileId,
         careerRoles: careerRoles.map(r => ({ id: r.id, description: careerOverrides[r.id] || r.description || '' })),
         skillsList: skillsList,
@@ -171,6 +196,25 @@ function VariantForm({ adminPassword, editingVariant, onClose }: VariantFormProp
     },
     onError: (err: Error) => toast({ title: 'Save failed', description: err.message, variant: 'destructive' }),
   });
+
+  // Inline CV upload — uploads file, creates a CV record, then auto-selects it
+  const handleCvUpload = async (file: File) => {
+    setCvUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('cv', file);
+      fd.append('label', file.name.replace(/\.[^.]+$/, ''));
+      const res = await fetch('/api/cv/upload', { method: 'POST', headers: { Authorization: `Bearer ${adminPassword}` }, body: fd });
+      if (!res.ok) throw new Error(await res.text());
+      const data = await res.json();
+      await queryClient.invalidateQueries({ queryKey: ['/api/cv/files'] });
+      if (data.id) setCvFileId(data.id);
+    } catch (e: any) {
+      alert(`CV upload failed: ${e.message}`);
+    } finally {
+      setCvUploading(false);
+    }
+  };
 
   // Skills ordered list helpers
   const isSkillSelected = (id: number) => skillsList.some(s => s.id === id);
@@ -276,6 +320,10 @@ function VariantForm({ adminPassword, editingVariant, onClose }: VariantFormProp
       <Card className="bg-white/5 border-white/10 p-4 space-y-3">
         <div className="text-sm font-semibold text-white/80 uppercase tracking-wider">Profile Content</div>
         <div>
+          <label className="text-xs text-white/60 mb-1 block">Title (left panel, e.g. "PMO Lead" or "Senior Programme Director")</label>
+          <Input value={title} onChange={e => setTitle(e.target.value)} className={inputCls} placeholder="Leave blank to use default title" data-testid="input-variant-title" />
+        </div>
+        <div>
           <label className="text-xs text-white/60 mb-1 block">Tagline / Quote</label>
           <Textarea value={tagline} onChange={e => setTagline(e.target.value)} className={inputCls} rows={3} placeholder="Profile tagline..." data-testid="input-variant-tagline" />
         </div>
@@ -285,7 +333,29 @@ function VariantForm({ adminPassword, editingVariant, onClose }: VariantFormProp
         </div>
       </Card>
 
-      {/* CV Selection */}
+      {/* Key Impact Stats */}
+      <Card className="bg-white/5 border-white/10 p-4 space-y-3">
+        <div className="text-sm font-semibold text-white/80 uppercase tracking-wider">Key Impact Stats</div>
+        <p className="text-xs text-white/50">Override the three headline numbers shown in the left panel. Leave blank to use the default values.</p>
+        {[
+          { val: stat1Val, setVal: setStat1Val, lbl: stat1Label, setLbl: setStat1Label, placeholder: '£50M+', lblPlaceholder: 'Programmes led', n: 1 },
+          { val: stat2Val, setVal: setStat2Val, lbl: stat2Label, setLbl: setStat2Label, placeholder: '17 yrs', lblPlaceholder: 'Experience', n: 2 },
+          { val: stat3Val, setVal: setStat3Val, lbl: stat3Label, setLbl: setStat3Label, placeholder: '34', lblPlaceholder: 'Largest team', n: 3 },
+        ].map(({ val, setVal, lbl, setLbl, placeholder, lblPlaceholder, n }) => (
+          <div key={n} className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-xs text-white/40 mb-1 block">Stat {n} value</label>
+              <Input value={val} onChange={e => setVal(e.target.value)} className={inputCls} placeholder={placeholder} data-testid={`input-stat${n}-val`} />
+            </div>
+            <div>
+              <label className="text-xs text-white/40 mb-1 block">Stat {n} label</label>
+              <Input value={lbl} onChange={e => setLbl(e.target.value)} className={inputCls} placeholder={lblPlaceholder} data-testid={`input-stat${n}-label`} />
+            </div>
+          </div>
+        ))}
+      </Card>
+
+      {/* CV Selection + inline upload */}
       <Card className="bg-white/5 border-white/10 p-4 space-y-3">
         <div className="text-sm font-semibold text-white/80 uppercase tracking-wider">CV File</div>
         <select
@@ -299,6 +369,29 @@ function VariantForm({ adminPassword, editingVariant, onClose }: VariantFormProp
             <option key={f.id} value={f.id}>{f.label || f.filename} ({new Date(f.uploadedAt).toLocaleDateString()})</option>
           ))}
         </select>
+        <div className="flex items-center gap-2">
+          <input
+            ref={cvFileRef}
+            type="file"
+            accept=".pdf,.doc,.docx"
+            className="hidden"
+            onChange={e => { const f = e.target.files?.[0]; if (f) handleCvUpload(f); e.target.value = ''; }}
+            data-testid="input-variant-cv-file"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="border-white/20 text-white/70 bg-white/5"
+            onClick={() => cvFileRef.current?.click()}
+            disabled={cvUploading}
+            data-testid="btn-upload-cv"
+          >
+            {cvUploading ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" /> : <Upload className="w-3.5 h-3.5 mr-1.5" />}
+            {cvUploading ? 'Uploading…' : 'Upload new CV for this variant'}
+          </Button>
+          <span className="text-xs text-white/40">PDF, DOC, DOCX</span>
+        </div>
       </Card>
 
       {/* Career Role Overrides */}

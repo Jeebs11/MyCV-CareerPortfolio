@@ -62,8 +62,12 @@ export default function Home() {
 
   // Load variant if ?v= param is present
   type VariantContent = {
+    title?: string;
     tagline?: string;
     bio?: string;
+    stat1Val?: string; stat1Label?: string;
+    stat2Val?: string; stat2Label?: string;
+    stat3Val?: string; stat3Label?: string;
     careerRoles?: Array<{ id: number; description: string }>;
     skillsList?: Array<{ id: number; name: string; category: string }>;
     highlightedAchievements?: Array<{ id: number; overrideText?: string }>;
@@ -167,7 +171,7 @@ export default function Home() {
   ];
 
   const profileName = settings['profile.name'] || 'Mujeeb Lawal';
-  const profileTitle = settings['profile.title'] || 'Senior Programme Director';
+  const profileTitle = variantContent.title || settings['profile.title'] || 'Senior Programme Director';
   const baseQuote = settings['profile.quote'] || '"A programme director who builds institutions, not just outputs — governing at scale, delivering under pressure, and leaving infrastructure behind."';
   const baseBio = settings['profile.bio'] || '17 years leading complex change across financial services, telecoms, insurance, and sustainability. Comfortable at board level and delivery level simultaneously. PRINCE2 Practitioner, Certified Scrum Master. London and Dubai based.';
   // Override quote/bio with variant content if present
@@ -204,9 +208,9 @@ export default function Home() {
       .filter(Boolean) as typeof flagshipWins;
   })();
   const stats = [
-    { val: settings['profile.stat1_val'] || '£50M+', label: settings['profile.stat1_label'] || 'Programmes led' },
-    { val: settings['profile.stat2_val'] || '17 yrs', label: settings['profile.stat2_label'] || 'Experience' },
-    { val: settings['profile.stat3_val'] || '34', label: settings['profile.stat3_label'] || 'Largest team' },
+    { val: variantContent.stat1Val || settings['profile.stat1_val'] || '£50M+', label: variantContent.stat1Label || settings['profile.stat1_label'] || 'Programmes led' },
+    { val: variantContent.stat2Val || settings['profile.stat2_val'] || '17 yrs', label: variantContent.stat2Label || settings['profile.stat2_label'] || 'Experience' },
+    { val: variantContent.stat3Val || settings['profile.stat3_val'] || '34', label: variantContent.stat3Label || settings['profile.stat3_label'] || 'Largest team' },
   ];
 
   const s = (id: string, el: HTMLElement | null) => { sectionRefs.current[id] = el; };

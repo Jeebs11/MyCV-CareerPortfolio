@@ -74,8 +74,12 @@ export const profileVariantsTable = pgTable('profile_variants', {
   isActive: boolean('is_active').default(true).notNull(),
   sortOrder: integer('sort_order').default(0).notNull(),
   content: jsonb('content').$type<{
+    title?: string;
     tagline?: string;
     bio?: string;
+    stat1Val?: string; stat1Label?: string;
+    stat2Val?: string; stat2Label?: string;
+    stat3Val?: string; stat3Label?: string;
     careerRoles?: Array<{ id: number; description: string }>;
     skillsList?: Array<{ id: number; name: string; category: string }>;
     highlightedAchievements?: Array<{ id: number; overrideText?: string }>;
@@ -86,8 +90,12 @@ export const profileVariantsTable = pgTable('profile_variants', {
 });
 
 const variantContentSchema = z.object({
+  title: z.string().optional(),
   tagline: z.string().optional(),
   bio: z.string().optional(),
+  stat1Val: z.string().optional(), stat1Label: z.string().optional(),
+  stat2Val: z.string().optional(), stat2Label: z.string().optional(),
+  stat3Val: z.string().optional(), stat3Label: z.string().optional(),
   careerRoles: z.array(z.object({ id: z.number(), description: z.string() })).optional(),
   skillsList: z.array(z.object({ id: z.number(), name: z.string(), category: z.string() })).optional(),
   highlightedAchievements: z.array(z.object({ id: z.number(), overrideText: z.string().optional() })).optional(),
