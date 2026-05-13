@@ -87,8 +87,21 @@ const imageUpload = multer({
     if (['.jpg', '.jpeg', '.png', '.webp', '.svg', '.gif'].includes(ext)) cb(null, true);
     else cb(new Error('Only image files (JPG, PNG, WEBP, SVG, GIF) are allowed'));
   },
-  limits: { fileSize: 5 * 1024 * 1024 },
+  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB — accommodates retina screenshots
 });
+
+// Wraps imageUpload.single() so MulterError is caught and returns a clean JSON error
+function handleImageUpload(req: Request, res: Response, next: NextFunction) {
+  imageUpload.single('image')(req, res, (err: any) => {
+    if (err) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(413).json({ error: 'File too large. Maximum image size is 20MB. Try compressing the screenshot first.' });
+      }
+      return res.status(400).json({ error: err.message || 'Upload error' });
+    }
+    next();
+  });
+}
 
 // Simple admin authentication middleware
 const adminAuth = (req: Request, res: Response, next: NextFunction) => {
@@ -587,7 +600,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Upload project image (admin)
-  app.post("/api/projects/upload-image", adminAuth, imageUpload.single('image'), async (req, res) => {
+  app.post("/api/projects/upload-image", adminAuth, handleImageUpload, async (req, res) => {
     try {
       if (!req.file) return res.status(400).json({ error: "No file uploaded" });
       const url = await uploadToAppStorage(req.file.buffer, req.file.originalname, req.file.mimetype, 'projects');
@@ -640,7 +653,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Upload screenshot image (admin)
-  app.post("/api/built-projects/upload-image", adminAuth, imageUpload.single('image'), async (req, res) => {
+  app.post("/api/built-projects/upload-image", adminAuth, handleImageUpload, async (req, res) => {
     try {
       if (!req.file) return res.status(400).json({ error: "No file uploaded" });
       const url = await uploadToAppStorage(req.file.buffer, req.file.originalname, req.file.mimetype, 'projects');
@@ -978,7 +991,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Generic site image upload (logos, etc.)
-  app.post("/api/site/upload-image", adminAuth, imageUpload.single('image'), async (req, res) => {
+  app.post("/api/site/upload-image", adminAuth, handleImageUpload, async (req, res) => {
     try {
       if (!req.file) return res.status(400).json({ error: "No file uploaded" });
       const url = await uploadToAppStorage(req.file.buffer, req.file.originalname, req.file.mimetype, 'projects');

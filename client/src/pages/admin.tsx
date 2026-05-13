@@ -452,12 +452,15 @@ export default function AdminPage() {
         headers: { 'Authorization': `Bearer ${adminPassword}` },
         body: fd,
       });
-      if (!res.ok) throw new Error('Upload failed');
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || 'Upload failed');
+      }
       const { url } = await res.json();
       setBuiltForm(f => ({ ...f, image: url }));
       toast({ title: 'Uploaded', description: 'Screenshot saved' });
-    } catch {
-      toast({ title: 'Error', description: 'Upload failed', variant: 'destructive' });
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'Upload failed', variant: 'destructive' });
     } finally {
       setUploadingBuiltImage(false);
     }
