@@ -145,12 +145,17 @@ export default function BuiltProjectsPage() {
                   <p style={{ fontSize: 13, lineHeight: 1.7, marginBottom: 16, color: p.highlight ? 'hsl(220,15%,68%)' : 'hsl(220,15%,42%)' }}>{p.description}</p>
                   {/* Mobile: image shown as block above details */}
                   {isMobile && p.image && (
-                    <div style={{ marginBottom: 16, overflow: 'hidden', height: 180 }}>
-                      <img src={p.image} alt={p.title} onError={e => { (e.currentTarget.parentElement as HTMLElement).style.display = 'none'; }} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }} />
+                    <div style={{ marginBottom: 16, overflow: 'hidden', height: 180, background: p.highlight ? 'hsl(220,20%,18%)' : HAIRLINE }}>
+                      <img
+                        src={p.image}
+                        alt={p.title}
+                        onError={e => { e.currentTarget.style.visibility = 'hidden'; }}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }}
+                      />
                     </div>
                   )}
                   {/* Desktop: hover-reveal overlay */}
-                  <div style={{ position: 'relative', flex: 1 }}>
+                  <div style={{ position: 'relative', flex: 1, minHeight: 120 }}>
                     <div>
                       <div style={{ marginBottom: 16 }}>
                         {lines.map((l, j) => (
@@ -164,8 +169,13 @@ export default function BuiltProjectsPage() {
                       </div>
                     </div>
                     {!isMobile && p.image && (
-                      <div style={{ position: 'absolute', inset: 0, opacity: isHovered ? 0 : 1, transition: 'opacity 0.45s cubic-bezier(0.4,0,0.2,1)', pointerEvents: isHovered ? 'none' : 'auto', overflow: 'hidden' }}>
-                        <img src={p.image} alt={p.title} onError={e => { (e.currentTarget.parentElement as HTMLElement).style.display = 'none'; }} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }} />
+                      <div style={{ position: 'absolute', inset: 0, opacity: isHovered ? 0 : 1, transition: 'opacity 0.45s cubic-bezier(0.4,0,0.2,1)', pointerEvents: isHovered ? 'none' : 'auto', overflow: 'hidden', background: p.highlight ? 'hsl(220,20%,18%)' : HAIRLINE }}>
+                        <img
+                          src={p.image}
+                          alt={p.title}
+                          onError={e => { e.currentTarget.style.visibility = 'hidden'; }}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }}
+                        />
                         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%', background: `linear-gradient(to bottom, transparent, ${cardBg === 'transparent' ? PAPER : cardBg})` }} />
                         <div style={{ position: 'absolute', bottom: 10, right: 12, fontSize: 9, fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: p.highlight ? 'hsl(220,15%,55%)' : MUTED }}>Hover to explore →</div>
                       </div>
