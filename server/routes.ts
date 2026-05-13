@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { chatWithAssistantStream } from "./openai";
+import { chatWithAssistantStream, generateBlogImage } from "./openai";
 import {
   insertBlogPostSchema, updateBlogPostSchema, insertCVContactSchema,
   insertProjectSchema, updateProjectSchema,
@@ -907,6 +907,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!req.file) return res.status(400).json({ error: "No file uploaded" });
       res.status(201).json({ url: `/uploads/projects/${req.file.filename}` });
     } catch (e) { console.error(e); res.status(500).json({ error: "Failed to upload" }); }
+  });
+
+  // AI image generation for blog hero images using gpt-image-1
+  app.post("/api/generate-image", adminAuth, async (req, res) => {
+    try {
+      const { title, category } = req.body;
+      if (!title) return res.status(400).json({ error: "title is required" });
+      const url = await generateBlogImage(title, category || "Programme Management");
+      res.json({ url });
+    } catch (e: any) {
+      console.error("Image generation error:", e);
+      res.status(500).json({ error: e.message || "Failed to generate image" });
+    }
   });
 
   // OG image upload — saves as /uploads/og-image.jpg (fixed filename for meta tag)

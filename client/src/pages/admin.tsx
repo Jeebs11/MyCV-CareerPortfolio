@@ -1144,23 +1144,73 @@ export default function AdminPage() {
                 <FormField
                   control={form.control}
                   name="heroImage"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white">Hero Image URL (Optional)</FormLabel>
-                      <FormControl>
-                        <Input 
-                          {...field} 
-                          className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
-                          placeholder="https://example.com/image.jpg"
-                          data-testid="input-article-heroimage"
-                        />
-                      </FormControl>
-                      <FormDescription className="text-white/50">
-                        Add a featured image for your article
-                      </FormDescription>
-                      <FormMessage className="text-red-400" />
-                    </FormItem>
-                  )}
+                  render={({ field }) => {
+                    const [generating, setGenerating] = useState(false);
+                    const articleTitle = form.watch('title');
+                    const articleCategory = form.watch('category');
+                    const adminToken = localStorage.getItem('adminToken') || '';
+
+                    const handleGenerate = async () => {
+                      if (!articleTitle) {
+                        toast({ title: 'Add a title first', description: 'The title is used to generate a relevant image.', variant: 'destructive' });
+                        return;
+                      }
+                      setGenerating(true);
+                      try {
+                        const res = await fetch('/api/generate-image', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+                          body: JSON.stringify({ title: articleTitle, category: articleCategory }),
+                        });
+                        const data = await res.json();
+                        if (!res.ok) throw new Error(data.error || 'Generation failed');
+                        field.onChange(data.url);
+                        toast({ title: 'Image generated', description: 'AI image saved and applied as hero image.' });
+                      } catch (e: any) {
+                        toast({ title: 'Generation failed', description: e.message, variant: 'destructive' });
+                      } finally {
+                        setGenerating(false);
+                      }
+                    };
+
+                    return (
+                      <FormItem>
+                        <FormLabel className="text-white">Hero Image (Optional)</FormLabel>
+                        <div className="flex gap-2">
+                          <FormControl>
+                            <Input
+                              {...field}
+                              className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                              placeholder="https://example.com/image.jpg or generate below"
+                              data-testid="input-article-heroimage"
+                            />
+                          </FormControl>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="shrink-0 border-white/20 text-white bg-white/5 hover:bg-white/10"
+                            onClick={handleGenerate}
+                            disabled={generating}
+                            data-testid="button-generate-image"
+                          >
+                            {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageIcon className="w-4 h-4" />}
+                            <span className="ml-2">{generating ? 'Generating…' : 'Generate with AI'}</span>
+                          </Button>
+                        </div>
+                        {field.value && (
+                          <img
+                            src={field.value}
+                            alt="Hero preview"
+                            className="mt-2 rounded-md w-full max-h-40 object-cover opacity-80"
+                          />
+                        )}
+                        <FormDescription className="text-white/50">
+                          Paste a URL or click "Generate with AI" to create a bespoke image from your title
+                        </FormDescription>
+                        <FormMessage className="text-red-400" />
+                      </FormItem>
+                    );
+                  }}
                 />
 
                 <Controller

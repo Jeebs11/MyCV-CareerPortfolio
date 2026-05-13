@@ -1,5 +1,7 @@
 import OpenAI from "openai";
 import { experiences, skills, keyAchievements } from "@shared/schema";
+import fs from "fs/promises";
+import path from "path";
 
 let openaiClient: OpenAI | null = null;
 
@@ -115,4 +117,37 @@ export async function chatWithAssistantStream(message: string) {
     console.error("OpenAI API error:", error);
     throw new Error("Failed to get response from AI assistant");
   }
+}
+
+export async function generateBlogImage(title: string, category: string): Promise<string> {
+  const client = getOpenAIClient();
+
+  const prompt = `Create a professional, editorial-style hero image for an article titled "${title}" in the category of "${category}". 
+The image should be:
+- Sophisticated and business-appropriate, suitable for LinkedIn/professional audiences
+- Abstract or conceptual rather than literal, using metaphor and visual storytelling
+- Dark, rich tones with warm brass/gold accents — think ink navy, deep charcoal, warm amber
+- No text, no people's faces, no stock-photo clichés
+- Could use architectural elements, geometric abstraction, light and shadow, or symbolic objects
+- Cinematic, high-contrast, magazine-quality composition
+- 16:9 landscape format feel`;
+
+  const response = await client.images.generate({
+    model: "gpt-image-1",
+    prompt,
+    n: 1,
+    size: "1536x1024",
+    quality: "standard",
+    output_format: "jpeg",
+  });
+
+  const b64 = (response.data[0] as any).b64_json as string;
+  if (!b64) throw new Error("No image data returned from OpenAI");
+
+  const dir = path.join(process.cwd(), "uploads", "blog");
+  await fs.mkdir(dir, { recursive: true });
+  const filename = `ai-${Date.now()}.jpg`;
+  await fs.writeFile(path.join(dir, filename), Buffer.from(b64, "base64"));
+
+  return `/uploads/blog/${filename}`;
 }
