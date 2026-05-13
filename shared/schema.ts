@@ -54,6 +54,7 @@ export type InsertCVContact = z.infer<typeof insertCVContactSchema>;
 export const cvFileTable = pgTable('cv_file', {
   id: serial('id').primaryKey(),
   filename: varchar('filename', { length: 300 }).notNull(),
+  storageUrl: varchar('storage_url', { length: 1000 }),
   label: varchar('label', { length: 200 }),
   uploadedAt: timestamp('uploaded_at').defaultNow().notNull(),
 });

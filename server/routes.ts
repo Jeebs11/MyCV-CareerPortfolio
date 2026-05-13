@@ -19,59 +19,60 @@ import { z } from "zod";
 import path from "path";
 import fs from "fs/promises";
 import multer from "multer";
+import { randomUUID } from "crypto";
+import { ObjectStorageService } from "./replit_integrations/object_storage";
 
-// Configure multer for CV file uploads
-const cvStorage = multer.diskStorage({
-  destination: async (req, file, cb) => {
-    const uploadDir = path.join(process.cwd(), 'uploads', 'cv');
-    await fs.mkdir(uploadDir, { recursive: true });
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = `CV_${Date.now()}${path.extname(file.originalname)}`;
-    cb(null, uniqueName);
-  },
+const objectStorage = new ObjectStorageService();
+
+// Helper: upload a buffer/stream to App Storage public bucket, return public URL
+async function uploadToAppStorage(
+  buffer: Buffer,
+  filename: string,
+  contentType: string,
+  folder: 'cv' | 'projects' | 'og'
+): Promise<string> {
+  const searchPaths = objectStorage.getPublicObjectSearchPaths();
+  // searchPaths[0] = "/<bucket>/public"
+  const basePath = searchPaths[0]; // e.g. /repl-default-bucket-xxx/public
+  const objectName = `${folder}/${Date.now()}_${randomUUID()}_${filename}`;
+  // basePath format: /bucketName/prefix — strip leading slash
+  const parts = basePath.replace(/^\//, '').split('/');
+  const bucketName = parts[0];
+  const prefix = parts.slice(1).join('/');
+  const fullObjectName = prefix ? `${prefix}/${objectName}` : objectName;
+
+  const { objectStorageClient } = await import('./replit_integrations/object_storage/objectStorage');
+  const bucket = objectStorageClient.bucket(bucketName);
+  const file = bucket.file(fullObjectName);
+  await file.save(buffer, { contentType, resumable: false });
+  await file.makePublic();
+  return `https://storage.googleapis.com/${bucketName}/${fullObjectName}`;
+}
+
+// Multer using memory storage — files land in req.file.buffer, then we push to App Storage
+const memUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
 });
 
-const upload = multer({
-  storage: cvStorage,
+const cvUpload = multer({
+  storage: multer.memoryStorage(),
   fileFilter: (req, file, cb) => {
-    const allowedTypes = ['.pdf', '.doc', '.docx'];
     const ext = path.extname(file.originalname).toLowerCase();
-    if (allowedTypes.includes(ext)) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only PDF, DOC, and DOCX files are allowed'));
-    }
+    if (['.pdf', '.doc', '.docx'].includes(ext)) cb(null, true);
+    else cb(new Error('Only PDF, DOC, and DOCX files are allowed'));
   },
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  limits: { fileSize: 10 * 1024 * 1024 },
 });
 
-// Configure multer for project image uploads
-const projectImageStorage = multer.diskStorage({
-  destination: async (req, file, cb) => {
-    const uploadDir = path.join(process.cwd(), 'uploads', 'projects');
-    await fs.mkdir(uploadDir, { recursive: true });
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = `project_${Date.now()}_${Math.round(Math.random() * 1e6)}${path.extname(file.originalname)}`;
-    cb(null, uniqueName);
-  },
-});
-
-const projectImageUpload = multer({
-  storage: projectImageStorage,
+const imageUpload = multer({
+  storage: multer.memoryStorage(),
   fileFilter: (req, file, cb) => {
-    const allowedTypes = ['.jpg', '.jpeg', '.png', '.webp', '.svg', '.gif'];
     const ext = path.extname(file.originalname).toLowerCase();
-    if (allowedTypes.includes(ext)) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only image files (JPG, PNG, WEBP, SVG, GIF) are allowed'));
-    }
+    if (['.jpg', '.jpeg', '.png', '.webp', '.svg', '.gif'].includes(ext)) cb(null, true);
+    else cb(new Error('Only image files (JPG, PNG, WEBP, SVG, GIF) are allowed'));
   },
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  limits: { fileSize: 5 * 1024 * 1024 },
 });
 
 // Simple admin authentication middleware
@@ -284,19 +285,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "CV file not found. Please contact the administrator." });
       }
 
-      const filePath = path.join(process.cwd(), 'uploads', 'cv', cvFile.filename);
-      
-      // Check if file exists
-      try {
-        await fs.access(filePath);
-      } catch {
-        return res.status(404).json({ error: "CV file not found on server. Please contact the administrator." });
-      }
-
-      // Send file — use the CV file's label as the download filename if available
       const downloadName = cvFile.label
         ? `${cvFile.label.replace(/[^a-zA-Z0-9_\- ]/g, '').trim()}.pdf`
         : 'Mujeeb_Lawal_CV.pdf';
+
+      // Prefer App Storage URL (survives redeploys); fall back to local disk for legacy rows
+      if (cvFile.storageUrl) {
+        // Redirect to the permanent GCS public URL — browser downloads directly from CDN
+        res.setHeader('Content-Disposition', `attachment; filename="${downloadName}"`);
+        const response = await fetch(cvFile.storageUrl);
+        if (!response.ok) {
+          return res.status(404).json({ error: "CV file not found in storage. Please contact the administrator." });
+        }
+        res.setHeader('Content-Type', response.headers.get('content-type') || 'application/pdf');
+        const arrayBuffer = await response.arrayBuffer();
+        return res.send(Buffer.from(arrayBuffer));
+      }
+
+      // Legacy fallback: local disk (pre-App Storage uploads)
+      const filePath = path.join(process.cwd(), 'uploads', 'cv', cvFile.filename);
+      try {
+        await fs.access(filePath);
+      } catch {
+        return res.status(404).json({ error: "CV file not found. Please re-upload via the admin panel." });
+      }
       res.download(filePath, downloadName);
     } catch (error) {
       console.error("Error processing CV download:", error);
@@ -336,7 +348,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Upload new CV (admin only)
-  app.post("/api/cv/upload", adminAuth, upload.single('cv'), async (req, res) => {
+  app.post("/api/cv/upload", adminAuth, cvUpload.single('cv'), async (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ error: "No file uploaded" });
@@ -347,9 +359,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Label is required for CV uploads" });
       }
 
-      // Save file metadata to database
+      // Upload to App Storage (persists across redeploys)
+      const storageUrl = await uploadToAppStorage(
+        req.file.buffer,
+        req.file.originalname,
+        req.file.mimetype,
+        'cv'
+      );
+
       const cvFile = await storage.createCVFile({
-        filename: req.file.filename,
+        filename: req.file.originalname,
+        storageUrl,
         label,
       });
 
@@ -517,10 +537,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Upload project image (admin)
-  app.post("/api/projects/upload-image", adminAuth, projectImageUpload.single('image'), async (req, res) => {
+  app.post("/api/projects/upload-image", adminAuth, imageUpload.single('image'), async (req, res) => {
     try {
       if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-      const url = `/uploads/projects/${req.file.filename}`;
+      const url = await uploadToAppStorage(req.file.buffer, req.file.originalname, req.file.mimetype, 'projects');
       res.status(201).json({ url });
     } catch (error) {
       console.error("Error uploading project image:", error);
@@ -569,11 +589,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (e) { console.error(e); res.status(500).json({ error: "Failed to delete" }); }
   });
 
-  // Upload screenshot image (admin) — reuses projectImageUpload multer
-  app.post("/api/built-projects/upload-image", adminAuth, projectImageUpload.single('image'), async (req, res) => {
+  // Upload screenshot image (admin)
+  app.post("/api/built-projects/upload-image", adminAuth, imageUpload.single('image'), async (req, res) => {
     try {
       if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-      res.status(201).json({ url: `/uploads/projects/${req.file.filename}` });
+      const url = await uploadToAppStorage(req.file.buffer, req.file.originalname, req.file.mimetype, 'projects');
+      res.status(201).json({ url });
     } catch (e) { console.error(e); res.status(500).json({ error: "Failed to upload" }); }
   });
 
@@ -906,11 +927,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (e) { console.error(e); res.status(500).json({ error: "Failed to delete variant" }); }
   });
 
-  // Generic site image upload (logos, etc.) — reuses project image multer
-  app.post("/api/site/upload-image", adminAuth, projectImageUpload.single('image'), async (req, res) => {
+  // Generic site image upload (logos, etc.)
+  app.post("/api/site/upload-image", adminAuth, imageUpload.single('image'), async (req, res) => {
     try {
       if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-      res.status(201).json({ url: `/uploads/projects/${req.file.filename}` });
+      const url = await uploadToAppStorage(req.file.buffer, req.file.originalname, req.file.mimetype, 'projects');
+      res.status(201).json({ url });
     } catch (e) { console.error(e); res.status(500).json({ error: "Failed to upload" }); }
   });
 
@@ -927,24 +949,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // OG image upload — saves as /uploads/og-image.jpg (fixed filename for meta tag)
-  const ogImageStorage = multer.diskStorage({
-    destination: async (req, file, cb) => {
-      const dir = path.join(process.cwd(), 'uploads');
-      await fs.mkdir(dir, { recursive: true });
-      cb(null, dir);
-    },
-    filename: (req, file, cb) => cb(null, 'og-image.jpg'),
-  });
-  const ogImageUpload = multer({
-    storage: ogImageStorage,
+  // OG image upload — stored in App Storage, returns permanent public URL
+  const ogImageMemUpload = multer({
+    storage: multer.memoryStorage(),
     limits: { fileSize: 5 * 1024 * 1024 },
     fileFilter: (req, file, cb) => cb(null, /image\/(jpeg|jpg|png|webp)/.test(file.mimetype)),
   });
-  app.post("/api/site/upload-og-image", adminAuth, ogImageUpload.single('image'), async (req, res) => {
+  app.post("/api/site/upload-og-image", adminAuth, ogImageMemUpload.single('image'), async (req, res) => {
     try {
       if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-      res.json({ success: true, url: '/uploads/og-image.jpg' });
+      const url = await uploadToAppStorage(req.file.buffer, 'og-image.jpg', req.file.mimetype, 'og');
+      // Persist URL in site settings so meta tags can reference it
+      await storage.upsertSiteSetting({ key: 'og.imageUrl', value: url });
+      res.json({ success: true, url });
     } catch (e) { console.error(e); res.status(500).json({ error: "Failed to upload OG image" }); }
   });
 
