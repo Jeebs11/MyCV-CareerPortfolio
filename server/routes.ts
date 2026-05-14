@@ -293,18 +293,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const allSettings = await storage.getAllSiteSettings();
       const ogUrl = allSettings.find(s => s.key === 'og.imageUrl')?.value;
-      if (!ogUrl || !ogUrl.startsWith('/api/files/')) {
-        return res.status(404).send('No OG image uploaded yet');
+      if (ogUrl && ogUrl.startsWith('/api/files/')) {
+        const file = await getStorageFile(ogUrl);
+        const [exists] = await file.exists();
+        if (exists) {
+          const [metadata] = await file.getMetadata();
+          res.set({
+            'Content-Type': (metadata.contentType as string) || 'image/jpeg',
+            'Cache-Control': 'public, max-age=3600',
+          });
+          return file.createReadStream().pipe(res);
+        }
       }
-      const file = await getStorageFile(ogUrl);
-      const [exists] = await file.exists();
-      if (!exists) return res.status(404).send('OG image not found in storage');
-      const [metadata] = await file.getMetadata();
-      res.set({
-        'Content-Type': (metadata.contentType as string) || 'image/jpeg',
-        'Cache-Control': 'public, max-age=3600',
-      });
-      file.createReadStream().pipe(res);
+      // Fallback: serve the disk-generated placeholder if no cloud image set yet
+      const diskPath = path.join(process.cwd(), 'uploads', 'og-image.jpg');
+      try {
+        await fs.access(diskPath);
+        res.set('Cache-Control', 'public, max-age=300');
+        return res.sendFile(diskPath);
+      } catch {
+        return res.status(404).send('No OG image available');
+      }
     } catch (e) {
       console.error('Error serving OG image:', e);
       res.status(500).send('Failed to serve OG image');

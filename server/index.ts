@@ -39,22 +39,16 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// OG image: fixed filename, must never be cached so re-uploads are seen immediately
-app.use("/uploads/og-image.jpg", (req, res, next) => {
-  res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-  res.setHeader("Pragma", "no-cache");
-  res.setHeader("Expires", "0");
-  next();
-});
-
-app.use(
-  "/uploads",
-  express.static(path.join(process.cwd(), "uploads"), {
+// /uploads/og-image.jpg is served dynamically from cloud storage (see routes.ts).
+// Never let express.static intercept it — always pass through to the dynamic route.
+app.use("/uploads", (req, res, next) => {
+  if (req.path === "/og-image.jpg") return next();
+  return express.static(path.join(process.cwd(), "uploads"), {
     fallthrough: true,
     maxAge: "7d",
     index: false,
-  })
-);
+  })(req, res, next);
+});
 
 app.use((req, res, next) => {
   const start = Date.now();
