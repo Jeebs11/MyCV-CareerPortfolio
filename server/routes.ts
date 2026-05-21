@@ -1,5 +1,6 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
+import rateLimit from "express-rate-limit";
 import { storage } from "./storage";
 import { chatWithAssistantStream, generateBlogImage } from "./openai";
 import {
@@ -252,9 +253,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ============ CHATBOT ROUTE ============
-  
+
+  // Rate limiter: max 25 requests per IP per 10 minutes
+  // Generous enough for genuine visitors, blocks bots and cost attacks
+  const chatRateLimiter = rateLimit({
+    windowMs: 10 * 60 * 1000, // 10 minutes
+    max: 25,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Too many requests — please try again in a few minutes." },
+  });
+
   // Chatbot API endpoint with streaming
-  app.post("/api/chat", async (req, res) => {
+  app.post("/api/chat", chatRateLimiter, async (req, res) => {
     try {
       const { message } = req.body;
 

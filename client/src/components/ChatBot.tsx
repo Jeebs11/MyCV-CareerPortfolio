@@ -12,6 +12,8 @@ interface Message {
 
 const GREETING = "Hi — I'm Mujeeb's AI assistant. Ask me about his experience.";
 
+const MAX_USER_MESSAGES = 15;
+
 const CHIPS = [
   "Can Mujeeb help me?",
   "Tell me about Mujeeb",
@@ -168,8 +170,11 @@ export default function ChatBot() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const userMessageCount = messages.filter(m => m.role === 'user').length;
+  const isAtLimit = userMessageCount >= MAX_USER_MESSAGES;
+
   const sendMessage = useCallback(async (text: string) => {
-    if (!text.trim() || isLoading) return;
+    if (!text.trim() || isLoading || isAtLimit) return;
     const userMessage = text.trim();
     setInput('');
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
@@ -327,46 +332,66 @@ export default function ChatBot() {
           )}
 
           {/* Input */}
-          <div style={{ padding: '10px 14px 14px', borderTop: '1px solid hsl(220,20%,22%)', display: 'flex', gap: 8, flexShrink: 0 }}>
-            <input
-              type="text"
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Ask a question…"
-              disabled={isLoading}
-              data-testid="input-chat-message"
-              style={{
-                flex: 1,
-                padding: '8px 12px',
+          <div style={{ padding: '10px 14px 14px', borderTop: '1px solid hsl(220,20%,22%)', flexShrink: 0 }}>
+            {isAtLimit ? (
+              <div style={{
+                padding: '10px 14px',
                 background: 'hsl(220,20%,18%)',
                 border: '1px solid hsl(220,20%,28%)',
                 borderRadius: 4,
-                color: PAPER,
-                fontSize: 13,
-                outline: 'none',
-                fontFamily: 'Inter, sans-serif',
-              }}
-            />
-            <button
-              onClick={() => sendMessage(input)}
-              disabled={!input.trim() || isLoading}
-              data-testid="button-send-message"
-              style={{
-                padding: '8px 14px',
-                background: input.trim() && !isLoading ? BRASS : 'hsl(220,20%,22%)',
-                border: 'none',
-                borderRadius: 4,
-                color: input.trim() && !isLoading ? PAPER : 'hsl(220,15%,45%)',
-                cursor: input.trim() && !isLoading ? 'pointer' : 'default',
-                fontSize: 13,
-                fontFamily: 'Inter, sans-serif',
-                fontWeight: 500,
-                transition: 'background 0.15s',
-              }}
-            >
-              Send
-            </button>
+                fontSize: 12,
+                color: 'hsl(220,15%,55%)',
+                lineHeight: 1.5,
+                textAlign: 'center',
+              }}>
+                You've reached the message limit for this session.{' '}
+                <a href="https://www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/" target="_blank" rel="noopener noreferrer" style={{ color: BRASS_LIGHT, textDecoration: 'none' }}>
+                  Connect on LinkedIn
+                </a>{' '}to continue the conversation.
+              </div>
+            ) : (
+              <div style={{ display: 'flex', gap: 8 }}>
+                <input
+                  type="text"
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Ask a question…"
+                  disabled={isLoading}
+                  data-testid="input-chat-message"
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    background: 'hsl(220,20%,18%)',
+                    border: '1px solid hsl(220,20%,28%)',
+                    borderRadius: 4,
+                    color: PAPER,
+                    fontSize: 13,
+                    outline: 'none',
+                    fontFamily: 'Inter, sans-serif',
+                  }}
+                />
+                <button
+                  onClick={() => sendMessage(input)}
+                  disabled={!input.trim() || isLoading}
+                  data-testid="button-send-message"
+                  style={{
+                    padding: '8px 14px',
+                    background: input.trim() && !isLoading ? BRASS : 'hsl(220,20%,22%)',
+                    border: 'none',
+                    borderRadius: 4,
+                    color: input.trim() && !isLoading ? PAPER : 'hsl(220,15%,45%)',
+                    cursor: input.trim() && !isLoading ? 'pointer' : 'default',
+                    fontSize: 13,
+                    fontFamily: 'Inter, sans-serif',
+                    fontWeight: 500,
+                    transition: 'background 0.15s',
+                  }}
+                >
+                  Send
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
