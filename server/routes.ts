@@ -262,12 +262,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Message is required" });
       }
 
+      // Hard cap on message length — prevents large injection payloads
+      if (message.length > 600) {
+        return res.status(400).json({ error: "Message too long" });
+      }
+
       // Set headers for Server-Sent Events
       res.setHeader('Content-Type', 'text/event-stream');
       res.setHeader('Cache-Control', 'no-cache');
       res.setHeader('Connection', 'keep-alive');
 
       const stream = await chatWithAssistantStream(message);
+
+      // null means the message was flagged as malicious — send safe deflection
+      if (stream === null) {
+        const deflection = "I'm only set up to chat about Mujeeb's professional background — happy to help with anything on that front! If you'd like to reach him directly, he's quick to respond on LinkedIn: www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/";
+        res.write(`data: ${JSON.stringify({ content: deflection })}\n\n`);
+        res.write('data: [DONE]\n\n');
+        res.end();
+        return;
+      }
 
       for await (const chunk of stream) {
         const content = chunk.choices[0]?.delta?.content || '';
