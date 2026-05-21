@@ -44,25 +44,24 @@ function MLBadge({ onClick, hasNudge }: { onClick: () => void; hasNudge: boolean
         outline: 'none',
       }}
     >
-      {hasNudge && (
-        <span style={{
-          position: 'absolute',
-          inset: -4,
-          borderRadius: 10,
-          border: `2px solid ${BRASS}`,
-          opacity: 0.55,
-          animation: 'ml-pulse 2s ease-in-out infinite',
-          pointerEvents: 'none',
-        }} />
-      )}
+      <span style={{
+        position: 'absolute',
+        inset: -3,
+        borderRadius: 10,
+        border: `1.5px solid ${BRASS}`,
+        opacity: 0,
+        animation: 'ml-breathe 4s ease-in-out infinite',
+        pointerEvents: 'none',
+        boxShadow: `0 0 8px 2px hsla(35,45%,45%,0.35)`,
+      }} />
       <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
         <rect width="40" height="40" rx="3" fill={BRASS} />
         <text x="20" y="27" textAnchor="middle" fontFamily="Cormorant Garamond,serif" fontWeight="600" fontSize="15" fill={PAPER}>ML</text>
       </svg>
       <style>{`
-        @keyframes ml-pulse {
-          0%, 100% { transform: scale(1); opacity: 0.55; }
-          50% { transform: scale(1.12); opacity: 0.85; }
+        @keyframes ml-breathe {
+          0%, 100% { opacity: 0; box-shadow: 0 0 4px 1px hsla(35,45%,45%,0.15); }
+          50%       { opacity: 0.7; box-shadow: 0 0 10px 3px hsla(35,45%,45%,0.4); }
         }
       `}</style>
     </button>
