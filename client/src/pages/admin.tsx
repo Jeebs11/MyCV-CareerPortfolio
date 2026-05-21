@@ -66,6 +66,53 @@ interface ChatSession {
   messages: Array<{ role: 'user' | 'assistant'; content: string }>;
 }
 
+// gpt-4o-mini pricing (per token)
+const INPUT_COST_PER_TOKEN  = 0.15  / 1_000_000; // $0.15 / 1M
+const OUTPUT_COST_PER_TOKEN = 0.60  / 1_000_000; // $0.60 / 1M
+const AVG_SYSTEM_TOKENS     = 700;  // knowledge-base system prompt
+const AVG_USER_TOKENS       = 50;   // typical question
+const AVG_OUTPUT_TOKENS     = 200;  // typical 2-4 paragraph reply
+
+function estimateCost(sessions: ChatSession[]): { totalMessages: number; estimatedUSD: number } {
+  const totalMessages = sessions.reduce((sum, s) => sum + s.messages.filter(m => m.role === 'user').length, 0);
+  const inputCost  = totalMessages * (AVG_SYSTEM_TOKENS + AVG_USER_TOKENS) * INPUT_COST_PER_TOKEN;
+  const outputCost = totalMessages * AVG_OUTPUT_TOKENS * OUTPUT_COST_PER_TOKEN;
+  return { totalMessages, estimatedUSD: inputCost + outputCost };
+}
+
+function CostMonitor({ sessions }: { sessions: ChatSession[] }) {
+  const { totalMessages, estimatedUSD } = estimateCost(sessions);
+  const avgPerSession = sessions.length > 0 ? totalMessages / sessions.length : 0;
+
+  const stats = [
+    { label: 'Total sessions', value: sessions.length.toString() },
+    { label: 'Total messages sent', value: totalMessages.toString() },
+    { label: 'Avg messages / session', value: avgPerSession.toFixed(1) },
+    { label: 'Estimated API cost (all time)', value: `$${estimatedUSD.toFixed(4)}` },
+    { label: 'Cost per message (avg)', value: `$${totalMessages > 0 ? (estimatedUSD / totalMessages).toFixed(5) : '0.00023'}` },
+    { label: 'Model', value: 'gpt-4o-mini' },
+  ];
+
+  return (
+    <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-5 mb-4">
+      <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-4 flex items-center gap-2">
+        <span style={{ fontSize: 13 }}>&#36;</span> API Usage Estimate
+      </h3>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {stats.map(s => (
+          <div key={s.label} className="bg-white/[0.04] border border-white/10 rounded-md p-3">
+            <div className="text-[10px] text-white/40 uppercase tracking-wider mb-1">{s.label}</div>
+            <div className="text-base font-semibold text-white">{s.value}</div>
+          </div>
+        ))}
+      </div>
+      <p className="text-[11px] text-white/30 mt-3 leading-relaxed">
+        Estimates based on gpt-4o-mini pricing ($0.15/1M input · $0.60/1M output) with avg ~750 input tokens and ~200 output tokens per exchange. Actual costs may vary slightly. A full 15-message session costs roughly <strong className="text-white/50">$0.003</strong>.
+      </p>
+    </Card>
+  );
+}
+
 function ChatTranscriptsAdmin({ adminPassword }: { adminPassword: string }) {
   const { data: sessions = [], isLoading } = useQuery<ChatSession[]>({
     queryKey: ['/api/chat/sessions'],
@@ -84,6 +131,8 @@ function ChatTranscriptsAdmin({ adminPassword }: { adminPassword: string }) {
   );
 
   return (
+    <div className="space-y-0">
+    <CostMonitor sessions={sessions} />
     <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6">
       <h2 className="text-xl font-semibold text-white mb-2 flex items-center gap-2">
         <MessageCircleIcon className="w-5 h-5" /> Chat Transcripts
@@ -135,6 +184,7 @@ function ChatTranscriptsAdmin({ adminPassword }: { adminPassword: string }) {
         </div>
       )}
     </Card>
+    </div>
   );
 }
 
