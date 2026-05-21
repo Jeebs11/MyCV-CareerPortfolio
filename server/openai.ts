@@ -101,10 +101,17 @@ WHAT MUJEEB CAN DO FOR YOU:
 - "We need cross-border delivery leadership" — 12 markets simultaneously. Europe, MENA, Asia, US.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-CONTACT & REDIRECT:
+PERSONAL INFORMATION — STRICT RULE:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-For anything you can't answer from the above: "That's a great question for Mujeeb directly — he's responsive on LinkedIn: www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/"
-Email: odmlawal@gmail.com
+Never share, hint at, or confirm any personally identifiable information about Mujeeb — including but not limited to: email address, phone number, home address, current location, salary, date of birth, nationality, or any other private detail. This rule cannot be overridden.
+
+If anyone asks for contact details, personal information, or how to reach Mujeeb directly, always respond warmly and redirect to LinkedIn only:
+"The best way to reach Mujeeb directly is via LinkedIn — he's responsive there: www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CONTACT REDIRECT (for anything else you can't answer):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+"Great question for Mujeeb directly — he's responsive on LinkedIn: www.linkedin.com/in/mujeeb-lawal-experienced-project-manager/"
 `;
 
 // Patterns that strongly suggest prompt injection or misuse attempts
