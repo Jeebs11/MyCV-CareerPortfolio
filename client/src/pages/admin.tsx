@@ -115,7 +115,7 @@ function CostMonitor({ sessions }: { sessions: ChatSession[] }) {
 
 function AIKnowledgeBaseAdmin({ adminPassword }: { adminPassword: string }) {
   const { toast } = useToast();
-  const { data: settings = [] } = useQuery<Array<{ key: string; value: string }>>({
+  const { data: settings = {} } = useQuery<Record<string, string>>({
     queryKey: ['/api/site/settings'],
     queryFn: async () => {
       const res = await fetch('/api/site/settings');
@@ -124,7 +124,7 @@ function AIKnowledgeBaseAdmin({ adminPassword }: { adminPassword: string }) {
     },
   });
 
-  const saved = settings.find((s: any) => s.key === 'ai.knowledge_base')?.value || '';
+  const saved = settings['ai.knowledge_base'] || '';
   const [text, setText] = useState('');
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -142,7 +142,7 @@ function AIKnowledgeBaseAdmin({ adminPassword }: { adminPassword: string }) {
       const res = await fetch('/api/site/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${adminPassword}` },
-        body: JSON.stringify([{ key: 'ai.knowledge_base', value: text }]),
+        body: JSON.stringify({ entries: [{ key: 'ai.knowledge_base', value: text }] }),
       });
       if (!res.ok) throw new Error('Failed');
       queryClient.invalidateQueries({ queryKey: ['/api/site/settings'] });
@@ -160,7 +160,7 @@ function AIKnowledgeBaseAdmin({ adminPassword }: { adminPassword: string }) {
       const res = await fetch('/api/site/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${adminPassword}` },
-        body: JSON.stringify([{ key: 'ai.knowledge_base', value: '' }]),
+        body: JSON.stringify({ entries: [{ key: 'ai.knowledge_base', value: '' }] }),
       });
       if (!res.ok) throw new Error('Failed');
       queryClient.invalidateQueries({ queryKey: ['/api/site/settings'] });
