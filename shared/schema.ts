@@ -329,6 +329,18 @@ export type BuiltProjectRow = typeof builtProjectsTable.$inferSelect;
 export type InsertBuiltProject = z.infer<typeof insertBuiltProjectSchema>;
 export type UpdateBuiltProject = z.infer<typeof updateBuiltProjectSchema>;
 
+// Chat Sessions Table
+export const chatSessionsTable = pgTable('chat_sessions', {
+  id: serial('id').primaryKey(),
+  sessionId: varchar('session_id', { length: 100 }).notNull(),
+  startedAt: timestamp('started_at').defaultNow().notNull(),
+  messages: jsonb('messages').$type<Array<{ role: 'user' | 'assistant'; content: string }>>().notNull().default([]),
+});
+
+export const insertChatSessionSchema = createInsertSchema(chatSessionsTable).omit({ id: true, startedAt: true });
+export type ChatSessionRow = typeof chatSessionsTable.$inferSelect;
+export type InsertChatSession = z.infer<typeof insertChatSessionSchema>;
+
 // ============ INTERFACES ============
 
 export interface Experience {

@@ -49,7 +49,8 @@ import {
   ArrowDown,
   ImageIcon,
   Building2,
-  ExternalLink as ExternalLinkIcon
+  ExternalLink as ExternalLinkIcon,
+  MessageCircle as MessageCircleIcon,
 } from 'lucide-react';
 import type { ProjectRow, BuiltProjectRow } from '@shared/schema';
 import { Link } from 'wouter';
@@ -57,6 +58,85 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CareerRolesAdmin, FlagshipWinsAdmin, SiteSkillsAdmin, SiteCertificationsAdmin, SiteEducationAdmin, SiteSettingsAdmin } from '@/components/admin/SiteContentTabs';
 import { AppearanceAdmin } from '@/components/admin/AppearanceAdmin';
 import { VariantsAdmin } from '@/components/admin/VariantsAdmin';
+
+interface ChatSession {
+  id: number;
+  sessionId: string;
+  startedAt: string;
+  messages: Array<{ role: 'user' | 'assistant'; content: string }>;
+}
+
+function ChatTranscriptsAdmin({ adminPassword }: { adminPassword: string }) {
+  const { data: sessions = [], isLoading } = useQuery<ChatSession[]>({
+    queryKey: ['/api/chat/sessions'],
+    queryFn: async () => {
+      const res = await fetch('/api/chat/sessions', { headers: { Authorization: `Bearer ${adminPassword}` } });
+      if (!res.ok) throw new Error('Failed to fetch');
+      return res.json();
+    },
+  });
+  const [expanded, setExpanded] = useState<number | null>(null);
+
+  if (isLoading) return (
+    <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6">
+      <div className="flex items-center gap-2 text-white/60"><Loader2 className="w-4 h-4 animate-spin" /> Loading transcripts…</div>
+    </Card>
+  );
+
+  return (
+    <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6">
+      <h2 className="text-xl font-semibold text-white mb-2 flex items-center gap-2">
+        <MessageCircleIcon className="w-5 h-5" /> Chat Transcripts
+      </h2>
+      <p className="text-white/50 text-sm mb-6">{sessions.length} session{sessions.length !== 1 ? 's' : ''} captured</p>
+      {sessions.length === 0 ? (
+        <div className="text-center py-12 text-white/40">
+          <MessageCircleIcon className="w-10 h-10 mx-auto mb-3 opacity-30" />
+          <p className="text-sm">No chat sessions yet — sessions are saved when users close the chatbot.</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {sessions.map(s => {
+            const userTurns = s.messages.filter(m => m.role === 'user').length;
+            const firstMsg = s.messages.find(m => m.role === 'user')?.content || '—';
+            const isExpanded = expanded === s.id;
+            return (
+              <div key={s.id} className="border border-white/10 rounded-md overflow-hidden" data-testid={`row-session-${s.id}`}>
+                <button
+                  onClick={() => setExpanded(isExpanded ? null : s.id)}
+                  className="w-full text-left p-4 hover:bg-white/5 transition-colors"
+                >
+                  <div className="flex items-start justify-between gap-4 flex-wrap">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm text-white truncate">{firstMsg}</div>
+                      <div className="flex items-center gap-3 mt-1 flex-wrap">
+                        <span className="text-xs text-white/40 flex items-center gap-1"><CalendarIcon className="w-3 h-3" />{new Date(s.startedAt).toLocaleString()}</span>
+                        <Badge variant="secondary" className="text-xs">{userTurns} message{userTurns !== 1 ? 's' : ''}</Badge>
+                      </div>
+                    </div>
+                    <span className="text-white/30 text-xs mt-1">{isExpanded ? '▲' : '▼'}</span>
+                  </div>
+                </button>
+                {isExpanded && (
+                  <div className="border-t border-white/10 p-4 space-y-3 bg-white/[0.02]">
+                    {s.messages.map((msg, i) => (
+                      <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[80%] rounded px-3 py-2 text-sm ${msg.role === 'user' ? 'bg-white/15 text-white' : 'bg-white/5 text-white/80 border border-white/10'}`}>
+                          <div className="text-[10px] font-semibold uppercase tracking-wider mb-1 opacity-50">{msg.role}</div>
+                          <div className="whitespace-pre-wrap leading-relaxed">{msg.content}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </Card>
+  );
+}
 
 interface BlogPost {
   id: string;
@@ -954,6 +1034,7 @@ export default function AdminPage() {
               { value: 'settings', label: 'Site Content' },
               { value: 'variants', label: 'Variants' },
               { value: 'appearance', label: 'Appearance' },
+              { value: 'chat-transcripts', label: 'Chat Transcripts' },
             ].map(t => (
               <TabsTrigger
                 key={t.value}
@@ -2188,6 +2269,10 @@ export default function AdminPage() {
           </TabsContent>
           <TabsContent value="appearance" className="space-y-6">
             <AppearanceAdmin adminPassword={adminPassword} />
+          </TabsContent>
+
+          <TabsContent value="chat-transcripts" className="space-y-6">
+            <ChatTranscriptsAdmin adminPassword={adminPassword} />
           </TabsContent>
         </Tabs>
       </div>

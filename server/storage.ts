@@ -47,6 +47,9 @@ import {
   siteSettingsTable,
   type UpsertSiteSetting,
   type SiteSettingRow,
+  chatSessionsTable,
+  type InsertChatSession,
+  type ChatSessionRow,
   timelineProjects,
   detailedCertifications,
   education as educationDefaults,
@@ -143,6 +146,10 @@ export interface IStorage {
   updateBuiltProject(id: number, data: UpdateBuiltProject): Promise<BuiltProjectRow | undefined>;
   deleteBuiltProject(id: number): Promise<boolean>;
   reorderBuiltProjects(orders: { id: number; sortOrder: number }[]): Promise<void>;
+
+  // Chat Sessions
+  saveChatSession(data: InsertChatSession): Promise<ChatSessionRow>;
+  listChatSessions(): Promise<ChatSessionRow[]>;
 
   // Seed
   seedSiteContentIfEmpty(): Promise<void>;
@@ -526,6 +533,20 @@ export class DatabaseStorage implements IStorage {
           target: siteSettingsTable.key,
           set: { value: entry.value, updatedAt: new Date() },
         });
+    }
+  }
+
+  // Chat Sessions
+  async saveChatSession(data: InsertChatSession): Promise<ChatSessionRow> {
+    const [row] = await db.insert(chatSessionsTable).values(data).returning();
+    return row;
+  }
+  async listChatSessions(): Promise<ChatSessionRow[]> {
+    try {
+      return await db.select().from(chatSessionsTable).orderBy(desc(chatSessionsTable.startedAt));
+    } catch (err) {
+      if (isNeonEmptyResultError(err)) return [];
+      throw err;
     }
   }
 

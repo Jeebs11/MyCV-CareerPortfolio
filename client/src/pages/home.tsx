@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import ChatBot from '@/components/ChatBot';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
 import type { CareerRoleRow, FlagshipWinRow, SiteSkillRow, SiteEducationRow } from '@shared/schema';
@@ -231,6 +232,7 @@ export default function Home() {
   const P = isMobile ? 24 : 64;
 
   return (
+    <>
     <div style={{ fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: isMobile ? 'column' : 'row', height: isMobile ? 'auto' : '100vh', overflow: isMobile ? 'visible' : 'hidden' }}>
       <style>{`
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -599,5 +601,7 @@ export default function Home() {
         </div>
       )}
     </div>
+    <ChatBot />
+    </>
   );
 }

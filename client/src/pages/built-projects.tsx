@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
 import type { BuiltProjectRow } from '@shared/schema';
 import FloatingNav from '@/components/FloatingNav';
+import ChatBot from '@/components/ChatBot';
 import { getVariantHomeHref } from '@/hooks/useVariantHomeHref';
 
 const INK = 'hsl(220,25%,14%)';
@@ -62,6 +63,7 @@ export default function BuiltProjectsPage() {
   function changeFilter(f: string) { setFilter(f); setPage(1); }
 
   return (
+    <>
     <div style={{ fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: isMobile ? 'column' : 'row', minHeight: '100vh' }}>
       <style>{`* { box-sizing: border-box; margin: 0; padding: 0; } a { text-decoration: none; } ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: hsl(220,20%,30%); }`}</style>
       <FloatingNav />
@@ -206,5 +208,7 @@ export default function BuiltProjectsPage() {
         )}
       </main>
     </div>
+    <ChatBot />
+    </>
   );
 }

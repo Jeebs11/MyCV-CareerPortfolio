@@ -13,6 +13,7 @@ import {
   insertSiteEducationSchema, updateSiteEducationSchema,
   upsertSiteSettingSchema,
   insertProfileVariantSchema, updateProfileVariantSchema,
+  insertChatSessionSchema,
 } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 import { z } from "zod";
@@ -1089,6 +1090,31 @@ ${pages.map(p => `  <url>
   app.get('/robots.txt', (req, res) => {
     res.type('text/plain');
     res.send(`User-agent: *\nAllow: /\nSitemap: https://mujeeb-lawal.replit.app/sitemap.xml\n`);
+  });
+
+  // ============ CHAT SESSION ROUTES ============
+
+  // Save a chat session transcript (public — called on chat close)
+  app.post("/api/chat/session", async (req, res) => {
+    try {
+      const v = insertChatSessionSchema.safeParse(req.body);
+      if (!v.success) return res.status(400).json({ error: fromZodError(v.error).toString() });
+      const row = await storage.saveChatSession(v.data);
+      res.status(201).json(row);
+    } catch (e) {
+      console.error("Error saving chat session:", e);
+      res.status(500).json({ error: "Failed to save chat session" });
+    }
+  });
+
+  // List all chat sessions (admin only)
+  app.get("/api/chat/sessions", adminAuth, async (_req, res) => {
+    try {
+      res.json(await storage.listChatSessions());
+    } catch (e) {
+      console.error("Error fetching chat sessions:", e);
+      res.status(500).json({ error: "Failed to fetch chat sessions" });
+    }
   });
 
   // Seed defaults from constants if tables are empty

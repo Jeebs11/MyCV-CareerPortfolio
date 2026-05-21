@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
 import DOMPurify from 'dompurify';
 import FloatingNav from '@/components/FloatingNav';
+import ChatBot from '@/components/ChatBot';
 import { getVariantHomeHref } from '@/hooks/useVariantHomeHref';
 
 const INK = 'hsl(220,25%,14%)';
@@ -53,6 +54,7 @@ export default function InsightsPage() {
   function changeCategory(cat: string) { setSelectedCategory(cat); setPage(1); }
 
   return (
+    <>
     <div style={{ fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: isMobile ? 'column' : 'row', minHeight: '100vh' }}>
       <style>{`* { box-sizing: border-box; margin: 0; padding: 0; } a { text-decoration: none; } ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: hsl(220,20%,30%); } .article-hover:hover { background: hsl(40,18%,94%) !important; }`}</style>
       <FloatingNav />
@@ -185,5 +187,7 @@ export default function InsightsPage() {
         )}
       </main>
     </div>
+    <ChatBot />
+    </>
   );
 }
