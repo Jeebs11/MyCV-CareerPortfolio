@@ -113,6 +113,134 @@ function CostMonitor({ sessions }: { sessions: ChatSession[] }) {
   );
 }
 
+function AIKnowledgeBaseAdmin({ adminPassword }: { adminPassword: string }) {
+  const { toast } = useToast();
+  const { data: settings = [] } = useQuery<Array<{ key: string; value: string }>>({
+    queryKey: ['/api/site/settings'],
+    queryFn: async () => {
+      const res = await fetch('/api/site/settings');
+      if (!res.ok) throw new Error('Failed');
+      return res.json();
+    },
+  });
+
+  const saved = settings.find((s: any) => s.key === 'ai.knowledge_base')?.value || '';
+  const [text, setText] = useState('');
+  const [dirty, setDirty] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (saved !== undefined) { setText(saved); setDirty(false); }
+  }, [saved]);
+
+  const handleChange = (v: string) => { setText(v); setDirty(true); };
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch('/api/site/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${adminPassword}` },
+        body: JSON.stringify([{ key: 'ai.knowledge_base', value: text }]),
+      });
+      if (!res.ok) throw new Error('Failed');
+      queryClient.invalidateQueries({ queryKey: ['/api/site/settings'] });
+      setDirty(false);
+      toast({ title: 'AI knowledge base saved', description: 'The chatbot will use your updated content immediately.' });
+    } catch {
+      toast({ title: 'Save failed', variant: 'destructive' });
+    } finally { setSaving(false); }
+  };
+
+  const reset = async () => {
+    if (!confirm('Reset to the built-in default CV content? Your custom text will be removed.')) return;
+    setSaving(true);
+    try {
+      const res = await fetch('/api/site/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${adminPassword}` },
+        body: JSON.stringify([{ key: 'ai.knowledge_base', value: '' }]),
+      });
+      if (!res.ok) throw new Error('Failed');
+      queryClient.invalidateQueries({ queryKey: ['/api/site/settings'] });
+      setText('');
+      setDirty(false);
+      toast({ title: 'Reset to default', description: 'The chatbot will use the built-in CV content.' });
+    } catch {
+      toast({ title: 'Reset failed', variant: 'destructive' });
+    } finally { setSaving(false); }
+  };
+
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+
+  return (
+    <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-5 mb-4">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between text-left"
+      >
+        <div>
+          <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+            <FileText className="w-4 h-4 text-white/60" />
+            AI Knowledge Base
+            {text.trim() ? (
+              <Badge variant="secondary" className="text-[10px]">Custom</Badge>
+            ) : (
+              <Badge variant="outline" className="text-[10px] border-white/20 text-white/40">Default</Badge>
+            )}
+          </h3>
+          <p className="text-[11px] text-white/40 mt-0.5">
+            {text.trim() ? `${words} words — chatbot is using your custom content` : 'Using built-in CV content — paste your updated CV to override'}
+          </p>
+        </div>
+        <span className="text-white/30 text-xs ml-4">{open ? '▲' : '▼'}</span>
+      </button>
+
+      {open && (
+        <div className="mt-4 space-y-3">
+          <p className="text-[11px] text-white/40 leading-relaxed">
+            Paste plain text from your CV here — roles, achievements, skills, anything you want the AI to know. Leave blank to use the built-in default. The security rules and tone are always fixed and cannot be changed here.
+          </p>
+          <textarea
+            value={text}
+            onChange={e => handleChange(e.target.value)}
+            rows={16}
+            placeholder={`Paste your CV content here, e.g.:\n\nMujeeb Lawal — Senior Programme Director\n\nHead of Projects — Acme Corp (2025–present)\n- Led digital transformation across 3 business units\n- Delivered £10M programme on time and under budget\n...\n\nLeave blank to use the built-in default.`}
+            className="w-full bg-white/[0.04] border border-white/10 rounded-md p-3 text-sm text-white/80 placeholder:text-white/20 font-mono leading-relaxed resize-y outline-none focus:border-white/25"
+            data-testid="input-ai-knowledge-base"
+          />
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <span className="text-[11px] text-white/30">{words} words · changes take effect immediately on save</span>
+            <div className="flex gap-2">
+              <button
+                onClick={reset}
+                disabled={saving}
+                className="text-[11px] text-white/40 hover:text-white/70 transition-colors px-3 py-1.5 rounded border border-white/10 hover:border-white/20"
+              >
+                Reset to default
+              </button>
+              <button
+                onClick={save}
+                disabled={saving || !dirty}
+                className="text-[11px] font-medium px-4 py-1.5 rounded"
+                style={{
+                  background: dirty && !saving ? 'hsl(35,45%,45%)' : 'hsl(220,20%,22%)',
+                  color: dirty && !saving ? 'hsl(40,20%,97%)' : 'hsl(220,15%,45%)',
+                  cursor: dirty && !saving ? 'pointer' : 'default',
+                }}
+                data-testid="button-save-knowledge-base"
+              >
+                {saving ? 'Saving…' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </Card>
+  );
+}
+
 function ChatTranscriptsAdmin({ adminPassword }: { adminPassword: string }) {
   const { data: sessions = [], isLoading } = useQuery<ChatSession[]>({
     queryKey: ['/api/chat/sessions'],
@@ -132,6 +260,7 @@ function ChatTranscriptsAdmin({ adminPassword }: { adminPassword: string }) {
 
   return (
     <div className="space-y-0">
+    <AIKnowledgeBaseAdmin adminPassword={adminPassword} />
     <CostMonitor sessions={sessions} />
     <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6">
       <h2 className="text-xl font-semibold text-white mb-2 flex items-center gap-2">

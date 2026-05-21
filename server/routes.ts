@@ -283,7 +283,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.setHeader('Cache-Control', 'no-cache');
       res.setHeader('Connection', 'keep-alive');
 
-      const stream = await chatWithAssistantStream(message);
+      // Load admin-managed CV override (falls back to default if not set)
+      const allSettings = await storage.getAllSiteSettings();
+      const customCV = allSettings.find(s => s.key === 'ai.knowledge_base')?.value || null;
+
+      const stream = await chatWithAssistantStream(message, customCV);
 
       // null means the message was flagged as malicious — send safe deflection
       if (stream === null) {
