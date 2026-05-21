@@ -150,6 +150,7 @@ export interface IStorage {
   // Chat Sessions
   saveChatSession(data: InsertChatSession): Promise<ChatSessionRow>;
   listChatSessions(): Promise<ChatSessionRow[]>;
+  deleteChatSession(id: number): Promise<void>;
 
   // Seed
   seedSiteContentIfEmpty(): Promise<void>;
@@ -548,6 +549,9 @@ export class DatabaseStorage implements IStorage {
       if (isNeonEmptyResultError(err)) return [];
       throw err;
     }
+  }
+  async deleteChatSession(id: number): Promise<void> {
+    await db.delete(chatSessionsTable).where(eq(chatSessionsTable.id, id));
   }
 
   // Seed defaults if tables empty

@@ -33,7 +33,8 @@ import { useToast } from '@/hooks/use-toast';
 import { 
   Plus, 
   Edit, 
-  Trash2, 
+  Trash2,
+  Trash2 as Trash2Icon,
   Lock, 
   LogOut, 
   Loader2,
@@ -51,6 +52,10 @@ import {
   Building2,
   ExternalLink as ExternalLinkIcon,
   MessageCircle as MessageCircleIcon,
+  ChevronLeft as ChevronLeftIcon,
+  ChevronRight as ChevronRightIcon,
+  ChevronsLeft as ChevronsLeftIcon,
+  ChevronsRight as ChevronsRightIcon,
 } from 'lucide-react';
 import type { ProjectRow, BuiltProjectRow } from '@shared/schema';
 import { Link } from 'wouter';
@@ -241,7 +246,10 @@ function AIKnowledgeBaseAdmin({ adminPassword }: { adminPassword: string }) {
   );
 }
 
+const PAGE_SIZE = 20;
+
 function ChatTranscriptsAdmin({ adminPassword }: { adminPassword: string }) {
+  const { toast } = useToast();
   const { data: sessions = [], isLoading } = useQuery<ChatSession[]>({
     queryKey: ['/api/chat/sessions'],
     queryFn: async () => {
@@ -251,6 +259,31 @@ function ChatTranscriptsAdmin({ adminPassword }: { adminPassword: string }) {
     },
   });
   const [expanded, setExpanded] = useState<number | null>(null);
+  const [page, setPage] = useState(1);
+  const [deleting, setDeleting] = useState<number | null>(null);
+
+  const totalPages = Math.max(1, Math.ceil(sessions.length / PAGE_SIZE));
+  const pageSessions = sessions.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const deleteSession = async (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm('Delete this chat transcript? This cannot be undone.')) return;
+    setDeleting(id);
+    try {
+      const res = await fetch(`/api/chat/sessions/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${adminPassword}` },
+      });
+      if (!res.ok) throw new Error('Failed');
+      queryClient.invalidateQueries({ queryKey: ['/api/chat/sessions'] });
+      if (expanded === id) setExpanded(null);
+      // If we just deleted the last item on this page, go back one page
+      if (pageSessions.length === 1 && page > 1) setPage(p => p - 1);
+      toast({ title: 'Transcript deleted' });
+    } catch {
+      toast({ title: 'Delete failed', variant: 'destructive' });
+    } finally { setDeleting(null); }
+  };
 
   if (isLoading) return (
     <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6">
@@ -263,54 +296,123 @@ function ChatTranscriptsAdmin({ adminPassword }: { adminPassword: string }) {
     <AIKnowledgeBaseAdmin adminPassword={adminPassword} />
     <CostMonitor sessions={sessions} />
     <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6">
-      <h2 className="text-xl font-semibold text-white mb-2 flex items-center gap-2">
-        <MessageCircleIcon className="w-5 h-5" /> Chat Transcripts
-      </h2>
-      <p className="text-white/50 text-sm mb-6">{sessions.length} session{sessions.length !== 1 ? 's' : ''} captured</p>
+      <div className="flex items-center justify-between gap-4 flex-wrap mb-2">
+        <h2 className="text-xl font-semibold text-white flex items-center gap-2">
+          <MessageCircleIcon className="w-5 h-5" /> Chat Transcripts
+        </h2>
+        {sessions.length > 0 && (
+          <span className="text-white/40 text-xs">
+            {sessions.length} session{sessions.length !== 1 ? 's' : ''}
+            {totalPages > 1 && ` · page ${page} of ${totalPages}`}
+          </span>
+        )}
+      </div>
       {sessions.length === 0 ? (
         <div className="text-center py-12 text-white/40">
           <MessageCircleIcon className="w-10 h-10 mx-auto mb-3 opacity-30" />
           <p className="text-sm">No chat sessions yet — sessions are saved when users close the chatbot.</p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {sessions.map(s => {
-            const userTurns = s.messages.filter(m => m.role === 'user').length;
-            const firstMsg = s.messages.find(m => m.role === 'user')?.content || '—';
-            const isExpanded = expanded === s.id;
-            return (
-              <div key={s.id} className="border border-white/10 rounded-md overflow-hidden" data-testid={`row-session-${s.id}`}>
-                <button
-                  onClick={() => setExpanded(isExpanded ? null : s.id)}
-                  className="w-full text-left p-4 hover:bg-white/5 transition-colors"
-                >
-                  <div className="flex items-start justify-between gap-4 flex-wrap">
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm text-white truncate">{firstMsg}</div>
-                      <div className="flex items-center gap-3 mt-1 flex-wrap">
-                        <span className="text-xs text-white/40 flex items-center gap-1"><CalendarIcon className="w-3 h-3" />{new Date(s.startedAt).toLocaleString()}</span>
-                        <Badge variant="secondary" className="text-xs">{userTurns} message{userTurns !== 1 ? 's' : ''}</Badge>
-                      </div>
-                    </div>
-                    <span className="text-white/30 text-xs mt-1">{isExpanded ? '▲' : '▼'}</span>
-                  </div>
-                </button>
-                {isExpanded && (
-                  <div className="border-t border-white/10 p-4 space-y-3 bg-white/[0.02]">
-                    {s.messages.map((msg, i) => (
-                      <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[80%] rounded px-3 py-2 text-sm ${msg.role === 'user' ? 'bg-white/15 text-white' : 'bg-white/5 text-white/80 border border-white/10'}`}>
-                          <div className="text-[10px] font-semibold uppercase tracking-wider mb-1 opacity-50">{msg.role}</div>
-                          <div className="whitespace-pre-wrap leading-relaxed">{msg.content}</div>
+        <>
+          <div className="space-y-3 mb-4">
+            {pageSessions.map(s => {
+              const userTurns = s.messages.filter(m => m.role === 'user').length;
+              const firstMsg = s.messages.find(m => m.role === 'user')?.content || '—';
+              const isExpanded = expanded === s.id;
+              return (
+                <div key={s.id} className="border border-white/10 rounded-md overflow-hidden" data-testid={`row-session-${s.id}`}>
+                  <button
+                    onClick={() => setExpanded(isExpanded ? null : s.id)}
+                    className="w-full text-left p-4 hover:bg-white/5 transition-colors"
+                    data-testid={`button-expand-session-${s.id}`}
+                  >
+                    <div className="flex items-start justify-between gap-4 flex-wrap">
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm text-white truncate">{firstMsg}</div>
+                        <div className="flex items-center gap-3 mt-1 flex-wrap">
+                          <span className="text-xs text-white/40 flex items-center gap-1"><CalendarIcon className="w-3 h-3" />{new Date(s.startedAt).toLocaleString()}</span>
+                          <Badge variant="secondary" className="text-xs">{userTurns} message{userTurns !== 1 ? 's' : ''}</Badge>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="text-white/30 hover:text-red-400 shrink-0"
+                          onClick={(e) => deleteSession(s.id, e)}
+                          disabled={deleting === s.id}
+                          data-testid={`button-delete-session-${s.id}`}
+                        >
+                          {deleting === s.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2Icon className="w-4 h-4" />}
+                        </Button>
+                        <span className="text-white/30 text-xs">{isExpanded ? '▲' : '▼'}</span>
+                      </div>
+                    </div>
+                  </button>
+                  {isExpanded && (
+                    <div className="border-t border-white/10 p-4 space-y-3 bg-white/[0.02]">
+                      {s.messages.map((msg, i) => (
+                        <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                          <div className={`max-w-[80%] rounded px-3 py-2 text-sm ${msg.role === 'user' ? 'bg-white/15 text-white' : 'bg-white/5 text-white/80 border border-white/10'}`}>
+                            <div className="text-[10px] font-semibold uppercase tracking-wider mb-1 opacity-50">{msg.role}</div>
+                            <div className="whitespace-pre-wrap leading-relaxed">{msg.content}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 pt-2 border-t border-white/10" data-testid="pagination-transcripts">
+              <Button
+                size="icon"
+                variant="ghost"
+                className="text-white/50"
+                onClick={() => setPage(1)}
+                disabled={page === 1}
+                data-testid="button-page-first"
+              >
+                <ChevronsLeftIcon className="w-4 h-4" />
+              </Button>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="text-white/50"
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                data-testid="button-page-prev"
+              >
+                <ChevronLeftIcon className="w-4 h-4" />
+              </Button>
+              <span className="text-white/40 text-xs px-2">
+                {page} / {totalPages}
+              </span>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="text-white/50"
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                data-testid="button-page-next"
+              >
+                <ChevronRightIcon className="w-4 h-4" />
+              </Button>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="text-white/50"
+                onClick={() => setPage(totalPages)}
+                disabled={page === totalPages}
+                data-testid="button-page-last"
+              >
+                <ChevronsRightIcon className="w-4 h-4" />
+              </Button>
+            </div>
+          )}
+        </>
       )}
     </Card>
     </div>

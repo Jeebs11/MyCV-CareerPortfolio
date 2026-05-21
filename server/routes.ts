@@ -1146,6 +1146,19 @@ ${pages.map(p => `  <url>
     }
   });
 
+  // Delete a single chat session (admin only)
+  app.delete("/api/chat/sessions/:id", adminAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id, 10);
+      if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+      await storage.deleteChatSession(id);
+      res.json({ success: true });
+    } catch (e) {
+      console.error("Error deleting chat session:", e);
+      res.status(500).json({ error: "Failed to delete chat session" });
+    }
+  });
+
   // Seed defaults from constants if tables are empty
   try { await storage.seedSiteContentIfEmpty(); }
   catch (e) { console.error("Seed error:", e); }
