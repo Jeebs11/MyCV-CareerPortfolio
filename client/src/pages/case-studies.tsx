@@ -50,7 +50,7 @@ export default function CaseStudiesPage() {
   const [active, setActive] = useState(0);
   const { data: dbProjects = [] } = useQuery<ProjectRow[]>({ queryKey: ['/api/projects'] });
 
-  useEffect(() => { document.title = 'Case Studies — Mujeeb Lawal | Senior Programme Director'; }, []);
+  useEffect(() => { document.title = 'Case Studies — Mujeeb Lawal | Senior Program Manager & Transformation Lead'; }, []);
 
   const mandates: Mandate[] = dbProjects.length > 0 ? dbProjects.map(toMandate) : FALLBACK_MANDATES;
   const p = mandates[active] ?? mandates[0];

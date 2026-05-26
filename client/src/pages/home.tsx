@@ -98,7 +98,7 @@ export default function Home() {
   const variantContent: VariantContent = variantData?.content || {};
 
   useEffect(() => {
-    document.title = 'Mujeeb Lawal — Senior Programme Director | £50M+ Delivery';
+    document.title = 'Mujeeb Lawal — Senior Program Manager & Transformation Lead';
   }, []);
 
   useEffect(() => {
