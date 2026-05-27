@@ -355,9 +355,11 @@ export default function Home() {
             <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: isMobile ? 20 : 26, fontWeight: 400, lineHeight: 1.5, color: INK, maxWidth: 620, marginBottom: 24, fontStyle: 'italic' }}>
               {profileQuote}
             </p>
-            <p style={{ fontSize: isMobile ? 13 : 14, lineHeight: 1.8, color: 'hsl(220,15%,40%)', maxWidth: 600, marginBottom: 36 }}>
-              {profileBio}
-            </p>
+            <div style={{ fontSize: isMobile ? 13 : 14, lineHeight: 1.8, color: 'hsl(220,15%,40%)', maxWidth: 600, marginBottom: 36 }}>
+              {profileBio.split(/\n\n+/).map((para, i) => (
+                <p key={i} style={{ marginBottom: 12 }}>{para.trim()}</p>
+              ))}
+            </div>
             <div style={{ display: 'flex', gap: isMobile ? 16 : 40, alignItems: 'center', flexWrap: 'wrap' }}>
               <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'hsl(220,15%,55%)', flexShrink: 0 }}>Past employers</div>
               {pastEmployers.map((c: string) => (
