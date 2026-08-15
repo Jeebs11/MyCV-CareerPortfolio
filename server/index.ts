@@ -39,6 +39,19 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// CORS for cross-origin API calls from the immersive 3D site (Vercel / Cloudflare Pages / GitHub Pages)
+app.use('/api/', (req: Request, res: Response, next: NextFunction) => {
+  const origin = req.headers.origin || '';
+  if (/\.vercel\.app$|\.pages\.dev$|\.github\.io$|^https?:\/\/localhost/.test(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Vary', 'Origin');
+  }
+  if (req.method === 'OPTIONS') { res.sendStatus(204); return; }
+  next();
+});
+
 // /uploads/og-image.jpg is served dynamically from cloud storage (see routes.ts).
 // Never let express.static intercept it — always pass through to the dynamic route.
 app.use("/uploads", (req, res, next) => {
