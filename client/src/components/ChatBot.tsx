@@ -277,11 +277,12 @@ export default function ChatBot({ immersiveUrl }: { immersiveUrl?: string }) {
             position: 'fixed',
             bottom: 90,   // 28 (badge) + 52 (badge height) + 10 (gap)
             right: 28,
-            height: 42,
+            height: 52,
             paddingRight: 18,
             paddingLeft: 0,
             borderRadius: 6,
-            background: BRASS,
+            background: INK,
+            border: `1.5px solid hsl(220,20%,26%)`,
             border: 'none',
             cursor: 'pointer',
             display: 'inline-flex',
@@ -294,12 +295,12 @@ export default function ChatBot({ immersiveUrl }: { immersiveUrl?: string }) {
           }}
         >
           <span style={{
-            width: 42,
-            height: 42,
+            width: 52,
+            height: 52,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            background: 'hsla(0,0%,0%,0.18)',
+            background: BRASS,
             borderRadius: '5px 0 0 5px',
             flexShrink: 0,
             fontSize: 15,
