@@ -609,7 +609,7 @@ export default function Home() {
         </div>
       )}
     </div>
-    <ChatBot />
+    <ChatBot immersiveUrl={settings['immersive.url']} />
     </>
   );
 }
