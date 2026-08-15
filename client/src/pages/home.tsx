@@ -279,9 +279,12 @@ export default function Home() {
                 {navItems.map(item => (
                   <button key={item.id} onClick={() => scrollTo(item.id)} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 0', background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'hsl(220,15%,60%)', borderBottom: '1px solid hsl(220,20%,20%)' }}>{item.label}</button>
                 ))}
-                <div style={{ display: 'flex', gap: 20, marginTop: 12 }}>
+                <div style={{ display: 'flex', gap: 20, marginTop: 12, flexWrap: 'wrap' }}>
                   <Link href="/portfolio" onClick={() => setMobileNavOpen(false)} style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'hsl(220,15%,45%)' }}>Portfolio</Link>
                   <Link href="/insights" onClick={() => setMobileNavOpen(false)} style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'hsl(220,15%,45%)' }}>Thought Leadership</Link>
+                  {settings['immersive.url'] && (
+                    <a href={settings['immersive.url']} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: BRASS_LIGHT, textDecoration: 'none' }}>✦ Immersive</a>
+                  )}
                 </div>
               </div>
             )}
@@ -320,6 +323,9 @@ export default function Home() {
               <div style={{ marginTop: 24, paddingTop: 24, borderTop: '1px solid hsl(220,20%,22%)' }}>
                 <Link href="/portfolio" style={{ display: 'block', padding: '10px 0 10px 12px', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'hsl(220,15%,42%)', borderLeft: '2px solid transparent' }}>Portfolio</Link>
                 <Link href="/insights" style={{ display: 'block', padding: '10px 0 10px 12px', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'hsl(220,15%,42%)', borderLeft: '2px solid transparent' }}>Thought Leadership</Link>
+                {settings['immersive.url'] && (
+                  <a href={settings['immersive.url']} target="_blank" rel="noopener noreferrer" style={{ display: 'block', padding: '10px 0 10px 12px', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: BRASS_LIGHT, borderLeft: `2px solid ${BRASS}`, textDecoration: 'none' }}>✦ Immersive View</a>
+                )}
               </div>
             </nav>
             <div style={{ marginTop: 36, display: 'flex', flexDirection: 'column', gap: 8 }}>
