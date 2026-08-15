@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="preconnect" href="https://cdn.sanity.io" crossorigin />
+  <link rel="preconnect" href="https://kv5wjjmj.apicdn.sanity.io" crossorigin />
+  <link rel="preload" as="image" href="/textures/paper-texture.webp" type="image/webp" fetchpriority="high" crossorigin="anonymous">
+  <link rel="icon" type="image/png" href="/favico.png" />
+  <link rel="apple-touch-icon" href="/favico.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#fafafa" />
+
+  <!-- SEO Meta Tags -->
+  <!-- TODO(Stage 4): set canonical + og:url to the deployed Replit URL -->
+  <title>Mujeeb Lawal | Immersive 3D Portfolio — Transformation Lead & Program Manager</title>
+  <meta name="description"
+    content="The interactive 3D portfolio of Mujeeb Lawal, Senior Program Manager & Transformation Lead with 17 years delivering enterprise programmes, PMO governance and SaaS rollouts across insurance, telecoms, engineering and SaaS." />
+  <meta name="author" content="Mujeeb Lawal" />
+  <meta name="keywords"
+    content="Mujeeb Lawal, Transformation Lead, Program Manager, PMO Lead, Senior Project Manager, programme delivery, PMO governance, digital transformation, portfolio" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://mujeeb-lawal.replit.app/" />
+
+  <!-- Open Graph (Facebook, LinkedIn, Discord) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Mujeeb Lawal | Immersive 3D Portfolio — Transformation Lead & Program Manager" />
+  <meta property="og:description"
+    content="The interactive 3D portfolio of Mujeeb Lawal, Senior Program Manager & Transformation Lead. Walk through his programmes, achievements and career in an immersive WebGL experience." />
+  <meta property="og:url" content="https://mujeeb-lawal.replit.app/" />
+  <meta property="og:site_name" content="Mujeeb Lawal Portfolio" />
+  <meta property="og:image" content="/og-image.webp" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Mujeeb Lawal | Immersive 3D Portfolio — Transformation Lead & Program Manager" />
+  <meta name="twitter:description"
+    content="The interactive 3D portfolio of Mujeeb Lawal, Senior Program Manager & Transformation Lead. Walk through his programmes, achievements and career in an immersive WebGL experience." />
+  <meta name="twitter:image" content="/og-image.webp" />
+
+  <!-- Google Fonts: Hand-drawn + Primary -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Preload bazowych tekstur używanych w preloaderze -->
+
+  <style>
+    /* Absolute SEO text hiding - completely accessible to Googlebot, invisible to users */
+    .sr-only-seo {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+  </style>
+
+  <!-- Google tag (gtag.js) — same property as classic CV site; cross-domain tracking links sessions -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LC78VQQ1H4"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-LC78VQQ1H4', {
+      linker: { domains: ['mujeeb-lawal.replit.app'] }
+    });
+  </script>
+</head>
+
+<body>
+  <!-- SEO Fallback for WebGL SPAs (2026 Crawl Optimization) -->
+  <div id="seo-content" class="sr-only-seo">
+    <header>
+      <h1>Mujeeb Lawal | Senior Program Manager &amp; Transformation Lead</h1>
+      <p>Interactive, WebGL-powered portfolio presenting 17 years of enterprise programme delivery, PMO governance and business transformation across insurance, telecoms, engineering and SaaS.</p>
+    </header>
+
+    <nav aria-label="Main Navigation">
+      <ul>
+        <li><a href="/">Home (The Corridor)</a></li>
+        <li><a href="/gallery">Programmes &amp; Projects</a></li>
+        <li><a href="/about">About &amp; Career</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <main>
+      <article id="home-corridor">
+        <header>
+          <h2>An Immersive Walkthrough of a Transformation Leader's Career</h2>
+        </header>
+        <section>
+          <h3>Welcome</h3>
+          <p>
+            Welcome to the interactive 3D portfolio of <strong>Mujeeb Lawal</strong>, a Senior Program Manager and Transformation Lead with 17 years of experience across insurance, engineering, telecoms and SaaS in the UAE, UK, Europe and global markets.
+            Companies bring him in when they need someone who can bring clarity and process to ambiguity, liaise with cross-functional teams, and deliver against the project, programme or business objective.
+            This portfolio presents his profile, achievements, career and programmes as an immersive WebGL experience — a classic, scannable version is also available.
+          </p>
+          <p>
+            Mujeeb has operated primarily as a strategic contractor, delivering results fast in unfamiliar environments, on strict budgets and limited runway. He is currently open to senior permanent or long-term contract roles as a Transformation Lead, Program Manager, or PMO Lead. British national, based between the UAE and the UK, open to relocation and remote work.
+          </p>
+        </section>
+      </article>
+
+      <article id="about-me">
+        <header>
+          <h2>About Mujeeb Lawal</h2>
+        </header>
+        <section>
+          <h3>Profile</h3>
+          <p>
+            With 17 years of experience, Mujeeb has delivered enterprise projects and programmes, PMO governance, operational improvement and SaaS implementations across insurance, telecoms, engineering, healthcare, education and hospitality environments. He is grounded in end-to-end project and programme management and PMO governance.
+          </p>
+        </section>
+        <section>
+          <h3>Core Capabilities</h3>
+          <ul>
+            <li><strong>Programme &amp; Project Delivery:</strong> End-to-end delivery of enterprise programmes and multi-country SaaS rollouts, on strict budgets and tight runways.</li>
+            <li><strong>PMO Governance:</strong> Building and leading PMO functions from the ground up, OKRs, portfolio governance and audit-ready reporting.</li>
+            <li><strong>Business Transformation:</strong> AI-enabled workflow design, operational improvement and process optimisation.</li>
+            <li><strong>Regulatory &amp; Compliance:</strong> FCA audit readiness for Operational Resilience and Consumer Duty programmes.</li>
+            <li><strong>Certifications:</strong> PRINCE2 (AXELOS), Scrum Master I &amp; II (Scrum.org), PMP (in progress).</li>
+            <li><strong>Education:</strong> MSc, Renewable Energy, Enterprise &amp; Management, Newcastle University; BEng.</li>
+          </ul>
+        </section>
+      </article>
+
+      <article id="gallery-projects">
+        <header>
+          <h2>Selected Programmes &amp; Achievements</h2>
+        </header>
+        <p>In the gallery room you can walk through Mujeeb's most significant programmes and delivery achievements.</p>
+
+        <section>
+          <h3>Built a PMO from the Ground Up — Novocycle Technology (2024)</h3>
+          <p>Established a group-wide PMO for a fast-growing battery-recycling technology company, overseeing OKRs and a $5m portfolio of EU-funded programmes across Europe and the Middle East. Delivered a 36% efficiency gain.</p>
+        </section>
+        <section>
+          <h3>Bespoke Programme Management Tool — Novocycle Technology (2025)</h3>
+          <p>Identified a gap in governance-compliant project tooling and built a full-stack application covering timesheet approvals, expense tracking, audit trails and multi-tenant support. Reduced manual reporting by 36% and enabled first-time successful grant submissions.</p>
+        </section>
+        <section>
+          <h3>Project Efficiency Improvement — JLT Specialty, Marsh &amp; McLennan (2018)</h3>
+          <p>Process optimisation in the insurance sector delivering a 34% efficiency gain.</p>
+        </section>
+        <section>
+          <h3>Energy Reduction for the UN 2030 SDGs — GSMA (2019–2020)</h3>
+          <p>Delivered a global sustainability programme aligned to the UN Sustainable Development Goals, onboarding 10 telecom operators at launch and achieving a 35% energy reduction.</p>
+        </section>
+      </article>
+
+      <article id="contact">
+        <header>
+          <h2>Contact</h2>
+        </header>
+        <aside>
+          <p>Mujeeb is currently open to new opportunities. Get in touch to discuss senior Transformation Lead, Program Manager or PMO Lead roles.</p>
+        </aside>
+      </article>
+    </main>
+  </div>
+
+  <!-- Noscript strict fallback -->
+  <noscript>
+    Please enable JavaScript to experience the interactive 3D portfolio of Mujeeb Lawal, Senior Program Manager &amp; Transformation Lead.
+  </noscript>
+
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
+</html>
