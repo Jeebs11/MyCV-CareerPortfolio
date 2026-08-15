@@ -27,23 +27,25 @@ function MLBadge({ onClick, hasNudge }: { onClick: () => void; hasNudge: boolean
     <button
       onClick={onClick}
       data-testid="button-chat-toggle"
+      aria-label="Ask me anything about Mujeeb"
       style={{
         position: 'fixed',
         bottom: 28,
         right: 28,
-        width: 52,
         height: 52,
+        paddingRight: 18,
+        paddingLeft: 0,
         borderRadius: 6,
         background: INK,
         border: `1.5px solid hsl(220,20%,26%)`,
         cursor: 'pointer',
-        display: 'flex',
+        display: 'inline-flex',
         alignItems: 'center',
-        justifyContent: 'center',
+        gap: 0,
         zIndex: 9999,
         boxShadow: '0 4px 24px rgba(0,0,0,0.28)',
-        padding: 0,
         outline: 'none',
+        whiteSpace: 'nowrap',
       }}
     >
       <span style={{
@@ -52,14 +54,36 @@ function MLBadge({ onClick, hasNudge }: { onClick: () => void; hasNudge: boolean
         borderRadius: 10,
         border: `1.5px solid ${BRASS}`,
         opacity: 0,
-        animation: 'ml-breathe 4s ease-in-out infinite',
+        animation: hasNudge ? 'none' : 'ml-breathe 4s ease-in-out infinite',
         pointerEvents: 'none',
         boxShadow: `0 0 8px 2px hsla(35,45%,45%,0.35)`,
       }} />
-      <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
-        <rect width="40" height="40" rx="3" fill={BRASS} />
-        <text x="20" y="27" textAnchor="middle" fontFamily="Cormorant Garamond,serif" fontWeight="600" fontSize="15" fill={PAPER}>ML</text>
-      </svg>
+      {/* ML monogram block */}
+      <span style={{
+        width: 52,
+        height: 52,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: BRASS,
+        borderRadius: '5px 0 0 5px',
+        flexShrink: 0,
+      }}>
+        <svg width="30" height="30" viewBox="0 0 40 40" fill="none">
+          <text x="20" y="27" textAnchor="middle" fontFamily="Cormorant Garamond,serif" fontWeight="600" fontSize="18" fill={PAPER}>ML</text>
+        </svg>
+      </span>
+      {/* Label */}
+      <span style={{
+        fontSize: 13,
+        fontWeight: 500,
+        color: PAPER,
+        fontFamily: 'Inter, sans-serif',
+        letterSpacing: '0.02em',
+        paddingLeft: 14,
+      }}>
+        Ask Me Anything
+      </span>
       <style>{`
         @keyframes ml-breathe {
           0%, 100% { opacity: 0; box-shadow: 0 0 4px 1px hsla(35,45%,45%,0.15); }
@@ -110,7 +134,7 @@ function NudgeBubble({ onDismiss }: { onDismiss: () => void }) {
   );
 }
 
-export default function ChatBot() {
+export default function ChatBot({ immersiveUrl }: { immersiveUrl?: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const [showNudge, setShowNudge] = useState(false);
   const [sessionId] = useState(() => `sess-${Date.now()}-${Math.random().toString(36).slice(2)}`);
@@ -234,9 +258,64 @@ export default function ChatBot() {
     }
   };
 
+  // Chat window sits above both buttons when immersiveUrl is present
+  const chatBottom = immersiveUrl ? 142 : 92;
+
   return (
     <>
-      {showNudge && !isOpen && <NudgeBubble onDismiss={dismissNudge} />}
+      {/* Nudge only shown when no Immersive button (button labels are already descriptive) */}
+      {showNudge && !isOpen && !immersiveUrl && <NudgeBubble onDismiss={dismissNudge} />}
+
+      {/* Immersive View — stacked directly above Ask Me Anything */}
+      {immersiveUrl && (
+        <a
+          href={immersiveUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Open immersive 3D view"
+          style={{
+            position: 'fixed',
+            bottom: 90,   // 28 (badge) + 52 (badge height) + 10 (gap)
+            right: 28,
+            height: 42,
+            paddingRight: 18,
+            paddingLeft: 0,
+            borderRadius: 6,
+            background: BRASS,
+            border: 'none',
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 0,
+            zIndex: 9999,
+            textDecoration: 'none',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.22)',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          <span style={{
+            width: 42,
+            height: 42,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'hsla(0,0%,0%,0.18)',
+            borderRadius: '5px 0 0 5px',
+            flexShrink: 0,
+            fontSize: 15,
+            color: PAPER,
+          }}>✦</span>
+          <span style={{
+            fontSize: 13,
+            fontWeight: 500,
+            color: PAPER,
+            fontFamily: 'Inter, sans-serif',
+            letterSpacing: '0.02em',
+            paddingLeft: 12,
+          }}>Immersive View</span>
+        </a>
+      )}
+
       <MLBadge onClick={isOpen ? closeChat : openChat} hasNudge={showNudge && !isOpen} />
 
       {isOpen && (
@@ -244,7 +323,7 @@ export default function ChatBot() {
           data-testid="chat-window"
           style={{
             position: 'fixed',
-            bottom: 92,
+            bottom: chatBottom,
             right: 28,
             width: 360,
             height: 520,
