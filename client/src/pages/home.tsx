@@ -155,6 +155,7 @@ export default function Home() {
   const certifications = effectiveSkills.filter(s => s.category === 'certification').map(s => s.name);
   const industries = effectiveSkills.filter(s => s.category === 'industry').map(s => s.name);
 
+  const immersiveUrl = settings['immersive.url'] || 'https://mujeeblawal.vercel.app';
   const email = settings['contact.email'] || 'odmlawal@gmail.com';
   const phoneUK = settings['contact.phone_uk'] || '+44 7908226038';
   const phoneUAE = settings['contact.phone_uae'] || '+971 509082234';
@@ -282,8 +283,8 @@ export default function Home() {
                 <div style={{ display: 'flex', gap: 20, marginTop: 12, flexWrap: 'wrap' }}>
                   <Link href="/portfolio" onClick={() => setMobileNavOpen(false)} style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'hsl(220,15%,45%)' }}>Portfolio</Link>
                   <Link href="/insights" onClick={() => setMobileNavOpen(false)} style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'hsl(220,15%,45%)' }}>Thought Leadership</Link>
-                  {settings['immersive.url'] && (
-                    <a href={settings['immersive.url']} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: BRASS_LIGHT, textDecoration: 'none' }}>✦ Immersive</a>
+                  {immersiveUrl && (
+                    <a href={immersiveUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: BRASS_LIGHT, textDecoration: 'none' }}>✦ Immersive</a>
                   )}
                 </div>
               </div>
@@ -323,8 +324,8 @@ export default function Home() {
               <div style={{ marginTop: 24, paddingTop: 24, borderTop: '1px solid hsl(220,20%,22%)' }}>
                 <Link href="/portfolio" style={{ display: 'block', padding: '10px 0 10px 12px', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'hsl(220,15%,42%)', borderLeft: '2px solid transparent' }}>Portfolio</Link>
                 <Link href="/insights" style={{ display: 'block', padding: '10px 0 10px 12px', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'hsl(220,15%,42%)', borderLeft: '2px solid transparent' }}>Thought Leadership</Link>
-                {settings['immersive.url'] && (
-                  <a href={settings['immersive.url']} target="_blank" rel="noopener noreferrer" style={{ display: 'block', padding: '10px 0 10px 12px', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: BRASS_LIGHT, borderLeft: `2px solid ${BRASS}`, textDecoration: 'none' }}>✦ Immersive View</a>
+                {immersiveUrl && (
+                  <a href={immersiveUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'block', padding: '10px 0 10px 12px', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: BRASS_LIGHT, borderLeft: `2px solid ${BRASS}`, textDecoration: 'none' }}>✦ Immersive View</a>
                 )}
               </div>
             </nav>
@@ -609,7 +610,7 @@ export default function Home() {
         </div>
       )}
     </div>
-    <ChatBot immersiveUrl={settings['immersive.url']} />
+    <ChatBot immersiveUrl={immersiveUrl} />
     </>
   );
 }
